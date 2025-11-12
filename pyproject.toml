@@ -4,4 +4,9 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "chincheron-util",
+]
+
+[tool.uv.sources]
+chincheron-util = { git = "https://github.com/Chincheron/chincheron_util", rev = "v1.0" }
