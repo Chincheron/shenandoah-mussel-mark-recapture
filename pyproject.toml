@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "chincheron-util",
+    "fastexcel>=0.16.0",
+    "openpyxl>=3.1.5",
+    "polars>=1.35.2",
 ]
 
 [tool.uv.sources]
