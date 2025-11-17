@@ -1,5 +1,6 @@
-#ignore data for now
-01_data
+#ignore results and data for now
+data
+results
 
 # Python-generated files
 __pycache__/
