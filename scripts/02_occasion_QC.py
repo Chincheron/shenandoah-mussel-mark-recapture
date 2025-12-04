@@ -29,9 +29,10 @@ mr2, unique_tag_mr2 = util.load_mr_occasion(mr2)
 mr3, unique_tag_mr3 = util.load_mr_occasion(mr3)
 mr4, unique_tag_mr4 = util.load_mr_occasion(mr4)
 
+print(unique_tag_mr1, unique_tag_mr2, unique_tag_mr3, unique_tag_mr4)
 
 #check non hallprint/Pit tag
-df_unknown_tag  = df_test.filter((pl.col('Tag Type') == 'Untagged') | (pl.col('Tag Type') == 'Unknown'))
+df_unknown_tag  = mr1.filter((pl.col('Tag Type') == 'Untagged') | (pl.col('Tag Type') == 'Unknown'))
 
 #load each occasion and flag QC issues
 

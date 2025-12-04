@@ -21,7 +21,7 @@ def load_mr_occasion(df):
 
     #create Hallprint tag 1 column
     df = df.with_columns(
-        pl.when(pl.col('Tag Type') == 'Hallprint')
+        pl.when(pl.col('Tag Type').str.contains('(?i)hall'))
         .then(pl.col('Tag Number'))
         .otherwise(pl.lit(None))
         .alias('Hallprint_tag_no_1')
@@ -29,7 +29,7 @@ def load_mr_occasion(df):
 
     #create Hallprint tag 2 column
     df = df.with_columns(
-        pl.when(pl.col('Tag Type') == 'Hallprint')
+        pl.when(pl.col('Tag Type').str.contains('(?i)hall'))
         .then(pl.col('Tag Number 2'))
         .otherwise(pl.lit(None))
         .alias('Hallprint_tag_no_2')
@@ -37,7 +37,7 @@ def load_mr_occasion(df):
 
     #create Pit Tag column
     df = df.with_columns(
-        pl.when(pl.col('Tag Type') == 'Pit tag')
+        pl.when(pl.col('Tag Type').str.contains('(?i)Pit')) # ('(?i)' is included to ignore capitalization (inline flag for regex))
         .then(pl.col('Tag Number 2'))
         .otherwise(pl.lit(None))
         .alias('PIT_tag_no')
@@ -45,7 +45,7 @@ def load_mr_occasion(df):
 
     #Set Hallprint tag column when there is a PIT tag
     df = df.with_columns(
-        pl.when(pl.col('Tag Type') == 'Pit tag')
+        pl.when(pl.col('Tag Type').str.contains('(?i)Pit'))
         .then(pl.col('Tag Number'))
         .otherwise(pl.col('Hallprint_tag_no_1'))
         .alias('Hallprint_tag_no_1')
