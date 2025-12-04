@@ -29,6 +29,18 @@ mr2 = util.load_mr_occasion(mr2)
 mr3 = util.load_mr_occasion(mr3)
 mr4 = util.load_mr_occasion(mr4)
 
+### combine occasions into one
+#list of occasions to run
+list = [mr1, mr2, mr3, mr4]
+
+combined_df = pl.DataFrame()
+for index, df in enumerate(list):
+    df = df.with_columns(sampling_occasion=index+1
+    )
+    combined_df = pl.concat([combined_df, df], how="diagonal")
+
+###
+
 #check non hallprint/Pit tag
 df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
 
