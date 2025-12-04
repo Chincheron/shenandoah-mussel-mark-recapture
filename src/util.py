@@ -16,9 +16,6 @@ def standardize_PIT(x):
 def load_mr_occasion(df):
     # Separate hallprint/Pit tag into distinct columns
 
-    #test values of Tag Type
-    tag_type_list = df['Tag Type'].unique().to_list()
-
     #create Hallprint tag 1 column
     df = df.with_columns(
         pl.when(pl.col('Tag Type').str.contains('(?i)hall'))
@@ -51,6 +48,16 @@ def load_mr_occasion(df):
         .alias('Hallprint_tag_no_1')
         )
 
+    #standardize spelling of tag type
+    df = df.with_columns(
+        pl.when(pl.col('Tag Type').str.contains('(?i)Pit'))
+        .then(pl.lit('PIT'))
+        .when(pl.col('Tag Type').str.contains('(?i)hall'))
+        .then(pl.lit('Hallprint'))
+        .otherwise(pl.col('Tag Type'))
+        .alias('Tag_type_standard')
+    )    
+
     # There is an issue with some PIT tag numbers being out of order
     # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
     # Standardize Pit tag to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3)
@@ -59,4 +66,9 @@ def load_mr_occasion(df):
         .map_elements(util.standardize_PIT)
         .alias('PIT_tag_no')
     )    
+
+
+    #test values of Tag Type
+    tag_type_list = df['Tag Type'].unique().to_list()
+
     return(df, tag_type_list)
