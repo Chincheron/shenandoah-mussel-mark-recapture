@@ -8,4 +8,8 @@ Raw data was received in email from Jess Jones on 10/30/2025 and consists of thr
 
 ## Additional steps taken:
 
-1. Confirm that QC issues found by Ellie were handle appropriately. 
+1. Confirm that QC issues found by Ellie were handled appropriately. 
+    1. Load raw data 
+    2. Initial filtering to relevant rows/columns
+    3. Export each sampling occasion and summary to csv file for review.
+    4. Review Ellie's QC files to confirm handling of issues
