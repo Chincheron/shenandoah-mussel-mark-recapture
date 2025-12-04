@@ -30,6 +30,33 @@ df_2 = pl.read_excel(data_file, sheet_name = "Mark Recapture #2", read_options={
 df_3 = pl.read_excel(data_file, sheet_name = "Mark Recapture #3", read_options={"header_row": 9})
 df_4 = pl.read_excel(data_file, sheet_name = "Mark Recapture #4", read_options={"header_row": 8})
 
+### 03.Get all occasions into same data schema
+
+#There is no status column in MR1. Add and rearrange to same order
+df_1 = df_1.with_columns(pl.lit(None).cast(pl.String).alias('Status'))
+
+#Status column in MR4 is unnamed. Rename to match other MRs
+df_4 = df_4.rename({"Column1": "Status"})
+
+## ensure all columns are ordered the same
+
+#list of dataframes
+df_list = [df_1, df_2, df_3, df_4]
+#list of columns
+cols = ['Species',
+        'Tag Type',
+        'Tag Color',
+        'Tag Number',
+        'Tag Number 2',
+        'Length',
+        'Status',
+        'Other Tag Attribute'
+        ]
+        
+#reorder
+df_list = [df.select(cols) for df in df_list]
+
+df_1, df_2, df_3, df_4 = df_list
 
 # write resulting data sets to separate csv files for confirming that all QC issues found by Ellie are handled appropriately 
 ellie_folder = Path("Ellie_QC_check")
