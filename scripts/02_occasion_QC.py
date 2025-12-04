@@ -60,8 +60,11 @@ df_test = df_test.with_columns(
 # There is an issue with some PIT tag numbers being out of order
 # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
 # Standardize Pit tag to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3)
-
-    
+df_test = df_test.with_columns(
+    pl.col('PIT_tag_no')
+    .map_elements(util.standardize_PIT)
+    .alias('PIT_tag_no')
+)    
 
 
 #check non hallprint/Pit tag
