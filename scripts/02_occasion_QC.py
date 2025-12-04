@@ -24,15 +24,13 @@ mr4 = pl.read_csv(mr_4_file)
 
 #load and basic cleaning of each occasion
 # (separate Tag types into dedicated columns, standardize PIT tag numbers)
-mr1, unique_tag_mr1 = util.load_mr_occasion(mr1)
-mr2, unique_tag_mr2 = util.load_mr_occasion(mr2)
-mr3, unique_tag_mr3 = util.load_mr_occasion(mr3)
-mr4, unique_tag_mr4 = util.load_mr_occasion(mr4)
-
-print(unique_tag_mr1, unique_tag_mr2, unique_tag_mr3, unique_tag_mr4)
+mr1 = util.load_mr_occasion(mr1)
+mr2 = util.load_mr_occasion(mr2)
+mr3 = util.load_mr_occasion(mr3)
+mr4 = util.load_mr_occasion(mr4)
 
 #check non hallprint/Pit tag
-df_unknown_tag  = mr1.filter((pl.col('Tag Type') == 'Untagged') | (pl.col('Tag Type') == 'Unknown'))
+df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
 
 #load each occasion and flag QC issues
 

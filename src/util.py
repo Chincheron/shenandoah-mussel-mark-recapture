@@ -67,8 +67,4 @@ def load_mr_occasion(df):
         .alias('PIT_tag_no')
     )    
 
-
-    #test values of Tag Type
-    tag_type_list = df['Tag Type'].unique().to_list()
-
-    return(df, tag_type_list)
+    return(df)
