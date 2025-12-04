@@ -2,6 +2,7 @@ import chincheron_util.file_util as file_util
 from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM
 import polars as pl
 from pathlib import Path
+import src.util as util
 
 ###
 
@@ -60,15 +61,6 @@ df_test = df_test.with_columns(
 # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
 # Standardize Pit tag to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3)
 
-x = 'B2F33D9.1A4FAA'
-position = x.find('.')
-print(position)
-if position != 0:
-    print(position-3)
-    prefix_string = x[position-3:position]
-    before_prefix = x[0:position-3]
-    period_string = x[position:]
-    final_string = prefix_string + period_string + before_prefix 
     
 
 
