@@ -63,11 +63,17 @@ combined_df = util.add_tag_columns(combined_df)
 
 ### Check for issues
 
+## check for exact duplicates
 df_mask = combined_df.is_duplicated()
 df_dup = combined_df.filter(df_mask)
+file_name = output_path / 'duplicate_check.csv'
+df_dup.write_csv(file_name)
+
+#deal with exact duplicates
+#TODO remove one each of F504 on occasion 4 and E885 on occasion 4
+#various other exact duplicates (~10) but none are individually identified by tag (e.g., green square/etc.). Can safely ignore
 
 
-### Write to output
+## write combined data to file for manual review
 file_name = output_path / 'combined_QC.csv'
-
 combined_df.write_csv(file_name)
