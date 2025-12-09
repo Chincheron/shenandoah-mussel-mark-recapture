@@ -48,6 +48,10 @@ util.write_unique_values(unique_df, file_name)
 ### Minor corrections to data (see documentation and/or functino for details)
 util.correct_original_values(combined_df)
 
+### Fix issue with 15 PIT numbers only including last four digits for occasion 2
+# This was causing these individuals to not match other occasions
+combined_df = util.fix_PIT_values(combined_df)
+
 # Confirm all values are standardized
 unique_df = util.get_unique_values(combined_df)
 file_name = output_path / 'unique_values_confirm.xlsx'

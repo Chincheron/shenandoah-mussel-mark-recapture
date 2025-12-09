@@ -136,3 +136,32 @@ def correct_original_values(df):
         'F2546': 'F246',
         }
     df = df.with_columns(pl.col(column_name).replace(mapping))
+    return df
+
+def fix_PIT_values(df):
+    fix_list = [
+        'B316',
+        'B30C',
+        'B30F',
+        'B2D8',
+        'B2EA',
+        'B2F2',
+        'B2D5',
+        'B31C',
+        'B313',
+        'B2EE',
+        'B2F3',
+        'B2CF',
+        'B325',
+        'B323',
+        'B2F0'
+    ]
+    prefix = '3D9.1A4FAA'
+    new_list = [prefix + item for item in fix_list]
+    
+    # Correct values
+    column_name = 'Tag Number 2'
+    mapping = {old:new for old, new in zip(fix_list, new_list)}
+    print(mapping)
+    df = df.with_columns(pl.col(column_name).replace(mapping))
+    return df
