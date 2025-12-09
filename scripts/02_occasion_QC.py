@@ -11,9 +11,14 @@ import pandas as pd
 #Overall purpose is to do first pass to ID QC issues for each occasion to be fixed in next step
 
 ### 
-# Load data
+#set folder locations
 source_folder = 'Ellie_QC_check'
+output_folder_name = Path('QC_check')
+output_path = DATA_INTERIM / output_folder_name
+file_util.make_directory(output_path)
 
+
+# Load data
 mr_1_file = DATA_INTERIM / source_folder / 'Occasion_1.csv'
 mr_2_file = DATA_INTERIM / source_folder / 'Occasion_2.csv'
 mr_3_file = DATA_INTERIM / source_folder / 'Occasion_3.csv'
@@ -53,7 +58,7 @@ for header in headers:
     unique_dict[header] = uniques
 
 #loop through dictionary and each key is separate workbook
-file_name = ROOT / 'temp' / 'unique.xlsx'
+file_name = output_path / 'unique.xlsx'
 #write unique values to csv for review
 with pd.ExcelWriter(file_name, engine='openpyxl') as writer: # need to use pandas for easier writing to excel
     for key, values in unique_dict.items():
@@ -73,9 +78,6 @@ df_dup = combined_df.filter(df_mask)
 df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
 
 ### Write to output
-file_name = Path("combined_QC.csv")
-folder_name = Path('QC_check')
-file_util.make_directory(DATA_INTERIM / folder_name)
-qc_file_path = DATA_INTERIM / folder_name / file_name
+file_name = output_path / 'combined_QC.csv'
 
-combined_df.write_csv(qc_file_path)
+combined_df.write_csv(file_name)
