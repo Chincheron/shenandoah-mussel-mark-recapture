@@ -2,6 +2,9 @@
 data
 results
 
+#ignore testing files
+temp
+
 # Python-generated files
 __pycache__/
 *.py[oc]

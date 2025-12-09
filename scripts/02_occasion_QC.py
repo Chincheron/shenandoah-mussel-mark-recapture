@@ -1,8 +1,10 @@
 import chincheron_util.file_util as file_util
-from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM
+from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, ROOT
 import polars as pl
 from pathlib import Path
 import src.util as util
+import csv
+import pandas as pd
 
 ###
 
@@ -37,9 +39,34 @@ combined_df = pl.DataFrame()
 for index, df in enumerate(list):
     df = df.with_columns(sampling_occasion=index+1
     )
-    combined_df = pl.concat([combined_df, df], how="diagonal")
+    combined_df = pl.concat([combined_df, df])
 
-###
+### data validation
+
+## get unique values for each header
+headers = combined_df.columns
+
+# generate dictionary of unique values for each column
+unique_dict = {}
+for header in headers:
+    uniques = combined_df[header].unique().to_list()
+    unique_dict[header] = uniques
+
+#loop through dictionary and each key is separate workbook
+file_name = ROOT / 'temp' / 'unique.xlsx'
+#write unique values to csv for review
+with pd.ExcelWriter(file_name, engine='openpyxl') as writer: # need to use pandas for easier writing to excel
+    for key, values in unique_dict.items():
+        sheet_name = str(key)[:31]
+        df_key = pd.DataFrame({key:values})
+        df_key.to_excel(writer, sheet_name=sheet_name, index=False)
+
+
+### Check for issues
+
+
+df_mask = combined_df.is_duplicated()
+df_dup = combined_df.filter(df_mask)
 
 #check non hallprint/Pit tag
 df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
