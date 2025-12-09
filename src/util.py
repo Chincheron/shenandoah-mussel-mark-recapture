@@ -12,8 +12,59 @@ def standardize_PIT(x):
     else:
         return(x)
 
+def clean_original_columns(df):
+    # Standardize species names
+    column_name = 'Species'
+    mapping = {
+        'E. fisheriana': 'Elliptio fisheriana',
+        'A. varicosa': 'Alasmidonta varicosa',
+        'L. cardium': 'Lampsilis cardium',
+        'L. Cardium': 'Lampsilis cardium',
+        'E. complanata': 'Elliptio complanata'
+    }
+    df = df.with_columns(pl.col(column_name).replace(mapping))
 
-def load_mr_occasion(df):
+    # Standardize Tag Type names
+    column_name = 'Tag Type'
+    mapping = {
+        'Untagged': 'No tag',
+        'Pit tag': 'PIT'
+    }
+    df = df.with_columns(pl.col(column_name).replace(mapping))
+
+    # Standardize Tag Color names
+    column_name = 'Tag Color'
+    mapping = {
+        'GREEN': 'Green',
+        'green': 'Green',
+        'G': 'Green',
+        'Untagged': 'No tag',
+        None: 'No tag'
+    }
+    df = df.with_columns(pl.col(column_name).replace(mapping))
+
+    # Standardize Status names
+    column_name = 'Status'
+    mapping = {
+        'DEAD': 'Dead',
+        'ALIVE': 'Alive'
+    }
+    df = df.with_columns(pl.col(column_name).replace(mapping))
+
+    #for checking that uniques are properly removed 
+    # uniques = df[column_name].unique().to_list()
+    # print(uniques)
+
+    # Fix PIT tag issue - standardize to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3) 
+    # Some PIT tag numbers are out of order # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
+    column_name = 'Tag Number 2'
+    df = df.with_columns(
+        pl.col(column_name)
+        .map_elements(standardize_PIT)
+    )    
+    return df
+
+def create_mr_columns(df):
     # Separate hallprint/Pit tag into distinct columns
 
     #create Hallprint tag 1 column
@@ -48,23 +99,14 @@ def load_mr_occasion(df):
         .alias('Hallprint_tag_no_1')
         )
 
-    #standardize spelling of tag type
-    df = df.with_columns(
-        pl.when(pl.col('Tag Type').str.contains('(?i)Pit'))
-        .then(pl.lit('PIT'))
-        .when(pl.col('Tag Type').str.contains('(?i)hall'))
-        .then(pl.lit('Hallprint'))
-        .otherwise(pl.col('Tag Type'))
-        .alias('Tag_type_standard')
-    )    
-
-    # There is an issue with some PIT tag numbers being out of order
-    # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
-    # Standardize Pit tag to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3)
-    df = df.with_columns(
-        pl.col('PIT_tag_no')
-        .map_elements(util.standardize_PIT)
-        .alias('PIT_tag_no')
-    )    
+    # #standardize spelling of tag type
+    # df = df.with_columns(
+    #     pl.when(pl.col('Tag Type').str.contains('(?i)Pit'))
+    #     .then(pl.lit('PIT'))
+    #     .when(pl.col('Tag Type').str.contains('(?i)hall'))
+    #     .then(pl.lit('Hallprint'))
+    #     .otherwise(pl.col('Tag Type'))
+    #     .alias('Tag_type_standard')
+    # )    
 
     return(df)

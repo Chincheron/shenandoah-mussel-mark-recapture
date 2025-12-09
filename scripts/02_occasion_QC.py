@@ -17,7 +17,6 @@ output_folder_name = Path('QC_check')
 output_path = DATA_INTERIM / output_folder_name
 file_util.make_directory(output_path)
 
-
 # Load data
 mr_1_file = DATA_INTERIM / source_folder / 'Occasion_1.csv'
 mr_2_file = DATA_INTERIM / source_folder / 'Occasion_2.csv'
@@ -29,12 +28,18 @@ mr2 = pl.read_csv(mr_2_file)
 mr3 = pl.read_csv(mr_3_file)
 mr4 = pl.read_csv(mr_4_file)
 
+# Basic cleaning of original columns for each occasion (Standardize spellings and PIT tag numbers)
+mr1 = util.clean_original_columns(mr1)
+mr2 = util.clean_original_columns(mr2)
+mr3 = util.clean_original_columns(mr3)
+mr4 = util.clean_original_columns(mr4)
+
 #load and basic cleaning of each occasion
 # (separate Tag types into dedicated columns, standardize PIT tag numbers)
-mr1 = util.load_mr_occasion(mr1)
-mr2 = util.load_mr_occasion(mr2)
-mr3 = util.load_mr_occasion(mr3)
-mr4 = util.load_mr_occasion(mr4)
+mr1 = util.create_mr_columns(mr1)
+mr2 = util.create_mr_columns(mr2)
+mr3 = util.create_mr_columns(mr3)
+mr4 = util.create_mr_columns(mr4)
 
 ### combine occasions into one
 #list of occasions to run
