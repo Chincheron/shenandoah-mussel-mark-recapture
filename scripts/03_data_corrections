@@ -1,0 +1,69 @@
+import chincheron_util.file_util as file_util
+from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, ROOT
+import polars as pl
+from pathlib import Path
+import src.util as util
+import csv
+import pandas as pd
+
+#set folder locations
+source_path = DATA_INTERIM / 'QC_check'
+output_folder_name = 'cleaned_data'
+output_path = DATA_INTERIM / output_folder_name
+file_util.make_directory(output_path)
+
+
+# Load data
+combined_raw_file = source_path / 'combined_QC.csv'
+combined_raw_df = pl.read_csv(combined_raw_file)
+
+# Standardize species names
+column_name = 'Species'
+mapping = {
+    'E. fisheriana': 'Elliptio fisheriana',
+    'A. varicosa': 'Alasmidonta varicosa',
+    'L. cardium': 'Lampsilis cardium',
+    'L. Cardium': 'Lampsilis cardium',
+    'E. complanata': 'Elliptio complanata'
+}
+combined_raw_df = combined_raw_df.with_columns(pl.col(column_name).replace(mapping))
+
+# Standardize Tag Type names
+column_name = 'Tag Type'
+mapping = {
+    'Untagged': 'No tag',
+    'Pit tag': 'PIT'
+}
+combined_raw_df = combined_raw_df.with_columns(pl.col(column_name).replace(mapping))
+
+# Standardize Tag Color names
+column_name = 'Tag Color'
+mapping = {
+    'GREEN': 'Green',
+    'green': 'Green',
+    'G': 'Green',
+    'Untagged': 'No tag',
+    None: 'No tag'
+}
+combined_raw_df = combined_raw_df.with_columns(pl.col(column_name).replace(mapping))
+
+# Standardize Status names
+column_name = 'Status'
+mapping = {
+    'DEAD': 'Dead',
+    'ALIVE': 'Alive'
+}
+combined_raw_df = combined_raw_df.with_columns(pl.col(column_name).replace(mapping))
+
+#for checking that uniques are properly removed 
+uniques = combined_raw_df[column_name].unique().to_list()
+print(uniques)
+
+# Fix PIT tag issue - standardize to Bi-hex display such that there are 3 digits before the period (3D9.1A4FAAB2F3) 
+# Some PIT tag numbers are out of order # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
+column_name = 'Tag Number 2'
+combined_raw_df = combined_raw_df.with_columns(
+    pl.col(column_name)
+    .map_elements(util.standardize_PIT)
+    #.alias('PIT_tag_no')
+)    
