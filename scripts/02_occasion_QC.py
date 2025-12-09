@@ -58,7 +58,8 @@ unique_df = util.get_unique_values(combined_df)
 file_name = output_path / 'unique_values_confirm.xlsx'
 util.write_unique_values(unique_df, file_name)
 
-
+### Create new columns for tag numbers split by type
+combined_df = util.add_tag_columns(combined_df)
 
 # #load and basic cleaning of each occasion
 # # (separate Tag types into dedicated columns, standardize PIT tag numbers)
@@ -78,8 +79,6 @@ util.write_unique_values(unique_df, file_name)
 df_mask = combined_df.is_duplicated()
 df_dup = combined_df.filter(df_mask)
 
-#check non hallprint/Pit tag
-df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
 
 ### Write to output
 file_name = output_path / 'combined_QC.csv'

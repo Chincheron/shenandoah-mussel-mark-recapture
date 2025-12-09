@@ -68,7 +68,7 @@ def clean_original_columns(df):
     )    
     return df
 
-def create_mr_columns(df):
+def add_tag_columns(df):
     # Separate hallprint/Pit tag into distinct columns
 
     #create Hallprint tag 1 column
