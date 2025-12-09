@@ -61,6 +61,7 @@ with pd.ExcelWriter(file_name, engine='openpyxl') as writer: # need to use panda
         df_key = pd.DataFrame({key:values})
         df_key.to_excel(writer, sheet_name=sheet_name, index=False)
 
+#
 
 ### Check for issues
 
@@ -71,5 +72,10 @@ df_dup = combined_df.filter(df_mask)
 #check non hallprint/Pit tag
 df_unknown_tag  = mr1.filter((pl.col('Tag_type_standard') != 'Hallprint') & (pl.col('Tag_type_standard') != 'PIT'))
 
-#load each occasion and flag QC issues
+### Write to output
+file_name = Path("combined_QC.csv")
+folder_name = Path('QC_check')
+file_util.make_directory(DATA_INTERIM / folder_name)
+qc_file_path = DATA_INTERIM / folder_name / file_name
 
+combined_df.write_csv(qc_file_path)
