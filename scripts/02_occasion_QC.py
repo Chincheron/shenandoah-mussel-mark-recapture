@@ -44,9 +44,10 @@ util.write_unique_values(unique_df, file_name)
 
 ### Basic cleaning of original columns for each occasion 
 # Based on unique values, standardize spellings and PIT tag numbers of original columns)
+combined_df = util.clean_original_columns(combined_df)
 
 ### Minor corrections to data (see documentation and/or functino for details)
-util.correct_original_values(combined_df)
+combined_df = util.correct_original_values(combined_df)
 
 ### Fix issue with 15 PIT numbers only including last four digits for occasion 2
 # This was causing these individuals to not match other occasions

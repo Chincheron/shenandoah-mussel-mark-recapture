@@ -60,8 +60,11 @@ def clean_original_columns(df):
     # Some PIT tag numbers are out of order # (e.g., 3D9.1A4FAAB2F3 on MR1 and B2F33D9.1A4FAA on subsequent occasions)
     column_name = 'Tag Number 2'
     df = df.with_columns(
-        pl.col(column_name)
+        pl.when(pl.col('Tag Type').str.contains('PIT'))
+        .then(pl.col(column_name)
         .map_elements(standardize_PIT)
+        )
+        .otherwise(pl.col(column_name))
     )    
     return df
 
