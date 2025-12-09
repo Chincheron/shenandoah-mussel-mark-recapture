@@ -1,5 +1,6 @@
 import polars as pl
 import src.util as util
+import pandas as pd
 
 def standardize_PIT(x):
     position = x.find('.')
@@ -110,3 +111,28 @@ def create_mr_columns(df):
     # )    
 
     return(df)
+
+def get_unique_values(df):
+    #  get unique values for each header
+    headers = df.columns
+    # generate dictionary of unique values for each column
+    unique_dict = {}
+    for header in headers:
+        uniques = df[header].unique().to_list()
+        unique_dict[header] = uniques
+    return unique_dict
+
+def write_unique_values(df, file_name):
+    with pd.ExcelWriter(file_name, engine='openpyxl') as writer: # need to use pandas for easier writing to excel
+        for key, values in df.items():
+            sheet_name = str(key)[:31]
+            df_key = pd.DataFrame({key:values})
+            df_key.to_excel(writer, sheet_name=sheet_name, index=False)
+    
+def correct_original_values(df):
+     # Correct mistyped tab number
+    column_name = 'Tag Number 2'
+    mapping = {
+        'F2546': 'F246',
+        }
+    df = df.with_columns(pl.col(column_name).replace(mapping))

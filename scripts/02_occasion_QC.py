@@ -28,48 +28,42 @@ mr2 = pl.read_csv(mr_2_file)
 mr3 = pl.read_csv(mr_3_file)
 mr4 = pl.read_csv(mr_4_file)
 
-# Basic cleaning of original columns for each occasion (Standardize spellings and PIT tag numbers)
-mr1 = util.clean_original_columns(mr1)
-mr2 = util.clean_original_columns(mr2)
-mr3 = util.clean_original_columns(mr3)
-mr4 = util.clean_original_columns(mr4)
-
-#load and basic cleaning of each occasion
-# (separate Tag types into dedicated columns, standardize PIT tag numbers)
-mr1 = util.create_mr_columns(mr1)
-mr2 = util.create_mr_columns(mr2)
-mr3 = util.create_mr_columns(mr3)
-mr4 = util.create_mr_columns(mr4)
-
-### combine occasions into one
+# combine occasions into one
 #list of occasions to run
 list = [mr1, mr2, mr3, mr4]
-
 combined_df = pl.DataFrame()
 for index, df in enumerate(list):
     df = df.with_columns(sampling_occasion=index+1
     )
     combined_df = pl.concat([combined_df, df])
 
+## Generate file of unique values to determine first round of QC
+unique_df = util.get_unique_values(combined_df)
+file_name = output_path / 'unique_values.xlsx'
+util.write_unique_values(unique_df, file_name)
+
+### Basic cleaning of original columns for each occasion 
+# Based on unique values, standardize spellings and PIT tag numbers of original columns)
+
+### Minor corrections to data (see documentation and/or functino for details)
+util.correct_original_values(combined_df)
+
+# Confirm all values are standardized
+unique_df = util.get_unique_values(combined_df)
+file_name = output_path / 'unique_values_confirm.xlsx'
+util.write_unique_values(unique_df, file_name)
+
+
+
+# #load and basic cleaning of each occasion
+# # (separate Tag types into dedicated columns, standardize PIT tag numbers)
+# mr1 = util.create_mr_columns(mr1)
+# mr2 = util.create_mr_columns(mr2)
+# mr3 = util.create_mr_columns(mr3)
+# mr4 = util.create_mr_columns(mr4)
+
 ### data validation
 
-## get unique values for each header
-headers = combined_df.columns
-
-# generate dictionary of unique values for each column
-unique_dict = {}
-for header in headers:
-    uniques = combined_df[header].unique().to_list()
-    unique_dict[header] = uniques
-
-#loop through dictionary and each key is separate workbook
-file_name = output_path / 'unique.xlsx'
-#write unique values to csv for review
-with pd.ExcelWriter(file_name, engine='openpyxl') as writer: # need to use pandas for easier writing to excel
-    for key, values in unique_dict.items():
-        sheet_name = str(key)[:31]
-        df_key = pd.DataFrame({key:values})
-        df_key.to_excel(writer, sheet_name=sheet_name, index=False)
 
 #
 
