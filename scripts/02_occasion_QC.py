@@ -61,20 +61,7 @@ util.write_unique_values(unique_df, file_name)
 ### Create new columns for tag numbers split by type
 combined_df = util.add_tag_columns(combined_df)
 
-# #load and basic cleaning of each occasion
-# # (separate Tag types into dedicated columns, standardize PIT tag numbers)
-# mr1 = util.create_mr_columns(mr1)
-# mr2 = util.create_mr_columns(mr2)
-# mr3 = util.create_mr_columns(mr3)
-# mr4 = util.create_mr_columns(mr4)
-
-### data validation
-
-
-#
-
 ### Check for issues
-
 
 df_mask = combined_df.is_duplicated()
 df_dup = combined_df.filter(df_mask)
