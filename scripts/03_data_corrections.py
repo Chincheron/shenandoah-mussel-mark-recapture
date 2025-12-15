@@ -99,6 +99,8 @@ join_df = summary_df.join(
 #occasion - Create unique ID column for each mussel
 join_df = join_df.with_row_index(name='ID', offset=1)
 
+#no nulls for encounter hisotyr (eihter 1 or 0)
+
 #clean up columns
 
 #export for mark-recapture analysis preparation
