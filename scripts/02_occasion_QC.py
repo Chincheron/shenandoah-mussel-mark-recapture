@@ -1,5 +1,5 @@
 import chincheron_util.file_util as file_util
-from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, ROOT
+from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, ROOT, DATA_PIPELINE
 import polars as pl
 from pathlib import Path
 import src.util as util
@@ -73,7 +73,10 @@ df_dup.write_csv(file_name)
 #TODO remove one each of F504 on occasion 4 and E885 on occasion 4
 #various other exact duplicates (~10) but none are individually identified by tag (e.g., green square/etc.). Can safely ignore
 
-
 ## write combined data to file for manual review
 file_name = output_path / 'combined_QC.csv'
+combined_df.write_csv(file_name)
+
+##write final data to file for further cleanup/analysis
+file_name = DATA_PIPELINE / '02_combined_occasions.csv'
 combined_df.write_csv(file_name)
