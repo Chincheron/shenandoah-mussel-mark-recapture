@@ -1,5 +1,5 @@
 import chincheron_util.file_util as file_util
-from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM
+from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, DATA_PIPELINE
 import polars as pl
 from pathlib import Path
 
@@ -68,3 +68,6 @@ df_1.write_csv(qc_folder / "Occasion_1.csv")
 df_2.write_csv(qc_folder / "Occasion_2.csv")
 df_3.write_csv(qc_folder / "Occasion_3.csv")
 df_4.write_csv(qc_folder / "Occasion_4.csv")
+
+# write to pipeline
+df_summary.write_csv(DATA_PIPELINE / '01_Summary.csv')
