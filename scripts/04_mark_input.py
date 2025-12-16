@@ -28,11 +28,11 @@ encounter_col = [
     'sampling_occasion_4'
 ]
 occasion_df = occasion_df.with_columns(
-    pl.concat_str(encounter_col).alias('encounter_history')
+    pl.concat_str(encounter_col).alias('ch') #column title must be ch for later use with RMark 
 )
 
 #just encounter history
-encounter_history = occasion_df.select('encounter_history').filter(pl.col('encounter_history').is_not_null())
+encounter_history = occasion_df.select('ch').filter(pl.col('ch').is_not_null())
 
 #write to file
-encounter_history.write_csv(DATA_PIPELINE / '04_mark_input.inp', include_header=False, line_terminator=' 1;\n')
+encounter_history.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True)
