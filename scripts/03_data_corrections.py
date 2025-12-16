@@ -78,6 +78,7 @@ columns_to_load = [
 summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
 
 #join occasion to summary
+#TODO account for tag numbers being in different olumns (e.g., F267 in tag # 1 column for MR but tag#2 col for rrelease data)
 #second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
 left_join_col = [
     'Tag color', 'Tag 1 #', 'PIT Tag ID'

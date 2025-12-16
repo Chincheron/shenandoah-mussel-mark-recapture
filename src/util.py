@@ -180,3 +180,55 @@ def fix_varicosa_color(df):
         .otherwise(pl.col(update_column))
         )
     return df
+
+def handle_tag_duplicates(df):
+    ## remove the row where length is least likely to be correct compared to release length
+    tag_list = [
+    'B225',
+    'B249',
+    'E442',
+    'E820',
+    'F186',
+    'F187',
+    'F231',
+    'F249',
+    'F268',
+    'F377',
+    'F440',
+    'F450',
+    'F502',
+    'F512'  
+    ]
+    #lengths to remove
+    length_list =[
+        58.6,
+        71.9,
+        70,
+        61,
+        54.3,
+        46.3,
+        56.4,
+        57.7,
+        43.1,
+        50,
+        49.9,
+        48,
+        40.8,
+        43.1
+    ]
+
+    delete_df = pl.DataFrame({'Tag Number': tag_list, 'Length': length_list})
+
+    df = df.join(
+        delete_df,
+        on=['Tag Number', 'Length'],
+        how='anti'
+    )
+    return df
+
+
+    # column_name = 'Tag Number'
+    # mapping = {old:new for old, new in zip(fix_list, new_list)}
+    # print(mapping)
+    # df = df.with_columns(pl.col(column_name).replace(mapping))
+    # return df
