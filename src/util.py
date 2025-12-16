@@ -216,15 +216,82 @@ def handle_tag_duplicates(df):
         40.8,
         43.1
     ]
-
+    #dictionary of paired values to remove
     delete_df = pl.DataFrame({'Tag Number': tag_list, 'Length': length_list})
-
+    #filter out rows where paired values match
     df = df.join(
         delete_df,
         on=['Tag Number', 'Length'],
         how='anti'
     )
-    return df
+
+    ## deal with remaing duplicates where lengths were identical or very close
+    tag_list = [
+    'E754',
+    'E848',
+    'E885',
+    'F319',
+    'F504',
+    'F512'  
+    ]
+    occasion_list = [
+        4, 1, 4, 1, 4, 1
+    ]
+    #dictionary of paired values to remove
+    pairs_df = pl.DataFrame({'Tag Number': tag_list, 'sampling_occasion': occasion_list})
+    #pull rows to be averaged
+    to_average = df.join(
+        pairs_df,
+        on=['Tag Number', 'sampling_occasion'],
+        how='inner'
+    )
+    # average
+    averaged_rows =(
+        to_average
+        .group_by(['Tag Number', 'sampling_occasion'])
+        .agg(
+            pl.first('Species'),
+            pl.first('Tag Type'),
+            pl.first('Tag Color'),
+            pl.first('Tag Number 2'),
+            pl.col('Length').mean(),
+            pl.first('Status'),
+            pl.first('Other Tag Attribute'),
+            pl.first('Hallprint_tag_no_1'),
+            pl.first('Hallprint_tag_no_2'),
+            pl.first('PIT_tag_no')
+        )
+    )
+    #order rows for rejoining
+    columns_to_load = [
+    'Species',
+    'Tag Type',
+    'Tag Color',
+    'Tag Number',
+    'Tag Number 2',
+    'Length',
+    'Status',
+    'Other Tag Attribute',
+    'sampling_occasion',
+    'Hallprint_tag_no_1',
+    'Hallprint_tag_no_2',
+    'PIT_tag_no',
+    ]
+    averaged_rows = averaged_rows.select(columns_to_load)
+     #filter out rows where paired values match
+    df_removed = df.join(
+        pairs_df,
+        on=['Tag Number', 'sampling_occasion'],
+        how='anti'
+    )
+    #append average
+    df_final = pl.concat(
+        [df_removed, averaged_rows],
+        how='vertical'
+    )   
+    
+
+    return df_final
 
 
     # column_name = 'Tag Number'
