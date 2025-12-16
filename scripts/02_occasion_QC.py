@@ -76,10 +76,16 @@ file_name = output_path / 'exact_duplicate_check.csv'
 df_dup.write_csv(file_name)
 
 #deal with exact duplicates
-#TODO remove one each of F504 on occasion 4 and E885 on occasion 4
+combined_df = util.handle_exact_duplicates(combined_df)
 #various other exact duplicates (~10) but none are individually identified by tag (e.g., green square/etc.). Can safely ignore
 
-#check for tag duplicates on each occasion and deal with
+#confirm exact duplicates dealt with
+df_mask = combined_df.is_duplicated()
+df_dup = combined_df.filter(df_mask)
+file_name = output_path / 'exact_duplicate_check_confirm.csv'
+df_dup.write_csv(file_name)
+
+## check for tag duplicates on each occasion and deal with
 df_mask = combined_df.select(['Tag Color', 'Tag Number', 'sampling_occasion']).is_duplicated()
 df_dup = combined_df.filter(df_mask).filter(pl.col('Tag Number').is_not_null() & (pl.col('Tag Number') != 'Square')).sort('Tag Number')
 file_name = output_path / 'individual_duplicate_check.csv'

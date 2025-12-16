@@ -293,9 +293,34 @@ def handle_tag_duplicates(df):
 
     return df_final
 
-
-    # column_name = 'Tag Number'
-    # mapping = {old:new for old, new in zip(fix_list, new_list)}
-    # print(mapping)
-    # df = df.with_columns(pl.col(column_name).replace(mapping))
-    # return df
+def handle_exact_duplicates(df):
+    tag_list = [
+    'F504',
+    'E885'
+    ]
+    #lengths to remove
+    length_list =[
+        46.2,
+        64.7
+    ]
+    #dictionary of paired values to remove
+    delete_df = pl.DataFrame({'Tag Number': tag_list, 'Length': length_list})
+    #filter out unique rows wher paired values match
+    df_dup = df.join(
+        delete_df,
+        on=['Tag Number', 'Length'],
+    )
+    #filter out rows where paired values match
+    df = df.join(
+        delete_df,
+        on=['Tag Number', 'Length'],
+        how='anti'
+    )
+    #keep first unique
+    df_keep = df_dup.unique(keep='first')
+    #add one row back
+    df_final = pl.concat(
+    [df, df_keep],
+    how='vertical'
+    )   
+    return df_final
