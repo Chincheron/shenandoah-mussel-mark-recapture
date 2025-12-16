@@ -168,3 +168,15 @@ def fix_PIT_values(df):
     print(mapping)
     df = df.with_columns(pl.col(column_name).replace(mapping))
     return df
+
+def fix_varicosa_color(df):
+    update_column = 'Tag Color'
+    df = df.with_columns(
+        pl.when(
+            (pl.col('Species') == 'Alasmidonta varicosa') 
+            & (pl.col('Tag Color') == 'Red')
+            & pl.col('Tag Number').str.starts_with('F'))
+        .then(pl.col(update_column).replace('Red', 'Orange'))
+        .otherwise(pl.col(update_column))
+        )
+    return df

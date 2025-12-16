@@ -46,12 +46,18 @@ util.write_unique_values(unique_df, file_name)
 # Based on unique values, standardize spellings and PIT tag numbers of original columns)
 combined_df = util.clean_original_columns(combined_df)
 
-### Minor corrections to data (see documentation and/or functino for details)
+### Minor corrections to data (see documentation and/or function for details)
 combined_df = util.correct_original_values(combined_df)
 
 ### Fix issue with 15 PIT numbers only including last four digits for occasion 2
 # This was causing these individuals to not match other occasions
 combined_df = util.fix_PIT_values(combined_df)
+
+### Fix issue with inconsistent orange/red tags
+# All A. varicosa with 'Red' FXXX tags changed to 'Orange'
+combined_df = util.fix_varicosa_color(combined_df)
+
+
 
 # Confirm all values are standardized
 unique_df = util.get_unique_values(combined_df)
