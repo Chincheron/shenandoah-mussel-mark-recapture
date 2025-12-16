@@ -64,6 +64,9 @@ unique_df = util.get_unique_values(combined_df)
 file_name = output_path / 'unique_values_confirm.xlsx'
 util.write_unique_values(unique_df, file_name)
 
+# TODO make sure that tag numbers are in order
+combined_df = util.order_tag_numbers(combined_df)
+
 ### Create new columns for tag numbers split by type
 combined_df = util.add_tag_columns(combined_df)
 

@@ -324,3 +324,63 @@ def handle_exact_duplicates(df):
     how='vertical'
     )   
     return df_final
+
+def order_tag_numbers(df):
+    test_df = pl.DataFrame({
+        'Tag Number': ['F548', 'X396'],
+        'Tag Number 2': ['F549', 'X395']
+    })
+
+    tag_1 = 'Tag Number'
+    tag_2 = 'Tag Number 2'
+    tag_1_no = 'tag_1_no'
+    tag_2_no = 'tag_2_no'
+    tag_1_letter = 'tag_1_letter'
+    tag_2_letter = 'tag_2_letter'
+    tag_comparison = 'tag_comparison'
+    tag_1_new = 'tag_1_new'
+    tag_2_new = 'tag_2_new'
+    df = df.with_columns(
+        pl.col(tag_1).str.tail(-1).alias(tag_1_no),
+        pl.col(tag_2).str.tail(-1).alias(tag_2_no),
+        pl.col(tag_1).str.head(1).alias(tag_1_letter),
+        pl.col(tag_2).str.head(1).alias(tag_2_letter) 
+    )
+    df = df.with_columns(
+        pl.when(pl.col(tag_1_no) < pl.col(tag_2_no))
+        .then(True)
+        .otherwise(False)
+        .alias(tag_comparison)
+    )
+
+    df = df.with_columns(
+        pl.when(pl.col(tag_comparison) == True)
+        .then(pl.col(tag_1_letter) + pl.col(tag_1_no))
+        .otherwise(pl.col(tag_2_letter) + pl.col(tag_2_no))
+        .alias(tag_1_new)
+    )
+    df = df.with_columns(
+        pl.when(pl.col(tag_comparison) == True)
+        .then(pl.col(tag_2_letter) + pl.col(tag_2_no))
+        .otherwise(pl.col(tag_1_letter) + pl.col(tag_1_no))
+        .alias(tag_2_new)
+    )
+    df = df.with_columns(
+        pl.col(tag_1_new)
+        .alias(tag_1)
+    )
+    df = df.with_columns(
+        pl.col(tag_2_new)
+        .alias(tag_2)
+    )
+    df = df.drop([
+        tag_1_no,
+        tag_2_no, 
+        tag_1_letter, 
+        tag_2_letter, 
+        tag_comparison, 
+        tag_1_new, 
+        tag_2_new
+    ])
+
+    return df
