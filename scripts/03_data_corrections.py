@@ -28,6 +28,26 @@ columns_to_load = [
 ]
 occasion_df = pl.read_csv(occasion_source_file, columns=columns_to_load)
 
+## exclude non-individually identifiable mussels 
+#include only Mussels with valid tag colors OR PIT tag no. 
+tag_color_list = ['Yellow', 'Green', 'Red', 'Orange']
+occasion_df = occasion_df.filter(
+    ((pl.col('Tag Color').is_in(tag_color_list)) |
+    (pl.col('PIT_tag_no').is_not_null())
+    )
+)
+
+# Two PIT tags were detected, but mussels were not found. Exlude these
+occasion_df = occasion_df.filter(
+    ~(pl.col('Tag Color') == 'NO MUSSEL')
+)
+
+#Exclude invalid tag numbers (also excludes null values for tag 1 column)
+invalid_tag_number = ['SQUARE', 'NO TAG', 'GLUE DOT']
+occasion_df = occasion_df.filter(
+    ~(pl.col('Hallprint_tag_no_1').is_in(invalid_tag_number))
+)
+
 ## collapse into single line for each mussel
 #TODO multiple results per occasion must be handled before this step
 
@@ -52,6 +72,7 @@ occasion_group_df = (
     .group_by(group_col)
     .agg(pl.col('Species').first(),
     pl.col('Length').max().alias('max_length'),
+    pl.col('Status').last().alias('last_status'),
     pl.col(f'sampling_occasion_1').first(),
     pl.col(f'sampling_occasion_2').first(),
     pl.col(f'sampling_occasion_3').first(),
@@ -78,7 +99,6 @@ columns_to_load = [
 summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
 
 #join occasion to summary
-#TODO account for tag numbers being in different olumns (e.g., F267 in tag # 1 column for MR but tag#2 col for rrelease data)
 #second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
 left_join_col = [
     'Tag color', 'Tag 1 #'#, 'PIT Tag ID'
@@ -87,7 +107,13 @@ right_join_col =[
     'Tag Color', 'Hallprint_tag_no_1'#, 'PIT_tag_no'
 ]
 
+#somewhere here need to cross compare tag1/2 to tag 2/1 (for records where occasion data is missing a second tag and is in wrong column)
+#where to place in order and how to fit in with unmatched?
+
+
+
 #QC - find unmatched records from MR occasions (i.e., records that could not be joined to release data )
+
 unmatched_occasion_df = occasion_group_df.join(
     summary_df,
     left_on=right_join_col,
@@ -98,6 +124,7 @@ unmatched_occasion_df = occasion_group_df.join(
 file_name = qc_output_path / 'unmatched_occasions_records.csv'
 unmatched_occasion_df.write_csv(file_name)
 
+#actual join of raw summary and processed occasion data
 join_df = summary_df.join(
     occasion_group_df, 
     left_on=left_join_col, 
