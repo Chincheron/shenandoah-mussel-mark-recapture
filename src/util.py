@@ -135,11 +135,27 @@ def write_unique_values(df, file_name):
     
 def correct_original_values(df):
      # Correct mistyped tab number
-    column_name = 'Tag Number 2'
-    mapping = {
-        'F2546': 'F246',
+    tag_1 = 'Tag Number'
+    tag_2 = 'Tag Number 2'
+    mapping_tag1 = {
+        'A3439': 'A343',
+        'F3392': 'F392', # based on matching PIT tag no with release data
         }
-    df = df.with_columns(pl.col(column_name).replace(mapping))
+    mapping_tag2 = {
+        'F2546': 'F246',
+        'R5621': 'E621'
+        }
+    df = df.with_columns(pl.col(tag_1).replace(mapping_tag1))
+    df = df.with_columns(pl.col(tag_2).replace(mapping_tag2))
+
+
+    df = df.with_columns(
+        pl.when((pl.col(tag_1) == 'B164') & (pl.col(tag_2) == 'B164'))
+        .then(pl.lit('B163'))
+        .otherwise(pl.col(tag_1))
+        .alias(tag_1)
+        )
+
     return df
 
 def fix_PIT_values(df):
