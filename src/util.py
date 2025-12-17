@@ -21,7 +21,8 @@ def clean_original_columns(df):
         'A. varicosa': 'Alasmidonta varicosa',
         'L. cardium': 'Lampsilis cardium',
         'L. Cardium': 'Lampsilis cardium',
-        'E. complanata': 'Elliptio complanata'
+        'E. complanata': 'Elliptio complanata',
+        'Ellipto complanata': 'Elliptio complanata'
     }
     df = df.with_columns(pl.col(column_name).replace(mapping))
 
