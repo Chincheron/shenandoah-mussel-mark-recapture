@@ -62,6 +62,7 @@ group_col = [
     'PIT_tag_no'
 ]
 #count of unique mussels
+#TODO this count (597) does not match count from raw summary (~533 with encounter history) confrim why
 unique_count = occasion_df.group_by(group_col).len().sort('len')
 
 #confirm only one species per group
