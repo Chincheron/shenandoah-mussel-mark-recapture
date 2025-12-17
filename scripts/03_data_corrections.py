@@ -81,17 +81,31 @@ summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
 #TODO account for tag numbers being in different olumns (e.g., F267 in tag # 1 column for MR but tag#2 col for rrelease data)
 #second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
 left_join_col = [
-    'Tag color', 'Tag 1 #', 'PIT Tag ID'
+    'Tag color', 'Tag 1 #'#, 'PIT Tag ID'
 ]
 right_join_col =[
-    'Tag Color', 'Hallprint_tag_no_1', 'PIT_tag_no'
+    'Tag Color', 'Hallprint_tag_no_1'#, 'PIT_tag_no'
 ]
+
+#QC - find unmatched records from MR occasions (i.e., records that could not be joined to release data )
+unmatched_occasion_df = occasion_group_df.join(
+    summary_df,
+    left_on=right_join_col,
+    right_on=left_join_col,
+    how="anti"
+)
+#write to csv for review
+file_name = qc_output_path / 'unmatched_occasions_records.csv'
+unmatched_occasion_df.write_csv(file_name)
+
 join_df = summary_df.join(
     occasion_group_df, 
     left_on=left_join_col, 
     right_on=right_join_col,
-    how='left'
+    how='inner'
 )
+
+
 
 #Various QC to be done here (compare tag number/color mismatch, different encounter histories, etc.)
 #make sure all from right table are joining 
