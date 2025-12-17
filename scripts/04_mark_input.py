@@ -39,6 +39,7 @@ occasion_df = occasion_df.with_columns(
 
 #just encounter history
 encounter_history = occasion_df.select('ch').filter(pl.col('ch').is_not_null())
+#TODO include relevant covariates or filtering (length, Facility, Species, PIT status?)
 
 #write to file
 encounter_history.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True)
