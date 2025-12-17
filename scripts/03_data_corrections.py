@@ -95,6 +95,7 @@ columns_to_load = [
  'Found in \r\npass 2',
  'Found in \r\npass 3',
  'Found in \r\npass 4',
+ 'Sum value',
  'A or D' 
 ]
 summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
@@ -126,21 +127,6 @@ file_name = qc_output_path / 'unmatched_occasions_records.csv'
 #TODO - finish manually reviewing and updating correction script in util for each mussel
 unmatched_occasion_df.write_csv(file_name)
 
-#test joiin of unmatched
-left_join_col = [
-    'Tag color', 'Tag 2 #'#, 'PIT Tag ID'
-]
-right_join_col =[
-    'Tag Color', 'Hallprint_tag_no_1'#, 'PIT_tag_no'
-]
-test_join = summary_df.join(
-    occasion_group_df, 
-    left_on=left_join_col, 
-    right_on=right_join_col,
-    how='inner'
-)
-
-
 #actual join of raw summary and processed occasion data
 join_df = summary_df.join(
     occasion_group_df, 
@@ -161,6 +147,7 @@ join_df = join_df.with_row_index(name='ID', offset=1)
 #no nulls for encounter hisotyr (eihter 1 or 0)
 
 #clean up columns
+#TODO - handle sampled lengths smaller than release
 
 #export for mark-recapture analysis preparation
 join_df.write_csv(output_path / '03_cleaned_data.csv')

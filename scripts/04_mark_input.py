@@ -13,6 +13,12 @@ output_path = DATA_PIPELINE
 # Load occasion data
 columns_to_load = [
  'ID',
+ 'Species',
+ 'Facility',
+ 'Measurement (mm)\r\nwhen released',
+ 'max_length',
+ 'A or D',
+ 'last_status',
  'sampling_occasion_1',
  'sampling_occasion_2',
  'sampling_occasion_3',
