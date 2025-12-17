@@ -123,7 +123,23 @@ unmatched_occasion_df = occasion_group_df.join(
 )
 #write to csv for review
 file_name = qc_output_path / 'unmatched_occasions_records.csv'
+#TODO - finish manually reviewing and updating correction script in util for each mussel
 unmatched_occasion_df.write_csv(file_name)
+
+#test joiin of unmatched
+left_join_col = [
+    'Tag color', 'Tag 2 #'#, 'PIT Tag ID'
+]
+right_join_col =[
+    'Tag Color', 'Hallprint_tag_no_1'#, 'PIT_tag_no'
+]
+test_join = summary_df.join(
+    occasion_group_df, 
+    left_on=left_join_col, 
+    right_on=right_join_col,
+    how='inner'
+)
+
 
 #actual join of raw summary and processed occasion data
 join_df = summary_df.join(

@@ -48,6 +48,8 @@ combined_df = util.clean_original_columns(combined_df)
 
 ### Minor corrections to data (see documentation and/or function for details)
 combined_df = util.correct_original_values(combined_df)
+combined_df.filter(pl.col('Tag Number 2') == 'B31D')
+combined_df.filter(pl.col('Tag Number') == 'B31D')
 
 ### Fix issue with 15 PIT numbers only including last four digits for occasion 2
 # This was causing these individuals to not match other occasions
