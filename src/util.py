@@ -143,7 +143,8 @@ def correct_original_values(df):
         }
     mapping_tag2 = {
         'F2546': 'F246',
-        'R5621': 'E621'
+        'R5621': 'E621',
+        'B31D': '3D9.1A4FAAB31D'
         }
     df = df.with_columns(pl.col(tag_1).replace(mapping_tag1))
     df = df.with_columns(pl.col(tag_2).replace(mapping_tag2))
@@ -155,6 +156,23 @@ def correct_original_values(df):
         .otherwise(pl.col(tag_1))
         .alias(tag_1)
         )
+    
+    #Tag likely mistyped. Changed to values below based on release data and lengths at release/sampling
+    df = df.with_columns(
+        pl.when((pl.col(tag_1) == 'E507') & (pl.col(tag_2) == 'E508'))
+        .then(pl.lit('E506'))
+        .otherwise(pl.col(tag_1))
+        .alias(tag_1)
+    )
+
+    #Tag likely mistyped. Changed to values below based on release data and lengths at release/sampling
+    df = df.with_columns(
+        pl.when((pl.col(tag_1) == 'E886') & (pl.col(tag_2) == 'E881'))
+        .then(pl.lit('E887'))
+        .otherwise(pl.col(tag_2))
+        .alias(tag_2)
+    )
+
 
     return df
 
