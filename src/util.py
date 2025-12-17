@@ -337,12 +337,16 @@ def order_tag_numbers(df):
     )
     
     df = df.with_columns(
-        (pl.when(pl.col(no1) < pl.col(no2))
+        (pl.when((pl.col(tag_2).is_null()))
+        .then(pl.col(tag_1))
+        .when((pl.col(no1) < pl.col(no2)))
         .then(pl.col(tag_1))
         .otherwise(pl.col(tag_2))
         .alias(tag_1)
         ),
-        (pl.when(pl.col(no1) < pl.col(no2))
+        (pl.when((pl.col(tag_2).is_null()))
+        .then(pl.col(tag_2))
+        .when((pl.col(no1) < pl.col(no2)) & (pl.col(tag_2).is_not_null()))
         .then(pl.col(tag_2))
         .otherwise(pl.col(tag_1))
         .alias(tag_2)
