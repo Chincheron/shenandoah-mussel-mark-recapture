@@ -48,10 +48,10 @@ occasion_df = occasion_df.with_columns(
 
 #just encounter history
 include_list = [
+    'ch',
     'Species',
     'Facility',
-    'PIT_status',
-    'ch', 
+    'PIT_status', 
     'Measurement (mm)\r\nwhen released', 
     'max_length']
 mark_input = occasion_df.select(include_list).filter(pl.col('ch').is_not_null())
