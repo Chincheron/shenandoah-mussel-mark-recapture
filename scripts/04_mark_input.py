@@ -15,7 +15,7 @@ columns_to_load = [
  'ID',
  'Species',
  'Facility',
- 'Measurement (mm) when released',
+ 'release_length',
  'max_length',
  'A or D',
  'last_status',
@@ -52,9 +52,9 @@ include_list = [
     'Species',
     'Facility',
     'PIT_status', 
-    'Measurement (mm) when released', 
+    'release_length', 
     'max_length']
 mark_input = occasion_df.select(include_list).filter(pl.col('ch').is_not_null())
 
 #write to file
-mark_input.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True)
+mark_input.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True, quote_style='always')

@@ -105,6 +105,8 @@ summary_df = summary_df.rename(
     lambda c: c.replace('\r\n', ' ').strip()
 )
 
+summary_df = summary_df.rename({'Measurement (mm) when released': 'release_length', 'Measurement (mm) when last found': 'sample_length'})
+
 #join occasion to summary
 #second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
 left_join_col = [
