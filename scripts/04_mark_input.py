@@ -19,6 +19,7 @@ columns_to_load = [
  'max_length',
  'A or D',
  'last_status',
+ 'PIT_tag_no',
  'sampling_occasion_1',
  'sampling_occasion_2',
  'sampling_occasion_3',
@@ -37,9 +38,23 @@ occasion_df = occasion_df.with_columns(
     pl.concat_str(encounter_col).alias('ch') #column title must be ch for later use with RMark 
 )
 
+#create column indicating whether there was a PIT tag
+occasion_df = occasion_df.with_columns(
+    pl.when(pl.col('PIT_tag_no').is_not_null())
+    .then(pl.lit(1))
+    .otherwise(pl.lit(0))
+    .alias('PIT_status')
+)
+
 #just encounter history
-encounter_history = occasion_df.select('ch').filter(pl.col('ch').is_not_null())
-#TODO include relevant covariates or filtering (length, Facility, Species, PIT status?)
+include_list = [
+    'Species',
+    'Facility',
+    'PIT_status',
+    'ch', 
+    'Measurement (mm)\r\nwhen released', 
+    'max_length']
+mark_input = occasion_df.select(include_list).filter(pl.col('ch').is_not_null())
 
 #write to file
-encounter_history.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True)
+mark_input.write_csv(DATA_PIPELINE / '04_mark_input.csv', include_header=True)
