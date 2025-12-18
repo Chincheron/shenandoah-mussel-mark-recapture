@@ -15,7 +15,7 @@ columns_to_load = [
  'ID',
  'Species',
  'Facility',
- 'Measurement (mm)\r\nwhen released',
+ 'Measurement (mm) when released',
  'max_length',
  'A or D',
  'last_status',
@@ -52,7 +52,7 @@ include_list = [
     'Species',
     'Facility',
     'PIT_status', 
-    'Measurement (mm)\r\nwhen released', 
+    'Measurement (mm) when released', 
     'max_length']
 mark_input = occasion_df.select(include_list).filter(pl.col('ch').is_not_null())
 

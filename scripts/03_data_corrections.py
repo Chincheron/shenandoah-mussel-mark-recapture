@@ -100,6 +100,11 @@ columns_to_load = [
 ]
 summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
 
+#remove \r and \n values from headings to avoid issues later when writing to csv
+summary_df = summary_df.rename(
+    lambda c: c.replace('\r\n', ' ').strip()
+)
+
 #join occasion to summary
 #second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
 left_join_col = [
