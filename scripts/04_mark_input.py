@@ -42,7 +42,7 @@ occasion_df = occasion_df.with_columns(
     pl.when(pl.col('sampling_occasion_1').is_null())
     .then(pl.lit('10000'))
     .otherwise(pl.concat_str(pl.lit('1'), pl.col('ch')))
-    .alias('test')
+    .alias('ch')
 )
 
 #create column indicating whether there was a PIT tag
