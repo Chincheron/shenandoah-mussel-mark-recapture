@@ -74,10 +74,10 @@ occasion_group_df = (
     .agg(pl.col('Species').first(),
     pl.col('Length').max().alias('max_length'),
     pl.col('Status').last().alias('last_status'),
-    pl.col(f'sampling_occasion_1').first(),
-    pl.col(f'sampling_occasion_2').first(),
-    pl.col(f'sampling_occasion_3').first(),
-    pl.col(f'sampling_occasion_4').first()
+    pl.col(f'sampling_occasion_2').max(),
+    pl.col(f'sampling_occasion_1').max(),
+    pl.col(f'sampling_occasion_3').max(),
+    pl.col(f'sampling_occasion_4').max()
     )
 )
 
@@ -139,7 +139,7 @@ join_df = summary_df.join(
     occasion_group_df, 
     left_on=left_join_col, 
     right_on=right_join_col,
-    how='inner'
+    how='left'
 )
 
 
