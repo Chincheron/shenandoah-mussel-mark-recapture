@@ -19,20 +19,25 @@ mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 summary(mark_input)
 mark_input[1:5,]
 
+# TODO - define time interval
+
 #Run Mark Model
 #must use with_dir to ensure Mark files are in desired subfolder instead of cluttering up Root folder 
 # subsequent data manipulation should use the assigned variable to avoid issues
-analysis_1 = with_dir(path(ROOT, "temp"), {
+cjs_analy = with_dir(path(ROOT, "temp"), {
     mark(mark_input, model = 'CJS',
       groups = c("Species", "Facility")
     )
     })
 
-PIMS(analysis_1, 'Phi', simplified = FALSE)
-PIMS(analysis_1, 'p')
+PIMS(cjs_analy, 'Phi', simplified = FALSE)
+PIMS(cjs_analy, 'p')
 
-summary(analysis_1)
-ls()
-class(analysis_1)
-getwd()
-#
+summary(cjs_analy) #why do groups have same parameter estimates (for POPAN too)
+
+popan_analy = with_dir(path(ROOT, "temp"), {
+    mark(mark_input, model = 'POPAN',
+      groups = c("Species", "Facility")
+    )
+    })
+summary(popan_analy)
