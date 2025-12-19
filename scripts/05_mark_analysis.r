@@ -23,7 +23,9 @@ mark_input[1:5,]
 #must use with_dir to ensure Mark files are in desired subfolder instead of cluttering up Root folder 
 # subsequent data manipulation should use the assigned variable to avoid issues
 analysis_1 = with_dir(path(ROOT, "temp"), {
-    mark(mark_input, model = 'CJS')
+    mark(mark_input, model = 'CJS',
+      groups = c("Species", "Facility")
+    )
     })
 
 PIMS(analysis_1, 'Phi', simplified = FALSE)
