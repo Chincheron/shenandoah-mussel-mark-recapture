@@ -38,6 +38,13 @@ occasion_df = occasion_df.with_columns(
     pl.concat_str(encounter_col).alias('ch') #column title must be ch for later use with RMark 
 )
 
+occasion_df = occasion_df.with_columns(
+    pl.when(pl.col('sampling_occasion_1').is_null())
+    .then(pl.lit('10000'))
+    .otherwise(pl.concat_str(pl.lit('1'), pl.col('ch')))
+    .alias('test')
+)
+
 #create column indicating whether there was a PIT tag
 occasion_df = occasion_df.with_columns(
     pl.when(pl.col('PIT_tag_no').is_not_null())
