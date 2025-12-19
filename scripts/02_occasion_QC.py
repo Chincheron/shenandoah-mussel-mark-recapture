@@ -46,6 +46,7 @@ util.write_unique_values(unique_df, file_name)
 # Based on unique values, standardize spellings and PIT tag numbers of original columns)
 combined_df = util.clean_original_columns(combined_df)
 
+#TODO - fix E602/E604 tag
 ### Minor corrections to data (see documentation and/or function for details)
 combined_df = util.correct_original_values(combined_df)
 combined_df.filter(pl.col('Tag Number 2') == 'B31D')
@@ -103,6 +104,7 @@ file_name = output_path / 'individual_duplicate_check.csv'
 df_dup.write_csv(file_name)
 
 # Deal with tag duplicates
+# TODO Some tag dupicates still remaining (e.g., E310, E742) crosscheck with Ellie QC files as final check
 combined_df = util.handle_tag_duplicates(combined_df)
 
 #confirm tag duplicates dealt with
@@ -111,6 +113,7 @@ df_dup = combined_df.filter(df_mask).filter(pl.col('Tag Number').is_not_null() &
 file_name = output_path / 'individual_duplicate_check_confirm.csv'
 df_dup.write_csv(file_name)
 
+#TODO update tag that likely fell off with the second tag based on release data (and order appropriatley for joining)
 ## write combined data to file for manual review
 file_name = output_path / 'combined_QC.csv'
 combined_df.write_csv(file_name)

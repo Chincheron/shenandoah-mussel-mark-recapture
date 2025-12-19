@@ -66,13 +66,13 @@ group_col = [
 unique_count = occasion_df.group_by(group_col).len().sort('len')
 
 #confirm only one species per group
-
+#TODO calculate separate 'Average' length column and decide which to use later
 # group by tags
 occasion_group_df = (
     occasion_df
     .group_by(group_col)
     .agg(pl.col('Species').first(),
-    pl.col('Length').max().alias('max_length'),
+    pl.col('Length').max().alias('max_length'), #TODO some are missing when converted to sample_length in final export (e.g., E310)
     pl.col('Status').last().alias('last_status'),
     pl.col(f'sampling_occasion_2').max(),
     pl.col(f'sampling_occasion_1').max(),
@@ -155,6 +155,7 @@ join_df = join_df.with_row_index(name='ID', offset=1)
 
 #clean up columns
 #TODO - handle sampled lengths smaller than release
+#TODO - exclude dead recoveries for a separate export; use only live animals for subsequent analysis for now
 
 #export for mark-recapture analysis preparation
 join_df.write_csv(output_path / '03_cleaned_data.csv')

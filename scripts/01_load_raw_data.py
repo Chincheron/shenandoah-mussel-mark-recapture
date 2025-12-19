@@ -18,6 +18,8 @@ df_summary = df_summary.filter(pl.col("Facility").is_not_null()) # summary rows 
 #check species found
 df_summary["Species"].unique().to_list()
 
+#TODO - handle duplicates for summary data
+
 # Sheet contains various summary statistics to right of data
 # remove these
 no_col_to_keep = 14 # keep first 14 columns (the data)
