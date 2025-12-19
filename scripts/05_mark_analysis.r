@@ -40,4 +40,4 @@ popan_analy = with_dir(path(ROOT, "temp"), {
       groups = c("Species", "Facility")
     )
     })
-summary(popan_analy)
+summary(popan_analy) 

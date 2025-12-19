@@ -6,6 +6,9 @@ import src.util as util
 import csv
 import pandas as pd
 
+### Purpose: join occasion data and release data together for final conversion into MARK format; includes additional QC
+
+
 #set folder locations
 occasion_source_file = DATA_PIPELINE / '02_combined_occasions.csv'
 summary_source_file = DATA_PIPELINE / '01_Summary.csv'
