@@ -19,6 +19,9 @@ mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 summary(mark_input)
 mark_input[1:5,]
 
+#split by species
+species_input <- split(mark_input, mark_input$Species)
+
 # TODO - define time interval 
 # but may need to explicity split up by speciesxFacility - different release dates
 #or not - most seems to be 10/11/23 and one species on 10/19. probably close enough?
@@ -30,7 +33,7 @@ mark_input[1:5,]
 #####
 # POPAN
 #####  
-
+mark_input = species_input$`Alasmidonta varicosa`
 #setup common analysis variables
 time_interval = c(1,1,1,1)
 begin_time = 2024 # must be a number and not a string
@@ -39,7 +42,7 @@ begin_time = 2024 # must be a number and not a string
 #phi
 Phi.dot=list(formula=~1)
 Phi.time = list(formula=~time)
-Phi.species = list(formula=~Species)
+#Phi.species = list(formula=~Species)
 
 #p
 p.dot=list(formula=~1)
@@ -50,7 +53,7 @@ popan_process = process.data(mark_input,
   model = 'POPAN'
   ,begin.time = begin_time
   ,time.intervals = time_interval
-  , groups = c("Species", "Facility")
+  #, groups = c("Facility")
 )
 popan_process$group.covariates
 
@@ -66,6 +69,10 @@ popan_results = with_dir(path(ROOT, "temp"), {
     })
 
 popan_results$Phi.dot.p.dot$results$real
+
+popan_results$Phi.time.p.time$results$real
+
+popan_results$Phi.time.p.time$results$derived
 
 popan_results$Phi.dot.p.dot$results$derived
 
