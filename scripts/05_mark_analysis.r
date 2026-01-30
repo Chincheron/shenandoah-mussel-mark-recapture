@@ -57,7 +57,10 @@ popan_process$group.covariates
 popan_ddl = make.design.data(popan_process)
 
 popan_model_list = create.model.list("POPAN")
-popan_results = mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl)
+popan_results = with_dir(path(ROOT, "temp"), {
+    mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
+    )
+    })
 
 popan_results$Phi.dot.p.dot$results$real
 
