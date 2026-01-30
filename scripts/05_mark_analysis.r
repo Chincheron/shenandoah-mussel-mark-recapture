@@ -45,7 +45,7 @@ Phi.species = list(formula=~Species)
 p.dot=list(formula=~1)
 p.time=list(formula=~time)
 
-
+#Create processed dataframe for specific model
 popan_process = process.data(mark_input, 
   model = 'POPAN'
   ,begin.time = begin_time
@@ -54,8 +54,11 @@ popan_process = process.data(mark_input,
 )
 popan_process$group.covariates
 
+#Create design data for analysis
 popan_ddl = make.design.data(popan_process)
 
+#Auto create all possible models to be run based on model list of individual parameters
+#TODO - Move individual parameter definiiton to function (from above to below)
 popan_model_list = create.model.list("POPAN")
 popan_results = with_dir(path(ROOT, "temp"), {
     mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
