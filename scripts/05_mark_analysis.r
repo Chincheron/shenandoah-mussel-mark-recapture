@@ -38,9 +38,12 @@ begin_time = 2024 # must be a number and not a string
 ## define models
 #phi
 Phi.dot=list(formula=~1)
+Phi.time = list(formula=~time)
+Phi.species = list(formula=~Species)
 
 #p
 p.dot=list(formula=~1)
+p.time=list(formula=~time)
 
 
 popan_process = process.data(mark_input, 
@@ -53,6 +56,15 @@ popan_process$group.covariates
 
 popan_ddl = make.design.data(popan_process)
 
+popan_model_list = create.model.list("POPAN")
+popan_results = mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl)
+
+popan_results$Phi.dot.p.dot$results$real
+
+popan_results$Phi.dot.p.dot$results$derived
+
+popan_results$model.table
+
 popan_analy = with_dir(path(ROOT, "temp"), {
     mark(popan_process, popan_ddl
     )
@@ -60,10 +72,12 @@ popan_analy = with_dir(path(ROOT, "temp"), {
 summary(popan_analy) 
 
 
+
+
 popan_analy = with_dir(path(ROOT, "temp"), {
     mark(mark_input, model = 'POPAN',
       groups = c("Species", "Facility")
-      , model.parameters = list(Phi = Phi.dot, p = p.dot)
+      , model.parameters = list(Phi = Phi.species, p = p.dot)
     )
     })
 summary(popan_analy) 
