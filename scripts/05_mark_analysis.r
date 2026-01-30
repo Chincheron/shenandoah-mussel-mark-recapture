@@ -35,6 +35,14 @@ mark_input[1:5,]
 time_interval = c(1,1,1,1)
 begin_time = 2024 # must be a number and not a string
 
+## define models
+#phi
+Phi.dot=list(formula=~1)
+
+#p
+p.dot=list(formula=~1)
+
+
 popan_process = process.data(mark_input, 
   model = 'POPAN'
   ,begin.time = begin_time
@@ -44,9 +52,6 @@ popan_process = process.data(mark_input,
 popan_process$group.covariates
 
 popan_ddl = make.design.data(popan_process)
-
-
-
 
 popan_analy = with_dir(path(ROOT, "temp"), {
     mark(popan_process, popan_ddl
@@ -58,6 +63,7 @@ summary(popan_analy)
 popan_analy = with_dir(path(ROOT, "temp"), {
     mark(mark_input, model = 'POPAN',
       groups = c("Species", "Facility")
+      , model.parameters = list(Phi = Phi.dot, p = p.dot)
     )
     })
 summary(popan_analy) 
