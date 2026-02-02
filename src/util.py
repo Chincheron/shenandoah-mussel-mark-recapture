@@ -388,3 +388,8 @@ def order_tag_numbers(df):
         )
     ).drop(no1, no2)
     return df
+
+def qc_unique_values(df, write_path, file_name):
+    unique_df = util.get_unique_values(df)
+    file_name = write_path / file_name
+    util.write_unique_values(unique_df, file_name)

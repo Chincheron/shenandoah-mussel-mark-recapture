@@ -38,9 +38,8 @@ for index, df in enumerate(list):
     combined_df = pl.concat([combined_df, df])
 
 ## Generate file of unique values to determine first round of QC
-unique_df = util.get_unique_values(combined_df)
-file_name = output_path / 'unique_values.xlsx'
-util.write_unique_values(unique_df, file_name)
+qc_unique_values_file_name = 'unique_values.xlsx'
+util.qc_unique_values(combined_df, output_path, qc_unique_values_file_name)
 
 ### Basic cleaning of original columns for each occasion 
 # Based on unique values, standardize spellings and PIT tag numbers of original columns)
@@ -60,12 +59,9 @@ combined_df = util.fix_PIT_values(combined_df)
 # All A. varicosa with 'Red' FXXX tags changed to 'Orange'
 combined_df = util.fix_varicosa_color(combined_df)
 
-
-
 # Confirm all values are standardized
-unique_df = util.get_unique_values(combined_df)
-file_name = output_path / 'unique_values_confirm.xlsx'
-util.write_unique_values(unique_df, file_name)
+qc_unique_values_confirm_file_name = 'unique_values_confirm.xlsx'
+util.qc_unique_values(combined_df, output_path, qc_unique_values_confirm_file_name)
 
 # make sure that tag numbers are in order
 combined_df = util.order_tag_numbers(combined_df)
