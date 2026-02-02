@@ -408,3 +408,53 @@ def check_exact_duplicates(df):
     
     return df_dup
 
+def encounter_to_AD(df):
+    update_column = 'sampling_occasion_1'
+    status_column = 'Status'
+    df = df.with_columns(
+        pl.when(
+            (pl.col(status_column) == 'Dead') 
+            & pl.col(update_column) == 1
+        )
+        .then(pl.lit('D'))
+        .otherwise(pl.col(update_column))
+        .alias(update_column)
+    )
+
+    update_column = 'sampling_occasion_2'
+    status_column = 'Status'
+    df = df.with_columns(
+        pl.when(
+            (pl.col(status_column) == 'Dead') 
+            & pl.col(update_column) == 1
+        )
+        .then(pl.lit('D'))
+        .otherwise(pl.col(update_column))
+        .alias(update_column)
+    )
+
+    update_column = 'sampling_occasion_3'
+    status_column = 'Status'
+    df = df.with_columns(
+        pl.when(
+            (pl.col(status_column) == 'Dead') 
+            & pl.col(update_column) == 1
+        )
+        .then(pl.lit('D'))
+        .otherwise(pl.col(update_column))
+        .alias(update_column)
+    )
+
+    update_column = 'sampling_occasion_4'
+    status_column = 'Status'
+    df = df.with_columns(
+        pl.when(
+            (pl.col(status_column) == 'Dead') 
+            & pl.col(update_column) == 1
+        )
+        .then(pl.lit('D'))
+        .otherwise(pl.col(update_column))
+        .alias(update_column)
+    )
+    
+    return df
