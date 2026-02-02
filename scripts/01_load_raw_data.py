@@ -24,12 +24,16 @@ no_col_to_keep = 14 # keep first 14 columns (the data)
 col_to_remove = df_summary.columns[14:] # list of column names to remove
 df_summary = df_summary.drop(col_to_remove) # remove columns
 
-#check species found
-df_summary["Species"].unique().to_list()
+#check unique values for each field
 qc_summary_unique_file = 'summary_unique_values.xlsx'
 util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_file)
 
-#TODO - handle duplicates for summary data
+#filter out mussels that are not individually identifiable
+df_summary = util.remove_summary_rows(df_summary)
+
+# confirm no further data issues/ record removal
+qc_summary_unique_confirm_file = 'summary_unique_values_confirm.xlsx'
+util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_confirm_file)
 
 ### 02. Load each occasion's raw data
 df_1 = pl.read_excel(data_file, sheet_name = "Mark Recapture #1", read_options={"header_row": 8})

@@ -393,3 +393,11 @@ def qc_unique_values(df, write_path, file_name):
     unique_df = util.get_unique_values(df)
     file_name = write_path / file_name
     util.write_unique_values(unique_df, file_name)
+
+def remove_summary_rows(df):
+    #Remove mussels that are not individually identifiable
+    df = df.remove(pl.col('Tag 1 #') == 'No #') # 91 records
+    df = df.remove(pl.col('Tag 1 #') == 'Untagged') # 30 records
+    df = df.remove(pl.col('Tag color') == 'Black Glue') # 156 records
+    
+    return df
