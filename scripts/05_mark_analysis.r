@@ -86,6 +86,13 @@ popan_results$Phi.dot.p.dot$results$derived
 
 popan_results$model.table
 
+
+with_dir(path(ROOT, "temp"), {
+      export.MARK(popan_process, "complanata_test",  popan_results
+    )
+    })
+
+
 popan_analy = with_dir(path(ROOT, "temp"), {
     mark(popan_process, popan_ddl
     )
