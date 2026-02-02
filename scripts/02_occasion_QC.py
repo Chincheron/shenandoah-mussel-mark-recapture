@@ -1,10 +1,8 @@
 import chincheron_util.file_util as file_util
-from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, ROOT, DATA_PIPELINE
+from config.paths import DATA_INTERIM, DATA_PIPELINE
 import polars as pl
 from pathlib import Path
 import src.util as util
-import csv
-import pandas as pd
 
 ###
 
