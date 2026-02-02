@@ -57,6 +57,9 @@ occasion_df = occasion_df.filter(
 #convert single occasion column into dummy variable columns
 occasion_df = occasion_df.to_dummies(columns='sampling_occasion')
 
+#Change encounter history to A/D
+occasion_df = util.encounter_to_AD(occasion_df)
+
 #grouping columns
 group_col = [
     'Tag Color',
@@ -158,7 +161,6 @@ join_df = join_df.with_row_index(name='ID', offset=1)
 
 #clean up columns
 #TODO - handle sampled lengths smaller than release
-#TODO - exclude dead recoveries for a separate export; use only live animals for subsequent analysis for now
 
 #export for mark-recapture analysis preparation
 join_df.write_csv(output_path / '03_cleaned_data.csv')

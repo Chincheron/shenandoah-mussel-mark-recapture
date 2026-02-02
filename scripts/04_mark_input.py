@@ -25,7 +25,15 @@ columns_to_load = [
  'sampling_occasion_3',
  'sampling_occasion_4'   
 ]
-occasion_df = pl.read_csv(source_file, columns=columns_to_load)
+
+occasion_schema_override = {
+ 'sampling_occasion_1': pl.String,
+ 'sampling_occasion_2': pl.String,
+ 'sampling_occasion_3': pl.String,
+ 'sampling_occasion_4': pl.String
+}
+
+occasion_df = pl.read_csv(source_file, columns=columns_to_load, schema_overrides=occasion_schema_override)
 
 #concantenate encounter histories
 encounter_col = [

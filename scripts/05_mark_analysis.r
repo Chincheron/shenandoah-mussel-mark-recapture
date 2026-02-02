@@ -14,6 +14,9 @@ source_file = path(source_folder, "04_mark_input.csv")
 
 mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 
+#Assume dead observations were not observed for modeling purposes
+mark_input$ch <- str_replace_all(mark_input$ch, 'D', '0') 
+
 # mark_input = select(mark_input, ch)
 #confirm data format
 summary(mark_input)
