@@ -33,27 +33,35 @@ species_input <- split(mark_input, mark_input$Species)
 #####
 # POPAN
 #####  
-mark_input = species_input$`Alasmidonta varicosa`
+
+## Species setups
+## Elliptio complanata
+# 569 FMCC and 489 Harrison released on 10/11/23
+# 443 FMCC released on 10/17/2024 
+#TODO - Analyze 2024 releases separately? Yes, they were not even reelase until just before the 4th sampling occasion
+
+mark_input = species_input$`Elliptio complanata`
 #setup common analysis variables
-time_interval = c(1,1,1,1)
+time_interval = c(246,35, 29, 69) #TODO setup formula for calculating for each species automaically
 begin_time = 2024 # must be a number and not a string
 
 ## define models
 #phi
 Phi.dot=list(formula=~1)
 Phi.time = list(formula=~time)
-#Phi.species = list(formula=~Species)
+Phi.species = list(formula=~Facility)
 
 #p
 p.dot=list(formula=~1)
 p.time=list(formula=~time)
+p.species = list(formula=~Facility)
 
 #Create processed dataframe for specific model
 popan_process = process.data(mark_input, 
   model = 'POPAN'
   ,begin.time = begin_time
   ,time.intervals = time_interval
-  #, groups = c("Facility")
+  , groups = c("Facility")
 )
 popan_process$group.covariates
 
