@@ -401,3 +401,10 @@ def remove_summary_rows(df):
     df = df.remove(pl.col('Tag color') == 'Black Glue') # 156 records
     
     return df
+
+def check_exact_duplicates(df):
+    df.filter(df.is_duplicated())
+    df_dup = df.filter(df.is_duplicated())
+    
+    return df_dup
+

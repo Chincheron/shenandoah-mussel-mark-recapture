@@ -28,12 +28,17 @@ df_summary = df_summary.drop(col_to_remove) # remove columns
 qc_summary_unique_file = 'summary_unique_values.xlsx'
 util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_file)
 
+#check for exact duplicates
+df_summary_dup = util.check_exact_duplicates(df_summary)
+
 #filter out mussels that are not individually identifiable
 df_summary = util.remove_summary_rows(df_summary)
 
 # confirm no further data issues/ record removal
 qc_summary_unique_confirm_file = 'summary_unique_values_confirm.xlsx'
 util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_confirm_file)
+#confirm exact duplicates handled
+df_summary_dup = util.check_exact_duplicates(df_summary)
 
 ### 02. Load each occasion's raw data
 df_1 = pl.read_excel(data_file, sheet_name = "Mark Recapture #1", read_options={"header_row": 8})
