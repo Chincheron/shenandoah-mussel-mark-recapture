@@ -1,8 +1,11 @@
 import chincheron_util.file_util as file_util
-from config.paths import DATA_RAW, RESULTS_TABLES, RESULTS_TEMP, DATA_INTERIM, DATA_PIPELINE
+from config.paths import DATA_RAW, DATA_INTERIM, DATA_PIPELINE
 import polars as pl
 from pathlib import Path
+import src.util as util
 
+qc_folder = DATA_INTERIM / Path('QC_check')
+file_util.make_directory(qc_folder)
 data_file = DATA_RAW / "Bentonville Data MR 2024.xlsx"
 ### 01. load summary data
 df_summary = pl.read_excel(data_file, sheet_name = "Summary")
@@ -15,16 +18,18 @@ df_summary = pl.read_excel(data_file, sheet_name = "Summary")
 # Cardium was combined for all further analyses
 df_summary = df_summary.filter(pl.col("Facility").is_not_null()) # summary rows were all null for Facility field
 
-#check species found
-df_summary["Species"].unique().to_list()
-
-#TODO - handle duplicates for summary data
-
 # Sheet contains various summary statistics to right of data
 # remove these
 no_col_to_keep = 14 # keep first 14 columns (the data)
 col_to_remove = df_summary.columns[14:] # list of column names to remove
 df_summary = df_summary.drop(col_to_remove) # remove columns
+
+#check species found
+df_summary["Species"].unique().to_list()
+qc_summary_unique_file = 'summary_unique_values.xlsx'
+util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_file)
+
+#TODO - handle duplicates for summary data
 
 ### 02. Load each occasion's raw data
 df_1 = pl.read_excel(data_file, sheet_name = "Mark Recapture #1", read_options={"header_row": 8})
