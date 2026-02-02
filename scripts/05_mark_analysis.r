@@ -4,6 +4,7 @@ library(withr)
 library(fs)
 library(dplyr)
 library(tidyverse)
+library(ggplot2)
 
 #pulls path constants
 source_python("config/paths.py")
@@ -11,6 +12,7 @@ source_python("config/paths.py")
 source_folder = DATA_PIPELINE
 output_folder = path(RESULTS_TEMP)
 source_file = path(source_folder, "04_mark_input.csv")
+results_figures = path(RESULTS_FIGURES)
 
 mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 
@@ -52,7 +54,7 @@ begin_time = 2024 # must be a number and not a string
 #phi
 Phi.dot=list(formula=~1)
 Phi.time = list(formula=~time)
-Phi.species = list(formula=~Facility)
+Phi.facility = list(formula=~Facility)
 
 #p
 p.dot=list(formula=~1)
@@ -79,15 +81,7 @@ popan_results = with_dir(path(ROOT, "temp"), {
     )
     })
 
-popan_results$Phi.dot.p.dot$results$real
 
-popan_results$Phi.time.p.time$results$real
-
-popan_results$Phi.time.p.time$results$derived
-
-popan_results$Phi.dot.p.dot$results$derived
-
-popan_results$model.table
 
 # export for easier exploration of results
 with_dir(path(ROOT, "temp"), {
@@ -95,25 +89,54 @@ with_dir(path(ROOT, "temp"), {
     )
     })
 
+####
+# Results
+####
+summary(popan_results)
+popan_results$model.table
 
-popan_analy = with_dir(path(ROOT, "temp"), {
-    mark(popan_process, popan_ddl
-    )
-    })
-summary(popan_analy) 
+popan_results$Phi.dot.p.dot$results$real
+
+popan_results$Phi.facility.p.time$results$real
+
+popan_results$Phi.facility.p.time$results$derived$`N Population Size`
+
+popan_results$Phi.dot.p.dot$results$derived
+
+typeof(popan_results$Phi.facility.p.time$results$derived$`N Population Size`)
 
 
+plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
 
+complanata <- data.frame(
+  estimate = plot_data$estimate,
+  lcl = plot_data$lcl,
+  ucl = plot_data$ucl
+)
 
-popan_analy = with_dir(path(ROOT, "temp"), {
-    mark(mark_input, model = 'POPAN',
-      groups = c("Species", "Facility")
-      , model.parameters = list(Phi = Phi.species, p = p.dot)
-    )
-    })
-summary(popan_analy) 
+complanata$label <- seq_len(nrow(complanata))
 
-PIMS(popan_analy, 'Phi')
+p <- ggplot(complanata, aes(x = factor(label), y = estimate)) +
+  geom_col(fill = "steelblue") +
+  geom_errorbar(
+    aes(ymin = lcl, ymax = ucl),
+    width = 0.2
+  ) +
+  labs(
+    x = "Group",
+    y = "Estimate",
+    title = "Estimates with Confidence Intervals"
+  ) +
+  theme_minimal()
+
+ggsave(
+  filename = "population_estimates_ci.png",
+  plot = p,
+  path = results_figures,  # <- change this
+  width = 8,
+  height = 5,
+  dpi = 300
+)
 
 #####
 # CJS
