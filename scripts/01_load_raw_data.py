@@ -40,6 +40,25 @@ util.qc_unique_values(df_summary, qc_folder, qc_summary_unique_confirm_file)
 #confirm exact duplicates handled
 df_summary_dup = util.check_exact_duplicates(df_summary)
 
+# summary data includes a number of releases from FMCC on 10/17/24, shortly before the last occasion
+# We are excluding these for analysis
+#import page
+#filter column to list
+release_2024 = DATA_RAW / 'FMCC Tagged Mussels 2020-2025.xlsx'
+sheet_name = '2024'
+df_release = pl.read_excel(release_2024, sheet_name = sheet_name)
+#filter nulls
+df_release = df_release.filter(pl.col("Tagged Mussels September 2024").is_not_null()) # summary rows were all null for Facility field
+#select tag numbers
+df_release = df_release.select(pl.col('__UNNAMED__2'))
+df_release = df_release.to_series(0)
+df_release = df_release.to_list()
+len(df_release)
+df_summary = df_summary.filter(~pl.col('Tag 1 #').is_in(df_release))
+# NOTE abandon current approach. Just need to pull release data for all mussels
+# or perhaps abandon current summary and just pull directlyf rom release data?
+
+
 ### 02. Load each occasion's raw data
 df_1 = pl.read_excel(data_file, sheet_name = "Mark Recapture #1", read_options={"header_row": 8})
 df_2 = pl.read_excel(data_file, sheet_name = "Mark Recapture #2", read_options={"header_row": 9})

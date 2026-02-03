@@ -8,7 +8,7 @@ library(ggplot2)
 
 # config
 #TRUE if only want to use the 2024 MR occasions (i.e., ignore release data/timing)
-mr_only = TRUE
+mr_only = FALSE
 
 #pulls path constants
 source_python("config/paths.py")
@@ -75,7 +75,12 @@ Phi.facility = list(formula=~Facility)
 #p
 p.dot=list(formula=~1)
 p.time=list(formula=~time)
-p.species = list(formula=~Facility)
+p.facility = list(formula=~Facility)
+
+#N
+N.dot=list(formula=~1)
+N.facility = list(formula=~Facility)
+
 
 #Create processed dataframe for specific model
 popan_process = process.data(mark_input, 
@@ -123,6 +128,8 @@ typeof(popan_results$Phi.facility.p.time$results$derived$`N Population Size`)
 
 
 plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
+plot_data <- popan_results$Phi.dot.p.time$results$derived$`N Population Size`
+
 
 complanata <- data.frame(
   estimate = plot_data$estimate,
