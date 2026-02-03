@@ -6,6 +6,10 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 
+# config
+#TRUE if only want to use the 2024 MR occasions (i.e., ignore release data/timing)
+mr_only = TRUE
+
 #pulls path constants
 source_python("config/paths.py")
 
@@ -18,6 +22,14 @@ mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 
 #Assume dead observations were not observed for modeling purposes
 mark_input$ch <- str_replace_all(mark_input$ch, 'D', '0') 
+
+# only 2024 data MR occasions
+if (mr_only == TRUE) {
+  mark_input$ch <- str_sub(mark_input$ch, -4, -1)
+  mark_input <- filter(mark_input, ch != '0000')
+} else {
+  print('f')}
+
 
 # mark_input = select(mark_input, ch)
 #confirm data format
@@ -47,7 +59,11 @@ species_input <- split(mark_input, mark_input$Species)
 
 mark_input = species_input$`Elliptio complanata`
 #setup common analysis variables
-time_interval = c(246,35, 29, 69) #TODO setup formula for calculating for each species automaically
+if (mr_only == TRUE) {
+  time_interval = c(35, 29, 69)
+} else {
+  time_interval = c(246,35, 29, 69) #TODO setup formula for calculating for each species automaically}
+}
 begin_time = 2024 # must be a number and not a string
 
 ## define models
