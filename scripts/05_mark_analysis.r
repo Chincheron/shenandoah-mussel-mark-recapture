@@ -5,6 +5,7 @@ library(fs)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(writexl)
 
 # config
 #TRUE if only want to use the 2024 MR occasions (i.e., ignore release data/timing)
@@ -105,6 +106,29 @@ N.species = list(formula=~Species)
 assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage")
 # add to results_list
 results_list[["assemblage"]] = popan_results
+
+####
+#Export model output
+####
+
+summary(results_list$`Elliptio complanata`$Phi.dot.p.dot.pent.0$results)
+model_table = results_list$`Alasmidonta varicosa`$model.table
+
+real_results = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$real
+group_lable = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$group.labels
+
+#None of derived results are labeled, which would be helpful
+#TODO add labels based on group_labels/number and number of estimates
+derived_pop_size_results = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$derived$`N Population Size`
+
+write_xlsx(
+  list(
+    'Model Results' = model_table,
+    'Real Results (Top)' = real_results,
+    'Derived Results (Top)' = derived_pop_size_results
+  ),
+  path = path(ROOT, "temp", "test.xlsx")
+)
 
 ####
 # Results
