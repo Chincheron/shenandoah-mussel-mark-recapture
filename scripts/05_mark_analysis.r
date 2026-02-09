@@ -56,7 +56,7 @@ species_input <- split(mark_input, mark_input$Species)
 # 569 FMCC and 489 Harrison released on 10/11/23
 # 443 FMCC released on 10/17/2024 
 #TODO - Analyze 2024 releases separately? Yes, they were not even reelase until just before the 4th sampling occasion
-run_popan = function(input_file)
+run_popan = function(input_file, analy_groups)
 {
 mark_input = input_file
 #setup common analysis variables
@@ -77,15 +77,15 @@ p.dot=list(formula=~1)
 p.time=list(formula=~time)
 p.facility = list(formula=~Facility)
 #N
-N.dot=list(formula=~1)
-N.facility = list(formula=~Facility)
+#N.dot=list(formula=~1)
+#N.facility = list(formula=~Facility)
   
 #Create processed dataframe for specific model
 popan_process = process.data(mark_input, 
   model = 'POPAN'
   ,begin.time = begin_time
   ,time.intervals = time_interval
-  , groups = c("Facility")
+  , groups = analy_groups
 )
 popan_process$group.covariates
 
@@ -114,9 +114,13 @@ with_dir(path(ROOT, "temp"), {
 }
 
 
-run_popan(species_input$`Elliptio complanata`)
+ groups = c("Facility")
 
-run_popan(mark_input)
+run_popan(species_input$`Elliptio complanata`, groups)
+
+groups = c("Facility", "Species")
+
+run_popan(mark_input, groups)
 
 
 
