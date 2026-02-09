@@ -66,24 +66,6 @@ if (mr_only == TRUE) {
 }
 begin_time = 2024 # must be a number and not a string
 
-
-
-## define models
-#phi
-Phi.dot=list(formula=~1)
-Phi.time = list(formula=~time)
-Phi.facility = list(formula=~Facility)
-
-#p
-p.dot=list(formula=~1)
-p.time=list(formula=~time)
-p.facility = list(formula=~Facility)
-
-#N
-N.dot=list(formula=~1)
-N.facility = list(formula=~Facility)
-
-
 #Create processed dataframe for specific model
 popan_process = process.data(mark_input, 
   model = 'POPAN'
@@ -104,11 +86,29 @@ popan_ddl = make.design.data(popan_process,
 
 #Auto create all possible models to be run based on model list of individual parameters
 #TODO - Move individual parameter definiiton to function (from above to below)
+popan_models =  function()
+{
+## define models
+#phi
+Phi.dot=list(formula=~1)
+Phi.time = list(formula=~time)
+Phi.facility = list(formula=~Facility)
+#p
+p.dot=list(formula=~1)
+p.time=list(formula=~time)
+p.facility = list(formula=~Facility)
+#N
+N.dot=list(formula=~1)
+N.facility = list(formula=~Facility)
 popan_model_list = create.model.list("POPAN")
 popan_results = with_dir(path(ROOT, "temp"), {
     mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
     )
     })
+return(popan_results)
+}
+
+popan_results = popan_models()
 
 # export for easier exploration of results
 with_dir(path(ROOT, "temp"), {
@@ -134,7 +134,7 @@ typeof(popan_results$Phi.facility.p.time$results$derived$`N Population Size`)
 
 
 plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
-plot_data <- popan_results$Phi.dot.p.time$results$derived$`N Population Size`
+plot_data <- popan_results$Phi.dot.p.time.N.dot$results$derived$`N Population Size`
 
 
 complanata <- data.frame(
