@@ -56,8 +56,9 @@ species_input <- split(mark_input, mark_input$Species)
 # 569 FMCC and 489 Harrison released on 10/11/23
 # 443 FMCC released on 10/17/2024 
 #TODO - Analyze 2024 releases separately? Yes, they were not even reelase until just before the 4th sampling occasion
-
-mark_input = species_input$`Elliptio complanata`
+run_popan = function(input_file)
+{
+mark_input = input_file
 #setup common analysis variables
 if (mr_only == TRUE) {
   time_interval = c(35, 29, 69)
@@ -115,6 +116,11 @@ with_dir(path(ROOT, "temp"), {
       export.MARK(popan_process, "complanata_test",  popan_results
     )
     })
+
+  }
+
+
+run_popan(species_input$`Elliptio complanata`)
 
 ####
 # Results
@@ -182,3 +188,4 @@ PIMS(cjs_analy, 'p')
 
 summary(cjs_analy) #why do groups have same parameter estimates (for POPAN too)
 
+  
