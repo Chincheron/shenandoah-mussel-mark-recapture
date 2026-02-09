@@ -113,37 +113,40 @@ results_list[["assemblage"]] = popan_results
 
 analysis_name = names(results_list)
 
+for (analysis in analysis_name){
+  print( analysis)
+  #analysis = "Elliptio fisheriana"
+  model_table = results_list[[analysis]]$model.table
+  #get top model name
+  top_model = head(model_table, 1)
+  phi_model = top_model[["Phi"]][1]
+  phi_model = substring(phi_model, 2, nchar(phi_model))
+  phi_model = str_to_lower(phi_model)
+  p_model = top_model[["p"]][1]
+  p_model = substring(p_model, 2, nchar(p_model))
+  p_model = str_to_lower(p_model)
+  top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")
+  top_model_name = gsub("1", "dot", top_model_name)
+  #results_list[[species]]$model.table
 
-model_table = results_list[[species]]$model.table
-#get top model name
-top_model = head(model_table, 1)
-phi_model = top_model[["Phi"]][1]
-phi_model = substring(phi_model, 2, nchar(phi_model))
-phi_model = str_to_lower(phi_model)
-p_model = top_model[["p"]][1]
-p_model = substring(p_model, 2, nchar(p_model))
-p_model = str_to_lower(p_model)
-top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")
+  #results_list[[analysis]][[top_model_name]]$results$real
 
-#results_list[[species]]$model.table
+  real_results = results_list[[analysis]][[top_model_name]]$results$real
+  group_label = results_list[[analysis]][[top_model_name]]$group.labels
 
-results_list[[species]][[top_model_name]]$results$real
+  #None of derived results are labeled, which would be helpful
+  #TODO add labels based on group_labels/number and number of estimates
+  derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
 
-real_results = results_list[[species]][[top_model_name]]$results$real
-group_label = results_list[[species]][[top_model_name]]$group.labels
-
-#None of derived results are labeled, which would be helpful
-#TODO add labels based on group_labels/number and number of estimates
-derived_pop_size_results = results_list[[species]][[top_model_name]]$results$derived$`N Population Size`
-
-write_xlsx(
-  list(
-    'Model Results' = model_table,
-    'Real Results (Top)' = real_results,
-    'Derived Results (Top)' = derived_pop_size_results
-  ),
-  path = path(ROOT, "temp", "test.xlsx")
-)
+  write_xlsx(
+    list(
+      'Model Results' = model_table,
+      'Real Results (Top)' = real_results,
+      'Derived Results (Top)' = derived_pop_size_results
+    ),
+    path = path(ROOT, "temp", sprintf("%s_Mark_results.xlsx", analysis))
+  )
+}
 
 ####
 # Results
