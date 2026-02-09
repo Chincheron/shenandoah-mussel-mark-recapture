@@ -66,6 +66,8 @@ if (mr_only == TRUE) {
 }
 begin_time = 2024 # must be a number and not a string
 
+
+
 ## define models
 #phi
 Phi.dot=list(formula=~1)
@@ -78,8 +80,8 @@ p.time=list(formula=~time)
 p.facility = list(formula=~Facility)
 
 #N
-N.dot=list(formula=~1)
-N.facility = list(formula=~Facility)
+#N.dot=list(formula=~1)
+#N.facility = list(formula=~Facility)
 
 
 #Create processed dataframe for specific model
@@ -92,13 +94,22 @@ popan_process = process.data(mark_input,
 popan_process$group.covariates
 
 #Create design data for analysis
-popan_ddl = make.design.data(popan_process)
+popan_ddl = make.design.data(popan_process,
+  parameters=list(pent=list(pim.type="time")
+  #, N=list(pim.type="constant")
+  )
+)
 
 #Auto create all possible models to be run based on model list of individual parameters
 #TODO - Move individual parameter definiiton to function (from above to below)
 popan_model_list = create.model.list("POPAN")
 popan_results = with_dir(path(ROOT, "temp"), {
     mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
+    )
+    })
+
+popan_results = with_dir(path(ROOT, "temp"), {
+    mark(popan_process, ddl=popan_ddl
     )
     })
 
@@ -116,7 +127,7 @@ with_dir(path(ROOT, "temp"), {
 summary(popan_results)
 popan_results$model.table
 
-popan_results$Phi.dot.p.dot$results$real
+popan_results$Phi.time.p.dot$results$real
 
 popan_results$Phi.facility.p.time$results$real
 
