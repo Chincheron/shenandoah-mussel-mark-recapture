@@ -111,15 +111,30 @@ results_list[["assemblage"]] = popan_results
 #Export model output
 ####
 
-summary(results_list$`Elliptio complanata`$Phi.dot.p.dot.pent.0$results)
-model_table = results_list$`Alasmidonta varicosa`$model.table
+analysis_name = names(results_list)
 
-real_results = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$real
-group_lable = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$group.labels
+
+model_table = results_list[[species]]$model.table
+#get top model name
+top_model = head(model_table, 1)
+phi_model = top_model[["Phi"]][1]
+phi_model = substring(phi_model, 2, nchar(phi_model))
+phi_model = str_to_lower(phi_model)
+p_model = top_model[["p"]][1]
+p_model = substring(p_model, 2, nchar(p_model))
+p_model = str_to_lower(p_model)
+top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")
+
+#results_list[[species]]$model.table
+
+results_list[[species]][[top_model_name]]$results$real
+
+real_results = results_list[[species]][[top_model_name]]$results$real
+group_label = results_list[[species]][[top_model_name]]$group.labels
 
 #None of derived results are labeled, which would be helpful
 #TODO add labels based on group_labels/number and number of estimates
-derived_pop_size_results = results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$derived$`N Population Size`
+derived_pop_size_results = results_list[[species]][[top_model_name]]$results$derived$`N Population Size`
 
 write_xlsx(
   list(
