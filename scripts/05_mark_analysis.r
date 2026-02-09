@@ -80,8 +80,8 @@ p.time=list(formula=~time)
 p.facility = list(formula=~Facility)
 
 #N
-#N.dot=list(formula=~1)
-#N.facility = list(formula=~Facility)
+N.dot=list(formula=~1)
+N.facility = list(formula=~Facility)
 
 
 #Create processed dataframe for specific model
@@ -94,11 +94,13 @@ popan_process = process.data(mark_input,
 popan_process$group.covariates
 
 #Create design data for analysis
+#fix pent to 0 because we are following one release cohort with no new entries or births
+pent.0 = list(formula=~1, fixed=0)
 popan_ddl = make.design.data(popan_process,
-  parameters=list(pent=list(pim.type="time")
+  parameters=list(pent=pent.0)
+  #parameters=list(pent=list(pim.type="time")
   #, N=list(pim.type="constant")
   )
-)
 
 #Auto create all possible models to be run based on model list of individual parameters
 #TODO - Move individual parameter definiiton to function (from above to below)
@@ -107,13 +109,6 @@ popan_results = with_dir(path(ROOT, "temp"), {
     mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
     )
     })
-
-popan_results = with_dir(path(ROOT, "temp"), {
-    mark(popan_process, ddl=popan_ddl
-    )
-    })
-
-
 
 # export for easier exploration of results
 with_dir(path(ROOT, "temp"), {
