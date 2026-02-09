@@ -50,25 +50,39 @@ species_input <- split(mark_input, mark_input$Species)
 # subsequent data manipulation should use the assigned variable to avoid issues
 
 #####
-# POPAN
+# POPAN Species level analysis
 #####  
 
+#define species parameters, variables of interest, and other inputs
+# group covariates
 groups = c("Facility")
-## define models
+## define models to be examined for each parameter
 model_def = list(
-#phi
-Phi.dot=list(formula=~1),
-Phi.time = list(formula=~time),
-Phi.facility = list(formula=~Facility),
-#p
-p.dot=list(formula=~1),
-p.time=list(formula=~time),
-p.facility = list(formula=~Facility)
-#N
-#N.dot=list(formula=~1)
-#N.facility = list(formula=~Facility)
+  #phi
+  Phi.dot=list(formula=~1),
+  Phi.time = list(formula=~time),
+  Phi.facility = list(formula=~Facility),
+  #p
+  p.dot=list(formula=~1),
+  p.time=list(formula=~time),
+  p.facility = list(formula=~Facility)
+  #N
+  #N.dot=list(formula=~1)
+  #N.facility = list(formula=~Facility)
 )
-popan_results = run_popan(species_input$`Elliptio complanata`, groups, model_def)
+results_list <- list()
+species_list = names(species_input)
+
+for (species in species_list) {
+  species_df = species_input[[species]]
+  popan_results = run_popan(species_df, groups, model_def, species)
+  results_list[[species]] = popan_results
+}
+
+results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$derived$`N Population Size`
+#####
+# POPAN Assemblage level analysis
+#####  
 
 groups = c("Facility", "Species")
 ## define models
@@ -77,15 +91,20 @@ model_def = list(
 Phi.dot=list(formula=~1),
 Phi.time = list(formula=~time),
 Phi.facility = list(formula=~Facility),
+Phi.species = list(formula=~Species),
 #p
 p.dot=list(formula=~1),
 p.time=list(formula=~time),
-p.facility = list(formula=~Facility)
+p.facility = list(formula=~Facility),
+p.species = list(formula=~Species),
 #N
-#N.dot=list(formula=~1)
-#N.facility = list(formula=~Facility)
+N.dot=list(formula=~1),
+N.facility = list(formula=~Facility),
+N.species = list(formula=~Species)
 )
-run_popan(mark_input, groups, model_def)
+assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage")
+# add to results_list
+results_list[["assemblage"]] = popan_results
 
 ####
 # Results
@@ -107,6 +126,7 @@ typeof(popan_results$Phi.facility.p.time$results$derived$`N Population Size`)
 plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
 plot_data <- popan_results$Phi.dot.p.time.N.dot$results$derived$`N Population Size`
 
+plot_data <- results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$derived$`N Population Size`
 
 complanata <- data.frame(
   estimate = plot_data$estimate,

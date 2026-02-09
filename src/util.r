@@ -6,14 +6,18 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 
-run_popan = function(input_file, analy_groups, model_def)
+run_popan = function(input_file, analy_groups, model_def, analysis_name)
 {
+  analysis_name = analysis_name
+  save_directory = path(ROOT, 'temp', analysis_name)
+  dir.create(save_directory, recursive = TRUE)
+
   # Must create a environment then inject parameter definitions and assign other variables to be used (e.g. fixing pent to 0)
   model_env = new.env(parent=environment())
   list2env(model_def, envir = model_env)
   assign("pent.0", list(formula=~1, fixed=0), envir = model_env)
   ls(model_env)
-  
+
   mark_input = input_file
   #setup common analysis variables
   if (mr_only == TRUE) {
@@ -47,15 +51,15 @@ run_popan = function(input_file, analy_groups, model_def)
   #Auto create all possible models to be run based on model list of individual parameters
     ls(model_env)
   popan_model_list = evalq(create.model.list("POPAN"), envir = model_env)
-  popan_results = evalq(with_dir(path(ROOT, "temp"), {
+  popan_results = evalq(with_dir(save_directory, {
       mark.wrapper(popan_model_list, data=popan_process, ddl=popan_ddl
       )
       })
       , envir = model_env)
 
   # export for easier exploration of results
-  with_dir(path(ROOT, "temp"), {
-        export.MARK(popan_process, "complanata_test",  popan_results
+  with_dir(save_directory, {
+        export.MARK(popan_process, analysis_name,  popan_results
       )
       })
   
