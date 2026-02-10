@@ -493,20 +493,21 @@ def correct_unmatched_records(df):
     tag_1 = 'Tag Number'
     tag_2 = 'Tag Number 2'
     corrections = pl.DataFrame({
-        tag_1: ['R194', 'R528', 'R459', 'R746', 'R452'],
-        tag_2: ['E195', 'E529', 'E548', 'E747', 'E453'
+        tag_1: ['R194', 'R528', 'R459', 'R746', 'R452', 'F469'],
+        tag_2: ['E195', 'E529', 'E548', 'E747', 'E453', None
         ],
         'tag_1_corrected': [
-            'E194', 'E528', 'E458', 'E746', 'E452'
+            'E194', 'E528', 'E458', 'E746', 'E452', 'F468'
         ],
          'tag_2_corrected': [
-            None, None, 'E459', None, None 
+            None, None, 'E459', None, None, 'F469' 
          ]
     })
     # fix values with no nulls on lookup (can't join on null values)
+    no_nulls_df = corrections.filter(pl.col(tag_2).is_not_null())
     df = (
         df
-        .join(corrections, on=[tag_1, tag_2], how='left')
+        .join(no_nulls_df, on=[tag_1, tag_2], how='left')
         .with_columns([
             pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1))
             .alias(tag_1),
@@ -515,6 +516,46 @@ def correct_unmatched_records(df):
         ])
         .drop('tag_1_corrected', 'tag_2_corrected')
     )
-    
-    
+    #fix cases where tag2 is null
+    nulls_included = (corrections.filter(pl.col(tag_2).is_null()))
+    df = (
+        df
+        .join(
+            nulls_included,
+            on=tag_1,
+            how='left',
+            #suffix = '_null'
+        )
+        .with_columns([
+        pl.when(pl.col(tag_2).is_null())
+        .then(pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1)))
+            .otherwise(pl.col(tag_1))
+            .alias(tag_1),
+        pl.when(pl.col(tag_2).is_null())
+        .then(pl.coalesce(pl.col('tag_2_corrected'), pl.col(tag_2)))
+            .otherwise(pl.col(tag_2))
+            .alias(tag_2)
+        ])
+        .drop(['tag_1_corrected', 'tag_2_corrected'])
+    )
+            
+
+        # )
+        # )
+        # .otherwise(pl.col(tag_1))
+        # .alias(tag_1),
+
+        # pl.when(pl.col(tag_2).is_null())
+        # .then(
+        #     pl.col(tag_1).map_elements(
+        #         nulls_included
+        #         .select([tag_1, tag_2])
+        #         .to_dict(as_series=False)
+        #         .get
+        #     )
+        # )
+        # .otherwise(pl.col(tag_2))
+        # .alias(tag_2),
+        # ])
+            
     return df
