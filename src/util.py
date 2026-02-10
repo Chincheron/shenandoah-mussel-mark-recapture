@@ -173,6 +173,36 @@ def correct_original_values(df):
         .alias(tag_2)
     )
 
+    ##Several instances where PIT ID is wrong for some MR observations. Updated based on release data
+    corrections = pl.DataFrame({
+        tag_1: ['F176', 'F177', 'F386', 'F390', 'F391', 'F395', 'F403'],
+        tag_2: ['3D9.1A4FAAB20D', '3D9.1A4FAAB2F2', '3D9.1A4FAAB2FE8', '3D9.1A4FAAF829', 
+        '3D9.1A4FAAB3OC', None, '3D9.1A4FAAB300F'
+        ],
+        'tag_2_corrected': ['3D9.1A4FAAB30D', '3D9.1A4FAAB2FE', '3D9.1A4FAAB2E8', '3D9.1A4FAAB301',
+        '3D9.1A4FAAB30C', '3D9.1A4FAAB306', '3D9.1A4FAAB30F'
+        ]
+    })
+    # fix values with no nulls on lookup (can't join on null values)
+    df = (
+        df
+        .join(corrections, on=[tag_1, tag_2], how='left')
+        .with_columns(
+            pl.coalesce(pl.col('tag_2_corrected'), pl.col(tag_2))
+            .alias(tag_2)
+        )
+        .drop('tag_2_corrected')
+    )
+    #fix values with nulls
+    df = df.with_columns(
+    pl.when(
+        (pl.col(tag_1) == 'F395') & pl.col(tag_2).is_null()
+    )
+    .then(pl.lit('3D9.1A4FAAB306'))
+    .otherwise(pl.col(tag_2))
+    .alias(tag_2)
+    )
+
 
     return df
 
