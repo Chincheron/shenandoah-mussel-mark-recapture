@@ -492,15 +492,20 @@ def correct_unmatched_records(df):
 # Corrections to issues found during unmatched records check 
     tag_1 = 'Tag Number'
     tag_2 = 'Tag Number 2'
+    tag_color = 'Tag Color'
     corrections = pl.DataFrame({
-        tag_1: ['R194', 'R528', 'R459', 'R746', 'R452', 'F469'],
-        tag_2: ['E195', 'E529', 'E548', 'E747', 'E453', None
+        tag_1: ['R194', 'R528', 'R459', 'R746', 'R452', 'F469', 'E909', 'F246', 'F310', 'R536',
+        'E201', 'E139', 'E663'],
+        tag_2: ['E195', 'E529', 'E548', 'E747', 'E453', None, None, None, None, 'R537',
+        None, 'E140', None
         ],
         'tag_1_corrected': [
-            'E194', 'E528', 'E458', 'E746', 'E452', 'F468'
+            'E194', 'E528', 'E458', 'E746', 'E452', 'F468', 'E906', 'F245', 'F309', 'E536',
+            'E200', 'B139', 'E662'
         ],
          'tag_2_corrected': [
-            None, None, 'E459', None, None, 'F469' 
+            None, None, 'E459', None, None, 'F469', 'E909', 'F246', 'F310', 'E537', 'E201',
+            'B140', 'E663'
          ]
     })
     # fix values with no nulls on lookup (can't join on null values)
@@ -517,7 +522,8 @@ def correct_unmatched_records(df):
         .drop('tag_1_corrected', 'tag_2_corrected')
     )
     #fix cases where tag2 is null
-    nulls_included = (corrections.filter(pl.col(tag_2).is_null()))
+    nulls_included = (corrections.filter(pl.col(tag_2).is_null())
+        .select([tag_1, 'tag_1_corrected', 'tag_2_corrected']))
     df = (
         df
         .join(
@@ -537,25 +543,25 @@ def correct_unmatched_records(df):
             .alias(tag_2)
         ])
         .drop(['tag_1_corrected', 'tag_2_corrected'])
+    )         
+    
+    #Correct colors for two instances
+    corrections_colors = pl.DataFrame({
+        tag_color: ['Green', 'Green'],
+        tag_1: ['F179', 'F401'],
+        'tag_color_corrected': ['Orange', 'Orange']
+    })
+     # fix values with no nulls on lookup (can't join on null values)
+    no_nulls_df = corrections_colors.filter(pl.col(tag_1).is_not_null())
+    df = (
+        df
+        .join(no_nulls_df, on=[tag_color, tag_1], how='left')
+        .with_columns([
+            pl.coalesce(pl.col('tag_color_corrected'), pl.col(tag_color))
+            .alias(tag_color)
+        ])
+        .drop('tag_color_corrected')
     )
-            
 
-        # )
-        # )
-        # .otherwise(pl.col(tag_1))
-        # .alias(tag_1),
-
-        # pl.when(pl.col(tag_2).is_null())
-        # .then(
-        #     pl.col(tag_1).map_elements(
-        #         nulls_included
-        #         .select([tag_1, tag_2])
-        #         .to_dict(as_series=False)
-        #         .get
-        #     )
-        # )
-        # .otherwise(pl.col(tag_2))
-        # .alias(tag_2),
-        # ])
-            
+    
     return df
