@@ -497,21 +497,23 @@ def correct_unmatched_records(df):
         tag_2: ['E195', 'E529', 'E548', 'E747', 'E453'
         ],
         'tag_1_corrected': [
-            'E194', 'E528', 'E459', 'E746', 'E452'
-        ]
-        # 'tag_2_corrected': [None
-
-        # ]
+            'E194', 'E528', 'E458', 'E746', 'E452'
+        ],
+         'tag_2_corrected': [
+            None, None, 'E459', None, None 
+         ]
     })
     # fix values with no nulls on lookup (can't join on null values)
     df = (
         df
         .join(corrections, on=[tag_1, tag_2], how='left')
-        .with_columns(
+        .with_columns([
             pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1))
-            .alias(tag_1)
-        )
-        .drop('tag_1_corrected')
+            .alias(tag_1),
+            pl.coalesce(pl.col('tag_2_corrected'), pl.col(tag_2))
+            .alias(tag_2),
+        ])
+        .drop('tag_1_corrected', 'tag_2_corrected')
     )
     
     
