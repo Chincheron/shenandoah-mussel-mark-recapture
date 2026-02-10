@@ -138,6 +138,7 @@ for (analysis in analysis_name){
   #TODO add labels based on group_labels/number and number of estimates
   derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
 
+  #write model results
   write_xlsx(
     list(
       'Model Results' = model_table,
@@ -146,24 +147,46 @@ for (analysis in analysis_name){
     ),
     path = path(ROOT, "temp", sprintf("%s_Mark_results.xlsx", analysis))
   )
+
+  #plot results
+  plot_data <- results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+
+  plot_data <- data.frame(
+    estimate = plot_data$estimate,
+    lcl = plot_data$lcl,
+    ucl = plot_data$ucl
+  )
+
+  plot_data$label <- seq_len(nrow(plot_data))
+
+  p <- ggplot(plot_data, aes(x = factor(label), y = estimate)) +
+    geom_col(fill = "steelblue") +
+    geom_errorbar(
+      aes(ymin = lcl, ymax = ucl),
+      width = 0.2
+    ) +
+    labs(
+      x = "Group",
+      y = "Estimate",
+      title = "Estimates with Confidence Intervals"
+    ) +
+    theme_minimal()
+
+  figure_path = path(ROOT, "temp")
+  ggsave(
+    filename =  sprintf("%s_abundance_estimate.png", analysis),
+    plot = p,
+    path = figure_path,  # <- change this
+    width = 8,
+    height = 5,
+    dpi = 300
+  )
+  
 }
 
 ####
 # Results
 ####
-summary(popan_results)
-popan_results$model.table
-
-popan_results$Phi.time.p.dot$results$real
-
-popan_results$Phi.facility.p.time$results$real
-
-popan_results$Phi.facility.p.time$results$derived$`N Population Size`
-
-popan_results$Phi.dot.p.dot$results$derived
-
-typeof(popan_results$Phi.facility.p.time$results$derived$`N Population Size`)
-
 
 plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
 plot_data <- popan_results$Phi.dot.p.time.N.dot$results$derived$`N Population Size`
