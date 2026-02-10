@@ -83,6 +83,19 @@ occasion_group_df = (
     pl.col(f'sampling_occasion_4').max()
     )
 )
+
+#QC - check for multiple instances of same tag 
+df_mask = occasion_group_df.select(['Tag Color', 'Hallprint_tag_no_1']).is_duplicated()
+df_dup = occasion_group_df.filter(df_mask).sort('Hallprint_tag_no_1')
+file_name = qc_output_path / 'individual_duplicate_check.csv'
+df_dup.write_csv(file_name)
+
+
+#QC - Manual review of grouped occasions
+file_name = qc_output_path / 'occasion_grouped.csv'
+occasion_group_df.write_csv(file_name)
+
+#after updates, still need 906 rows in occasion_df
 #check - should have 586 records after combining (2/10/26)
 
 
