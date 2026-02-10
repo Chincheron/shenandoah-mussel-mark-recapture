@@ -486,5 +486,33 @@ def encounter_to_AD(df):
         .otherwise(pl.col(update_column))
         .alias(update_column)
     )
+    return df
+
+def correct_unmatched_records(df):
+# Corrections to issues found during unmatched records check 
+    tag_1 = 'Tag Number'
+    tag_2 = 'Tag Number 2'
+    corrections = pl.DataFrame({
+        tag_1: ['R194', 'R528', 'R459', 'R746', 'R452'],
+        tag_2: ['E195', 'E529', 'E548', 'E747', 'E453'
+        ],
+        'tag_1_corrected': [
+            'E194', 'E528', 'E459', 'E746', 'E452'
+        ]
+        # 'tag_2_corrected': [None
+
+        # ]
+    })
+    # fix values with no nulls on lookup (can't join on null values)
+    df = (
+        df
+        .join(corrections, on=[tag_1, tag_2], how='left')
+        .with_columns(
+            pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1))
+            .alias(tag_1)
+        )
+        .drop('tag_1_corrected')
+    )
+    
     
     return df

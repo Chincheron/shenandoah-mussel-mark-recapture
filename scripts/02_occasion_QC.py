@@ -47,9 +47,9 @@ combined_df = util.clean_original_columns(combined_df)
 ### Minor corrections to data (see documentation and/or function for details)
 combined_df = util.correct_original_values(combined_df)
 
-combined_df.filter(pl.col('Tag Number') == 'F395')
+combined_df.filter(pl.col('Tag Number') == 'R194')
 
-combined_df.filter(pl.col('Tag Number') == 'F177')
+combined_df.filter(pl.col('Tag Number') == 'E194')
 
 
 ### Fix issue with 15 PIT numbers only including last four digits for occasion 2
@@ -66,6 +66,13 @@ util.qc_unique_values(combined_df, output_path, qc_unique_values_confirm_file_na
 
 # make sure that tag numbers are in order
 combined_df = util.order_tag_numbers(combined_df)
+
+#fix unmatched records issues
+combined_df = util.correct_unmatched_records(combined_df)
+
+combined_df.filter(pl.col('Tag Number') == 'R452')
+
+combined_df.filter(pl.col('Tag Number') == 'E452')
 
 #Make tag numbers all cap
 combined_df = combined_df.with_columns(
