@@ -83,6 +83,8 @@ occasion_group_df = (
     pl.col(f'sampling_occasion_4').max()
     )
 )
+#check - should have 586 records after combining (2/10/26)
+
 
 #load cleaned summary data
 columns_to_load = [
