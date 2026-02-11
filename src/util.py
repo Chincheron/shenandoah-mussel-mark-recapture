@@ -565,3 +565,76 @@ def correct_unmatched_records(df):
 
     
     return df
+
+def correct_tag_duplicates(df):
+# Corrections to issues found during individual_duplicate_check from script 03 
+    tag_1 = 'Tag Number'
+    tag_2 = 'Tag Number 2'
+    corrections = pl.DataFrame({
+        tag_1: [
+            'E410', 'E506', 'E546', 'E582', 'E602', 'E742', 'E916', 'E970', 'E994', 'F243',
+            'F283', 'F299', 'F309'
+        ],
+        tag_2: [
+            'R411', 'E508', 'R547', 'R583', 'E604', 'R743', 'R917', None, 'R995', None,
+            'F384', '3D9.1A4FAAB2D8', None
+        ],
+        'tag_1_corrected': [
+            None, None, None, None, None, None, None, None, None, None,
+            None, 'F399', None
+        ],
+         'tag_2_corrected': [
+            'E411', 'E507', 'E547', 'E583', 'E603', 'E743', 'E917', 'E971', 'E995', 'F244',
+            'F284', None, 'F310'
+         ]
+    })
+    # fix values with no nulls on lookup (can't join on null values)
+    no_nulls_df = corrections.filter(pl.col(tag_2).is_not_null())
+    df = (
+        df
+        .join(no_nulls_df, on=[tag_1, tag_2], how='left')
+        .with_columns([
+            pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1))
+            .alias(tag_1),
+            pl.coalesce(pl.col('tag_2_corrected'), pl.col(tag_2))
+            .alias(tag_2),
+        ])
+        .drop('tag_1_corrected', 'tag_2_corrected')
+    )
+    #fix cases where tag2 is null
+    nulls_included = (corrections.filter(pl.col(tag_2).is_null())
+        .select([tag_1, 'tag_1_corrected', 'tag_2_corrected']))
+    df = (
+        df
+        .join(
+            nulls_included,
+            on=tag_1,
+            how='left',
+            #suffix = '_null'
+        )
+        .with_columns([
+        pl.when(pl.col(tag_2).is_null())
+        .then(pl.coalesce(pl.col('tag_1_corrected'), pl.col(tag_1)))
+            .otherwise(pl.col(tag_1))
+            .alias(tag_1),
+        pl.when(pl.col(tag_2).is_null())
+        .then(pl.coalesce(pl.col('tag_2_corrected'), pl.col(tag_2)))
+            .otherwise(pl.col(tag_2))
+            .alias(tag_2)
+        ])
+        .drop(['tag_1_corrected', 'tag_2_corrected'])
+    )         
+
+    #two PIT tagged mussels were classified as Hallprint which caused them not to match when grouped later on
+    tag_type = 'Tag Type'
+    tag_list = ['3D9.1A4FAAB31D', '3D9.1A4FAAB306']
+    df = df.with_columns(
+        pl.when(
+            (pl.col(tag_type) == 'Hallprint') 
+            & (pl.col(tag_2).is_in(tag_list))
+        )
+        .then(pl.lit('PIT'))
+        .otherwise(pl.col(tag_type))
+        .alias(tag_type)
+    )
+    return df

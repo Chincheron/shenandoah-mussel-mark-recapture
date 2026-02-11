@@ -70,9 +70,11 @@ combined_df = util.order_tag_numbers(combined_df)
 #fix unmatched records issues
 combined_df = util.correct_unmatched_records(combined_df)
 
-combined_df.filter(pl.col('Tag Number') == 'E139')
+combined_df.filter(pl.col('Tag Number') == 'F395')
 
 combined_df.filter(pl.col('Tag Number 2') == 'E909')
+
+combined_df = util.correct_tag_duplicates(combined_df)
 
 #Make tag numbers all cap
 combined_df = combined_df.with_columns(
