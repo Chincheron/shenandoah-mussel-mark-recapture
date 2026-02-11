@@ -273,10 +273,15 @@ ggsave(
 #####  
 
 cjs_analy = with_dir(path(ROOT, "temp"), {
-    mark(mark_input, model = 'CJS',
-      groups = c("Species", "Facility")
+    mark(mark_input, model = 'CJS'
+    #, groups = c("Species", "Facility")
     )
     })
+
+Psilist = get.real(cjs_analy, "Phi", se = TRUE)
+Psilist$
+Psilist$`Group:SpeciesAlasmidonta varicosa.FacilityFMCC`$pim
+rownames((Psilist))
 
 PIMS(cjs_analy, 'Phi', simplified = FALSE)
 PIMS(cjs_analy, 'p')
