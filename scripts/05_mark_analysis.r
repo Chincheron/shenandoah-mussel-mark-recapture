@@ -105,14 +105,14 @@ N.species = list(formula=~Species)
 )
 assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage")
 # add to results_list
-results_list[["assemblage"]] = popan_results
+results_list[["assemblage"]] = assemblage_results
 
 ####
 #Export model output
 ####
 
 analysis_name = names(results_list)
-
+#analysis_name = 'assemblage'
 for (analysis in analysis_name){
   print( analysis)
   #analysis = "Elliptio fisheriana"
@@ -125,10 +125,19 @@ for (analysis in analysis_name){
   p_model = top_model[["p"]][1]
   p_model = substring(p_model, 2, nchar(p_model))
   p_model = str_to_lower(p_model)
-  top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")
-  top_model_name = gsub("1", "dot", top_model_name)
+  # assemblage model names include N (because we examined factors for N)
+  if (analysis == 'assemblage') {
+    n_model = top_model[["N"]][1]
+    n_model = substring(n_model, 2, nchar(n_model))
+    n_model = str_to_lower(n_model)
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0.N.", n_model)
+  } else {
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")  
+  }
+ top_model_name = gsub("1", "dot", top_model_name)
+  # TODO Add here if statement for assemblage lefle analysis
+  
   #results_list[[species]]$model.table
-
   #results_list[[analysis]][[top_model_name]]$results$real
 
   real_results = results_list[[analysis]][[top_model_name]]$results$real
@@ -168,7 +177,7 @@ for (analysis in analysis_name){
     labs(
       x = "Group",
       y = "Estimate",
-      title = "Estimates with Confidence Intervals"
+      title = "Abundance Estimates with Confidence Intervals"
     ) +
     theme_minimal()
 
@@ -176,6 +185,42 @@ for (analysis in analysis_name){
   ggsave(
     filename =  sprintf("%s_abundance_estimate.png", analysis),
     plot = p,
+    path = figure_path,  # <- change this
+    width = 8,
+    height = 5,
+    dpi = 300
+  )
+  
+  #plot
+  #need to figure out how to get parameter names for these dynamically and then filter to those of interest
+  plot_data <- results_list[[analysis]][[top_model_name]]$results$real
+  # get.real(popan_results, "Phi")
+
+  plot_data <- data.frame(
+    estimate = plot_data$estimate,
+    lcl = plot_data$lcl,
+    ucl = plot_data$ucl
+  )
+
+  plot_data$label <- seq_len(nrow(plot_data))
+
+  p_real <- ggplot(plot_data, aes(x = factor(label), y = estimate)) +
+    geom_col(fill = "steelblue") +
+    geom_errorbar(
+      aes(ymin = lcl, ymax = ucl),
+      width = 0.2
+    ) +
+    labs(
+      x = "Group",
+      y = "Estimate",
+      title = "Real Parameter Estimates with Confidence Intervals"
+    ) +
+    theme_minimal()
+
+  figure_path = path(ROOT, "temp")
+  ggsave(
+    filename =  sprintf("%s_real_parameter_estimate.png", analysis),
+    plot = p_real,
     path = figure_path,  # <- change this
     width = 8,
     height = 5,
