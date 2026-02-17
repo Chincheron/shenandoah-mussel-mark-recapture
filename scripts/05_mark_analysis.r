@@ -146,18 +146,26 @@ for (analysis in analysis_name){
   #results_list[[analysis]][[top_model_name]]$results$real
 
   real_results = results_list[[analysis]][[top_model_name]]$results$real
+  real_results_export = cbind(
+    Parameter = rownames(real_results)
+    ,real_results
+  )
   group_label = results_list[[analysis]][[top_model_name]]$group.labels
 
   #None of derived results are labeled, which would be helpful
   #TODO add labels based on group_labels/number and number of estimates
   derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+  derived_pop_size_results_export = cbind(
+    Parameter = rownames(derived_pop_size_results)
+    ,derived_pop_size_results
+  )
 
   #write model results
   write_xlsx(
     list(
       'Model Results' = model_table,
-      'Real Results (Top)' = real_results,
-      'Derived Results (Top)' = derived_pop_size_results
+      'Real Results (Top)' = real_results_export,
+      'Derived Results (Top)' = derived_pop_size_results_export
     ),
     path = path(ROOT, "temp", sprintf("%s_Mark_results.xlsx", analysis))
   )
