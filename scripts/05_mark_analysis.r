@@ -155,8 +155,19 @@ for (analysis in analysis_name){
   #None of derived results are labeled, which would be helpful
   #TODO add labels based on group_labels/number and number of estimates
   derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+  occasions = nrow(derived_pop_size_results)
+  derived_pop_size_groups = results_list[[analysis]][[top_model_name]]$group.labels
+  length_derived_pop_size_groups = length(derived_pop_size_groups)
+  number_of_mr_occasions = (occasions / length_derived_pop_size_groups)
+  suffixes = c('Release', paste('MR', 1:(number_of_mr_occasions-1)))
+  row_names = paste(
+    rep(derived_pop_size_groups, each = number_of_mr_occasions),
+    rep(suffixes, times = length(derived_pop_size_groups))
+  )  
+  row_names = str_remove(row_names, "Facility")
+
   derived_pop_size_results_export = cbind(
-    Parameter = rownames(derived_pop_size_results)
+    Parameter = row_names
     ,derived_pop_size_results
   )
 
