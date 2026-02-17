@@ -41,7 +41,8 @@ mark_input[1:5,]
 
 # E. fisheriana has only one tagged release, so remove it from analysis)
 mark_input = filter(mark_input,  Species != 'Elliptio fisheriana')
-
+# remove L. cardium from all analyses
+mark_input = filter(mark_input,  Species != 'Lampsilis cardium')
 
 #split by species
 species_input <- split(mark_input, mark_input$Species)
