@@ -74,6 +74,11 @@ model_def = list(
 results_list <- list()
 species_list = names(species_input)
 
+#Runs set of candidate models for each species
+#saves results as a list where each item is a marklist object containing results for a single species
+#each marklist object then contains the results for the candidate models run 
+# e.g.: results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0 would contain results for the specified model
+#to use most RMARK functions for extracting data, you must typically call at the level above (i.e., model level)
 for (species in species_list) {
   species_df = species_input[[species]]
   popan_results = run_popan(species_df, groups, model_def, species)
