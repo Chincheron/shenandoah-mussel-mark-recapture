@@ -152,7 +152,7 @@ for (analysis in analysis_name){
   p_model = substring(p_model, 2, nchar(p_model))
   p_model = str_to_lower(p_model)
   # assemblage model names include N (because we examined factors for N)
-  if (analysis == 'assemblage') {
+  if ("N" %in% colnames(top_model)) {
     n_model = top_model[["N"]][1]
     n_model = substring(n_model, 2, nchar(n_model))
     n_model = str_to_lower(n_model)
