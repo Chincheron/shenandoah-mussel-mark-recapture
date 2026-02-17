@@ -69,10 +69,16 @@ model_def = list(
   Phi.dot=list(formula=~1),
   Phi.time = list(formula=~time),
   Phi.facility = list(formula=~Facility),
+  Phi.facilityplustime = list(formula=~Facility + time),
+  Phi.facility.time = list(formula=~Facility*time),
+  Phi.Time = list(formula=~Time),
   #p
   p.dot=list(formula=~1),
   p.time=list(formula=~time),
-  p.facility = list(formula=~Facility)
+  p.facility = list(formula=~Facility),
+  p.facilityplustime = list(formula=~Facility + time),
+  p.facility.time = list(formula=~Facility*time),
+  p.Time = list(formula=~Time)
   #N
   #N.dot=list(formula=~1)
   #N.facility = list(formula=~Facility)
@@ -104,15 +110,24 @@ Phi.dot=list(formula=~1),
 Phi.time = list(formula=~time),
 Phi.facility = list(formula=~Facility),
 Phi.species = list(formula=~Species),
+Phi.facilityplusspecies = list(formula=~Facility + Species),
+Phi.facilityplustime = list(formula=~Facility + time),
+Phi.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
+Phi.speciesplustime = list(formula=~Species + time),
 #p
 p.dot=list(formula=~1),
 p.time=list(formula=~time),
 p.facility = list(formula=~Facility),
 p.species = list(formula=~Species),
+p.facilityplustime = list(formula=~Facility + time),
+p.facilityplusspecies = list(formula=~Facility + Species),
+p.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
+p.speciesplustime = list(formula=~Species + time),
 #N
 N.dot=list(formula=~1),
 N.facility = list(formula=~Facility),
-N.species = list(formula=~Species)
+N.species = list(formula=~Species),
+N.facilityplusspecies = list(formula=~Facility + Species)
 )
 assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage")
 # add to results_list
