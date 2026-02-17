@@ -39,8 +39,14 @@ if (mr_only == TRUE) {
 summary(mark_input)
 mark_input[1:5,]
 
+# E. fisheriana has only one tagged release, so remove it from analysis)
+mark_input = filter(mark_input,  Species != 'Elliptio fisheriana')
+
+
 #split by species
 species_input <- split(mark_input, mark_input$Species)
+# L. cardium models not converging at species level so remove from analysis. Have kept in assemblage analysis for now
+species_input$`Lampsilis cardium` = NULL
 
 # TODO - define time interval 
 # but may need to explicity split up by speciesxFacility - different release dates
