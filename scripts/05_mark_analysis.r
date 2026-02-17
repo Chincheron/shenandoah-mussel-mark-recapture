@@ -60,7 +60,6 @@ species_input$`Lampsilis cardium` = NULL
 #####
 # POPAN Species level analysis
 #####  
-#TODO - constrain first p occasion to 1 for each group
 #TODO - constrain each N to reelase numbers?
 
 #define species parameters, variables of interest, and other inputs
@@ -73,18 +72,14 @@ model_def = list(
   Phi.time = list(formula=~time),
   Phi.facility = list(formula=~Facility),
   Phi.facilityplustime = list(formula=~Facility + time),
-  Phi.facility.time = list(formula=~Facility*time),
-  Phi.Time = list(formula=~Time),
   #p
   p.dot=list(formula=~1),
   p.time=list(formula=~time),
+  #p.time.fixed=list(formula=~time, fixed=list(time=(c(2024)), value = 1)),
   p.facility = list(formula=~Facility),
-  p.facilityplustime = list(formula=~Facility + time),
-  p.facility.time = list(formula=~Facility*time),
-  p.Time = list(formula=~Time)
   #N
-  #N.dot=list(formula=~1)
-  #N.facility = list(formula=~Facility)
+  N.dot=list(formula=~1),
+  N.facility = list(formula=~Facility)
 )
 results_list <- list()
 species_list = names(species_input)
@@ -113,19 +108,19 @@ Phi.dot=list(formula=~1),
 Phi.time = list(formula=~time),
 Phi.facility = list(formula=~Facility),
 Phi.species = list(formula=~Species),
-Phi.facilityplusspecies = list(formula=~Facility + Species),
-Phi.facilityplustime = list(formula=~Facility + time),
-Phi.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
-Phi.speciesplustime = list(formula=~Species + time),
+# Phi.facilityplusspecies = list(formula=~Facility + Species),
+# Phi.facilityplustime = list(formula=~Facility + time),
+# Phi.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
+# Phi.speciesplustime = list(formula=~Species + time),
 #p
 p.dot=list(formula=~1),
 p.time=list(formula=~time),
 p.facility = list(formula=~Facility),
 p.species = list(formula=~Species),
-p.facilityplustime = list(formula=~Facility + time),
-p.facilityplusspecies = list(formula=~Facility + Species),
-p.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
-p.speciesplustime = list(formula=~Species + time),
+# p.facilityplustime = list(formula=~Facility + time),
+# p.facilityplusspecies = list(formula=~Facility + Species),
+# p.facilityplusspeciesplustime = list(formula=~ Facility + Species + time),
+# p.speciesplustime = list(formula=~Species + time),
 #N
 N.dot=list(formula=~1),
 N.facility = list(formula=~Facility),
@@ -141,10 +136,11 @@ results_list[["assemblage"]] = assemblage_results
 ####
 
 analysis_name = names(results_list)
-#analysis_name = 'assemblage'
+#analysis_name = 'Alasmidonta varicosa'
 for (analysis in analysis_name){
   print( analysis)
-  #analysis = "Elliptio fisheriana"
+  #analysis = "Alasmidonta varicosa"
+  #analysis = "Elliptio complanata"
   model_table = results_list[[analysis]]$model.table
   #get top model name
   top_model = head(model_table, 1)
