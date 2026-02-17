@@ -160,12 +160,14 @@ for (analysis in analysis_name){
   } else {
     top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")  
   }
- top_model_name = gsub("1", "dot", top_model_name)
+  top_model_name = gsub("1", "dot", top_model_name)
+  #deal with inconsistent naming of interaction models between row names and model names
+  top_model_name = str_replace(top_model_name, fixed(' + '), 'plus')
+  top_model_name = str_replace(top_model_name, fixed(' * '), '.')
   # TODO Add here if statement for assemblage lefle analysis
   
   #results_list[[species]]$model.table
   #results_list[[analysis]][[top_model_name]]$results$real
-
   real_results = results_list[[analysis]][[top_model_name]]$results$real
   real_results_export = cbind(
     Parameter = rownames(real_results)
