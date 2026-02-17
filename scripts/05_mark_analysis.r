@@ -60,6 +60,8 @@ species_input$`Lampsilis cardium` = NULL
 #####
 # POPAN Species level analysis
 #####  
+#TODO - constrain first p occasion to 1 for each group
+#TODO - constrain each N to reelase numbers?
 
 #define species parameters, variables of interest, and other inputs
 # group covariates
