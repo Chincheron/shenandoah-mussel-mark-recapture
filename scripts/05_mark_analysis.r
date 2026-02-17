@@ -162,10 +162,9 @@ for (analysis in analysis_name){
   }
   top_model_name = gsub("1", "dot", top_model_name)
   #deal with inconsistent naming of interaction models between row names and model names
-  top_model_name = str_replace(top_model_name, fixed(' + '), 'plus')
-  top_model_name = str_replace(top_model_name, fixed(' * '), '.')
+  top_model_name = str_replace_all(top_model_name, fixed(' + '), 'plus')
+  top_model_name = str_replace_all(top_model_name, fixed(' * '), '.')
   # TODO Add here if statement for assemblage lefle analysis
-  
   #results_list[[species]]$model.table
   #results_list[[analysis]][[top_model_name]]$results$real
   real_results = results_list[[analysis]][[top_model_name]]$results$real
