@@ -66,3 +66,33 @@ run_popan = function(input_file, analy_groups, model_def, analysis_name)
   return(popan_results)
 
 }
+
+graph_mark_results = function(plot_data, save_path, save_filename, graph_title) {  
+  
+  #force graph order to be same as row order
+  plot_data$label <- factor(plot_data$label, levels = plot_data$label)
+
+  p <- ggplot(plot_data, aes(x = factor(label), y = estimate)) +
+    geom_col(fill = "steelblue") +
+    geom_errorbar(
+      aes(ymin = lcl, ymax = ucl),
+      width = 0.2
+    ) +
+    labs(
+      x = "Group",
+      y = "Estimate",
+      title = graph_title
+    ) +
+    theme_minimal() +
+    scale_x_discrete(labels = label_wrap(width = 10)) # Automatically wraps labels to max 10 characters per line
+
+  ggsave(
+    filename =  save_filename,
+    plot = p,
+    path = save_path,  # <- change this
+    width = 8,
+    height = 5,
+    dpi = 300
+  )  
+
+}
