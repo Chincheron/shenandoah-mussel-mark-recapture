@@ -72,7 +72,7 @@ model_def = list(
   Phi.dot=list(formula=~1),
   Phi.time = list(formula=~time),
   Phi.facility = list(formula=~Facility),
-  Phi.facilityplustime = list(formula=~Facility + time),
+  Phi.facilityplustime = list(formula=~Facility + time), #TODO consider removing?
   #p
   p.dot=list(formula=~1),
   p.time=list(formula=~time),
@@ -194,7 +194,7 @@ for (analysis in analysis_name){
     Parameter = row_names
     ,derived_pop_size_results
   )
-
+#TODO convert daily to annual apparent survial
   #write model results
   write_xlsx(
     list(
