@@ -67,7 +67,7 @@ run_popan = function(input_file, analy_groups, model_def, analysis_name)
 
 }
 
-graph_mark_results = function(plot_data, save_path, save_filename, graph_title) {  
+graph_mark_results = function(plot_data, save_path, save_filename, graph_title, label_released) {  
   
   #force graph order to be same as row order
   plot_data$label <- factor(plot_data$label, levels = plot_data$label)
@@ -84,8 +84,16 @@ graph_mark_results = function(plot_data, save_path, save_filename, graph_title) 
       title = graph_title
     ) +
     theme_minimal() +
-    scale_x_discrete(labels = label_wrap(width = 10)) # Automatically wraps labels to max 10 characters per line
-
+    scale_x_discrete(labels = label_wrap(width = 10)) + # Automatically wraps labels to max 10 characters per line 
+    annotate(
+      "text",
+      x = -Inf,
+      y = Inf,
+      label = label_released,
+      hjust = -0.1,
+      vjust = 1.1
+    )
+  
   ggsave(
     filename =  save_filename,
     plot = p,
@@ -95,4 +103,27 @@ graph_mark_results = function(plot_data, save_path, save_filename, graph_title) 
     dpi = 300
   )  
 
+}
+
+generate_release_label = function(group_label, release_summary, analysis) {
+  
+  release_label = ''
+  group_label = group_label %>%
+    str_remove(., 'Facility')
+
+  release_label = paste(
+     analysis, 'released:'
+  )
+
+  for (i in group_label) {
+    release_number = release_summary %>%
+      filter(., Facility == i) %>%
+      filter(., Species == analysis) %>%
+      pull(releases)
+    release_label = paste(
+      release_label, sprintf('%s: %s', i, release_number)
+      , sep = '\n'
+    )
+  }    
+  return(release_label) 
 }

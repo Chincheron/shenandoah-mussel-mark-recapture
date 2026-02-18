@@ -22,6 +22,16 @@ results_figures = path(RESULTS_FIGURES)
 util_file = path(ROOT , "src", "util.r")
 source(util_file)
 
+#number of mussels released by species
+release_summary = data.frame(
+  Facility = c('FMCC', 'FMCC', 'FMCC', 'FMCC', 'Harrison Lake', 'Harrison Lake'),
+  Species = c(
+    'Alasmidonta varicosa', 'Elliptio complanata', 'Elliptio fisheriana', 'Lampsilis cardium', 
+    'Alasmidonta varicosa', 'Elliptio complanata'
+  ),
+  releases = c(34, 565, 1, 258, 245, 487)
+)
+
 mark_input = read_csv(path(source_file), col_types=cols('ch' = col_character()))
 
 #Assume dead observations were not observed for modeling purposes
@@ -139,11 +149,11 @@ results_list[["assemblage"]] = assemblage_results
 analysis_name = names(results_list)
 #analysis_name = 'Alasmidonta varicosa'
 for (analysis in analysis_name){
+  analysis = "Alasmidonta varicosa"
+  #analysis = "Elliptio complanata"
   results_save_path = path(ROOT, "temp", sprintf("%s_Results", analysis))
   dir.create(results_save_path, recursive = TRUE)
   print( analysis)
-  #analysis = "Alasmidonta varicosa"
-  #analysis = "Elliptio complanata"
   model_table = results_list[[analysis]]$model.table
   #get top model name
   top_model = head(model_table, 1)
@@ -174,7 +184,6 @@ for (analysis in analysis_name){
     Parameter = rownames(real_results)
     ,real_results
   )
-  group_label = results_list[[analysis]][[top_model_name]]$group.labels
 
   #None of derived results are labeled, which would be helpful
   #TODO add labels based on group_labels/number and number of estimates
@@ -208,6 +217,8 @@ for (analysis in analysis_name){
 ####
 # Results
 ####
+  group_label = results_list[[analysis]][[top_model_name]]$group.labels   
+  release_label = generate_release_label((group_label), release_summary)    
   
   #plot derived population size
   save_file_name = sprintf("%s_abundance_estimate.png", analysis)
@@ -218,7 +229,7 @@ for (analysis in analysis_name){
     ucl = derived_pop_size_results_export$ucl
   )
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, 'Abundance Estimates (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Abundance Estimates (95% CI)', release_label)
 
   #plot apparent survival 
   save_file_name = sprintf("%s_apparent_survival.png", analysis)
