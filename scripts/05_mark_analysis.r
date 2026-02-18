@@ -139,6 +139,8 @@ results_list[["assemblage"]] = assemblage_results
 analysis_name = names(results_list)
 #analysis_name = 'Alasmidonta varicosa'
 for (analysis in analysis_name){
+  results_save_path = path(ROOT, "temp", sprintf("%s_Results", analysis))
+  dir.create(results_save_path, recursive = TRUE)
   print( analysis)
   analysis = "Alasmidonta varicosa"
   #analysis = "Elliptio complanata"
@@ -200,13 +202,12 @@ for (analysis in analysis_name){
       'Real Results (Top)' = real_results_export,
       'Derived Results (Top)' = derived_pop_size_results_export
     ),
-    path = path(ROOT, "temp", sprintf("%s_Mark_results.xlsx", analysis))
+    path = path(results_save_path, sprintf("%s_Mark_results.xlsx", analysis))
   )
 
-## Plot results
+## Plot results 
 
   #plot derived population size
-  save_path = path(ROOT, "temp")
   save_file_name = sprintf("%s_abundance_estimate.png", analysis)
   plot_data <- data.frame(
     label = derived_pop_size_results_export$Parameter,
@@ -215,10 +216,9 @@ for (analysis in analysis_name){
     ucl = derived_pop_size_results_export$ucl
   )
   source(util_file)
-  graph_mark_results(plot_data, save_path, save_file_name, 'Abundance Estimates (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Abundance Estimates (95% CI)')
 
   #plot apparent survival 
-  save_path = path(ROOT, "temp")
   save_file_name = sprintf("%s_apparent_survival.png", analysis)
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -228,10 +228,9 @@ for (analysis in analysis_name){
   ) %>% 
     filter(., str_detect(real_results_export$Parameter, 'Phi'))
   source(util_file)
-  graph_mark_results(plot_data, save_path, save_file_name, 'Apparent Survival (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Apparent Survival (95% CI)')
 
   #plot capture probability
-  save_path = path(ROOT, "temp")
   save_file_name = sprintf("%s_capture_probability.png", analysis)
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -242,7 +241,7 @@ for (analysis in analysis_name){
     filter(., str_detect(label, 'p'))%>%
     filter(., !str_detect(label, 'pent'))
   source(util_file)
-  graph_mark_results(plot_data, save_path, save_file_name, 'Capture Probability (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Capture Probability (95% CI)')
   
   
   
