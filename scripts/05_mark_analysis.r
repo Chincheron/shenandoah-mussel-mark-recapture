@@ -142,7 +142,7 @@ for (analysis in analysis_name){
   results_save_path = path(ROOT, "temp", sprintf("%s_Results", analysis))
   dir.create(results_save_path, recursive = TRUE)
   print( analysis)
-  analysis = "Alasmidonta varicosa"
+  #analysis = "Alasmidonta varicosa"
   #analysis = "Elliptio complanata"
   model_table = results_list[[analysis]]$model.table
   #get top model name
@@ -244,7 +244,97 @@ for (analysis in analysis_name){
     filter(., !str_detect(label, 'pent'))
   source(util_file)
   graph_mark_results(plot_data, results_save_path, save_file_name, 'Capture Probability (95% CI)')
+
+  ## split by facility
+  # FMCC
+  facility = 'FMCC'
+  save_file_name = sprintf("%s_abundance_estimate_%s.png", analysis, facility)
+  graph_title = sprintf('%s Abundance Estimates (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = derived_pop_size_results_export$Parameter,
+    estimate = derived_pop_size_results_export$estimate,
+    lcl = derived_pop_size_results_export$lcl,
+    ucl = derived_pop_size_results_export$ucl
+  ) %>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+
+  #plot apparent survival 
+  save_file_name = sprintf("%s_apparent_survival_%s.png", analysis, facility)
+  graph_title = sprintf('%s Apparent Survival (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(label, 'Phi')) %>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+
+  #plot capture probability
+  save_file_name = sprintf("%s_capture_probability_%s.png", analysis, facility)
+  graph_title = sprintf('%s Capture Probability (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(label, 'p'))%>%
+    filter(., !str_detect(label, 'pent'))%>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+
+  # Harrison Lake
+  facility = 'Harrison Lake'
+  save_file_name = sprintf("%s_abundance_estimate_%s.png", analysis, facility)
+  graph_title = sprintf('%s Abundance Estimates (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = derived_pop_size_results_export$Parameter,
+    estimate = derived_pop_size_results_export$estimate,
+    lcl = derived_pop_size_results_export$lcl,
+    ucl = derived_pop_size_results_export$ucl
+  ) %>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+
+  #plot apparent survival 
+  save_file_name = sprintf("%s_apparent_survival_%s.png", analysis, facility)
+  graph_title = sprintf('%s Apparent Survival (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(label, 'Phi')) %>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+
+  #plot capture probability
+  save_file_name = sprintf("%s_capture_probability_%s.png", analysis, facility)
+  graph_title = sprintf('%s Capture Probability (95%% CI)', facility) 
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(label, 'p'))%>%
+    filter(., !str_detect(label, 'pent'))%>%
+    filter(., str_detect(label, facility))
+  source(util_file)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  
 }
+
+
 
 
 
