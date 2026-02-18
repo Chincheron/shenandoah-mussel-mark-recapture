@@ -205,8 +205,10 @@ for (analysis in analysis_name){
     path = path(results_save_path, sprintf("%s_Mark_results.xlsx", analysis))
   )
 
-## Plot results 
-
+####
+# Results
+####
+  
   #plot derived population size
   save_file_name = sprintf("%s_abundance_estimate.png", analysis)
   plot_data <- data.frame(
@@ -242,120 +244,9 @@ for (analysis in analysis_name){
     filter(., !str_detect(label, 'pent'))
   source(util_file)
   graph_mark_results(plot_data, results_save_path, save_file_name, 'Capture Probability (95% CI)')
-  
-  
-  
-  
-  
-  plot_data <- results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
-
-  plot_data <- data.frame(
-    estimate = plot_data$estimate,
-    lcl = plot_data$lcl,
-    ucl = plot_data$ucl
-  )
-
-  plot_data$label <- seq_len(nrow(plot_data))
-
-  p <- ggplot(plot_data, aes(x = factor(label), y = estimate)) +
-    geom_col(fill = "steelblue") +
-    geom_errorbar(
-      aes(ymin = lcl, ymax = ucl),
-      width = 0.2
-    ) +
-    labs(
-      x = "Group",
-      y = "Estimate",
-      title = "Abundance Estimates with Confidence Intervals"
-    ) +
-    theme_minimal()
-
-  figure_path = path(ROOT, "temp")
-  ggsave(
-    filename =  sprintf("%s_abundance_estimate.png", analysis),
-    plot = p,
-    path = figure_path,  # <- change this
-    width = 8,
-    height = 5,
-    dpi = 300
-  )
-  
-  #plot
-  #need to figure out how to get parameter names for these dynamically and then filter to those of interest
-  plot_data <- results_list[[analysis]][[top_model_name]]$results$real
-  # get.real(popan_results, "Phi")
-
-  plot_data <- data.frame(
-    estimate = plot_data$estimate,
-    lcl = plot_data$lcl,
-    ucl = plot_data$ucl
-  )
-
-  plot_data$label <- seq_len(nrow(plot_data))
-
-  p_real <- ggplot(plot_data, aes(x = factor(label), y = estimate)) +
-    geom_col(fill = "steelblue") +
-    geom_errorbar(
-      aes(ymin = lcl, ymax = ucl),
-      width = 0.2
-    ) +
-    labs(
-      x = "Group",
-      y = "Estimate",
-      title = "Real Parameter Estimates with Confidence Intervals"
-    ) +
-    theme_minimal()
-
-  figure_path = path(ROOT, "temp")
-  ggsave(
-    filename =  sprintf("%s_real_parameter_estimate.png", analysis),
-    plot = p_real,
-    path = figure_path,  # <- change this
-    width = 8,
-    height = 5,
-    dpi = 300
-  )
-  
 }
 
-####
-# Results
-####
 
-plot_data <- popan_results$Phi.facility.p.time$results$derived$`N Population Size`
-plot_data <- popan_results$Phi.dot.p.time.N.dot$results$derived$`N Population Size`
-
-plot_data <- results_list$`Alasmidonta varicosa`$Phi.facility.p.time.pent.0$results$derived$`N Population Size`
-
-complanata <- data.frame(
-  estimate = plot_data$estimate,
-  lcl = plot_data$lcl,
-  ucl = plot_data$ucl
-)
-
-complanata$label <- seq_len(nrow(complanata))
-
-p <- ggplot(complanata, aes(x = factor(label), y = estimate)) +
-  geom_col(fill = "steelblue") +
-  geom_errorbar(
-    aes(ymin = lcl, ymax = ucl),
-    width = 0.2
-  ) +
-  labs(
-    x = "Group",
-    y = "Estimate",
-    title = "Estimates with Confidence Intervals"
-  ) +
-  theme_minimal()
-
-ggsave(
-  filename = "population_estimates_ci.png",
-  plot = p,
-  path = results_figures,  # <- change this
-  width = 8,
-  height = 5,
-  dpi = 300
-)
 
 #####
 # CJS
