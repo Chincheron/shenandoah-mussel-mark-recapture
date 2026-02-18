@@ -6,6 +6,7 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(writexl)
+library(scales)
 
 # config
 #TRUE if only want to use the 2024 MR occasions (i.e., ignore release data/timing)
@@ -139,7 +140,7 @@ analysis_name = names(results_list)
 #analysis_name = 'Alasmidonta varicosa'
 for (analysis in analysis_name){
   print( analysis)
-  #analysis = "Alasmidonta varicosa"
+  analysis = "Alasmidonta varicosa"
   #analysis = "Elliptio complanata"
   model_table = results_list[[analysis]]$model.table
   #get top model name
@@ -202,7 +203,51 @@ for (analysis in analysis_name){
     path = path(ROOT, "temp", sprintf("%s_Mark_results.xlsx", analysis))
   )
 
-  #plot results
+## Plot results
+
+  #plot derived population size
+  save_path = path(ROOT, "temp")
+  save_file_name = sprintf("%s_abundance_estimate.png", analysis)
+  plot_data <- data.frame(
+    label = derived_pop_size_results_export$Parameter,
+    estimate = derived_pop_size_results_export$estimate,
+    lcl = derived_pop_size_results_export$lcl,
+    ucl = derived_pop_size_results_export$ucl
+  )
+  source(util_file)
+  graph_mark_results(plot_data, save_path, save_file_name, 'Abundance Estimates (95% CI)')
+
+  #plot apparent survival 
+  save_path = path(ROOT, "temp")
+  save_file_name = sprintf("%s_apparent_survival.png", analysis)
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(real_results_export$Parameter, 'Phi'))
+  source(util_file)
+  graph_mark_results(plot_data, save_path, save_file_name, 'Apparent Survival (95% CI)')
+
+  #plot capture probability
+  save_path = path(ROOT, "temp")
+  save_file_name = sprintf("%s_capture_probability.png", analysis)
+  plot_data <- data.frame(
+    label = real_results_export$Parameter,
+    estimate = real_results_export$estimate,
+    lcl = real_results_export$lcl,
+    ucl = real_results_export$ucl
+  ) %>% 
+    filter(., str_detect(label, 'p'))%>%
+    filter(., !str_detect(label, 'pent'))
+  source(util_file)
+  graph_mark_results(plot_data, save_path, save_file_name, 'Capture Probability (95% CI)')
+  
+  
+  
+  
+  
   plot_data <- results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
 
   plot_data <- data.frame(
