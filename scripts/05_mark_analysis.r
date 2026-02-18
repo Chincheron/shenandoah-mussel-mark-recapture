@@ -149,8 +149,8 @@ results_list[["assemblage"]] = assemblage_results
 analysis_name = names(results_list)
 #analysis_name = 'Alasmidonta varicosa'
 for (analysis in analysis_name){
-  analysis = "Alasmidonta varicosa"
-  #analysis = "Elliptio complanata"
+  # analysis = "Alasmidonta varicosa"
+  # analysis = "Elliptio complanata"
   results_save_path = path(ROOT, "temp", sprintf("%s_Results", analysis))
   dir.create(results_save_path, recursive = TRUE)
   print( analysis)
@@ -217,11 +217,12 @@ for (analysis in analysis_name){
 ####
 # Results
 ####
+  #generate group labels for each loop for labeling purposes
   group_label = results_list[[analysis]][[top_model_name]]$group.labels   
-  release_label = generate_release_label((group_label), release_summary)    
   
   #plot derived population size
   save_file_name = sprintf("%s_abundance_estimate.png", analysis)
+  release_label = generate_release_label((group_label), release_summary, analysis)    
   plot_data <- data.frame(
     label = derived_pop_size_results_export$Parameter,
     estimate = derived_pop_size_results_export$estimate,
@@ -233,6 +234,7 @@ for (analysis in analysis_name){
 
   #plot apparent survival 
   save_file_name = sprintf("%s_apparent_survival.png", analysis)
+  release_label = generate_release_label((group_label), release_summary, analysis)    
   plot_data <- data.frame(
     label = real_results_export$Parameter,
     estimate = real_results_export$estimate,
@@ -241,10 +243,11 @@ for (analysis in analysis_name){
   ) %>% 
     filter(., str_detect(real_results_export$Parameter, 'Phi'))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, 'Apparent Survival (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Apparent Survival (95% CI)', release_label)
 
   #plot capture probability
   save_file_name = sprintf("%s_capture_probability.png", analysis)
+  release_label = generate_release_label((group_label), release_summary, analysis)    
   plot_data <- data.frame(
     label = real_results_export$Parameter,
     estimate = real_results_export$estimate,
@@ -254,12 +257,13 @@ for (analysis in analysis_name){
     filter(., str_detect(label, 'p'))%>%
     filter(., !str_detect(label, 'pent'))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, 'Capture Probability (95% CI)')
+  graph_mark_results(plot_data, results_save_path, save_file_name, 'Capture Probability (95% CI)', release_label)
 
   ## split by facility
   # FMCC
   facility = 'FMCC'
   save_file_name = sprintf("%s_abundance_estimate_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)    
   graph_title = sprintf('%s Abundance Estimates (95%% CI)', facility) 
   plot_data <- data.frame(
     label = derived_pop_size_results_export$Parameter,
@@ -269,10 +273,11 @@ for (analysis in analysis_name){
   ) %>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
 
   #plot apparent survival 
   save_file_name = sprintf("%s_apparent_survival_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)
   graph_title = sprintf('%s Apparent Survival (95%% CI)', facility) 
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -283,10 +288,11 @@ for (analysis in analysis_name){
     filter(., str_detect(label, 'Phi')) %>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
 
   #plot capture probability
   save_file_name = sprintf("%s_capture_probability_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)
   graph_title = sprintf('%s Capture Probability (95%% CI)', facility) 
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -298,11 +304,12 @@ for (analysis in analysis_name){
     filter(., !str_detect(label, 'pent'))%>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
 
   # Harrison Lake
   facility = 'Harrison Lake'
   save_file_name = sprintf("%s_abundance_estimate_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)
   graph_title = sprintf('%s Abundance Estimates (95%% CI)', facility) 
   plot_data <- data.frame(
     label = derived_pop_size_results_export$Parameter,
@@ -312,10 +319,11 @@ for (analysis in analysis_name){
   ) %>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
 
   #plot apparent survival 
   save_file_name = sprintf("%s_apparent_survival_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)
   graph_title = sprintf('%s Apparent Survival (95%% CI)', facility) 
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -326,10 +334,11 @@ for (analysis in analysis_name){
     filter(., str_detect(label, 'Phi')) %>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
 
   #plot capture probability
   save_file_name = sprintf("%s_capture_probability_%s.png", analysis, facility)
+  release_label = generate_release_label((group_label), release_summary, analysis)
   graph_title = sprintf('%s Capture Probability (95%% CI)', facility) 
   plot_data <- data.frame(
     label = real_results_export$Parameter,
@@ -341,7 +350,7 @@ for (analysis in analysis_name){
     filter(., !str_detect(label, 'pent'))%>%
     filter(., str_detect(label, facility))
   source(util_file)
-  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title)
+  graph_mark_results(plot_data, results_save_path, save_file_name, graph_title, release_label)
   
 }
 
