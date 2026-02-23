@@ -19,6 +19,9 @@ source_folder = DATA_PIPELINE
 source_file = path(source_folder, "04_mark_input.csv")
 current_time = format(Sys.time(), "%Y-%m-%d_%H-%M-%S")  
 mark_output_folder = path(RESULTS, 'mark_output', current_time)
+#for saving the r object that contains model results from RMARK analysis
+mark_results_folder = path(DATA_INTERIM, 'saved_objects')
+dir.create(mark_results_folder, recursive = TRUE)
 results_figures = path(RESULTS_FIGURES)
 util_file = path(ROOT , "src", "util.r")
 source(util_file)
@@ -142,6 +145,12 @@ N.facilityplusspecies = list(formula=~Facility + Species)
 assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage", save_directory = mark_output_folder)
 # add to results_list
 results_list[["assemblage"]] = assemblage_results
+
+#export results of mark_models for further analysis
+mark_results_path = path(mark_results_folder, '05_mark_results.rds')
+saveRDS(results_list, mark_results_path, ascii = TRUE)
+
+
 
 ####
 #Export model output
