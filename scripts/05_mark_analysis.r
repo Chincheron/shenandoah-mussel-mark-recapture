@@ -16,8 +16,9 @@ mr_only = FALSE
 source_python("config/paths.py")
 
 source_folder = DATA_PIPELINE
-output_folder = path(RESULTS_TEMP)
 source_file = path(source_folder, "04_mark_input.csv")
+current_time = format(Sys.time(), "%Y-%m-%d_%H-%M-%S")  
+mark_output_folder = path(RESULTS, 'mark_output', current_time)
 results_figures = path(RESULTS_FIGURES)
 util_file = path(ROOT , "src", "util.r")
 source(util_file)
@@ -102,7 +103,7 @@ species_list = names(species_input)
 #to use most RMARK functions for extracting data, you must typically call at the level above (i.e., model level)
 for (species in species_list) {
   species_df = species_input[[species]]
-  popan_results = run_popan(species_df, groups, model_def, species)
+  popan_results = run_popan(species_df, groups, model_def, species, save_directory = mark_output_folder)
   results_list[[species]] = popan_results
 }
 
@@ -138,7 +139,7 @@ N.facility = list(formula=~Facility),
 N.species = list(formula=~Species),
 N.facilityplusspecies = list(formula=~Facility + Species)
 )
-assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage")
+assemblage_results = run_popan(mark_input, groups, model_def, "Assemblage", save_directory = mark_output_folder)
 # add to results_list
 results_list[["assemblage"]] = assemblage_results
 

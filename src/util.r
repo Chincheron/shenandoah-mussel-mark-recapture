@@ -6,10 +6,12 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 
-run_popan = function(input_file, analy_groups, model_def, analysis_name)
+run_popan = function(input_file, analy_groups, model_def, analysis_name, save_directory = path(ROOT, 'temp'))
 {
   analysis_name = analysis_name
-  save_directory = path(ROOT, 'temp', analysis_name)
+
+  #create output_directory for mark objects
+  save_directory = path(save_directory, analysis_name)
   dir.create(save_directory, recursive = TRUE)
 
   # Must create a environment then inject parameter definitions and assign other variables to be used (e.g. fixing pent to 0)
