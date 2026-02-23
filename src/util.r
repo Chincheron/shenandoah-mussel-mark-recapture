@@ -129,3 +129,74 @@ generate_release_label = function(group_label, release_summary, analysis) {
   }    
   return(release_label) 
 }
+
+
+extract_top_model_results = function(results_list, analysis) {
+  #analysis = 'assemblage'
+  model_table = results_list[[analysis]]$model.table
+
+  top_model = head(model_table, 1)
+  
+  #get top model name 
+  phi_model = top_model[["Phi"]][1] %>% 
+    substring(2, nchar(.)) |> 
+    str_to_lower()
+  p_model = top_model[["p"]][1] %>% 
+    substring(2, nchar(.)) |> 
+    str_to_lower()
+  
+  # assemblage model names include N (because we examined factors for N) so we need to account for when N is in model name
+  if ("N" %in% colnames(top_model)) {
+    n_model = top_model[["N"]][1] %>% 
+      substring(2, nchar(.)) |> 
+      str_to_lower()
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0.N.", n_model)
+  } else {
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")  
+  }
+
+  #Set top model name to pull results from marklist object
+  top_model_name = gsub("1", "dot", top_model_name)
+  #deal with inconsistent naming of interaction models between row names and model names
+  top_model_name = str_replace_all(top_model_name, fixed(' + '), 'plus')
+  top_model_name = str_replace_all(top_model_name, fixed(' * '), '.')
+  
+  # TODO Add here if statement for assemblage lefle analysis
+  #extract real results from top model
+  real_results = results_list[[analysis]][[top_model_name]]$results$real
+
+  real_df = as.data.frame(real_results) |>
+    tibble::rownames_to_column("Parameter") |>
+    separate_wider_regex(Parameter, patterns = c(
+      Parameter = "^[^ ]+",
+      " ",
+      Group = ".*",
+      " ",
+      Occasion = "a[0-9]+ t[0-9]+$"
+    ))
+  
+  #extract derived results from top model
+  derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+  occasions = nrow(derived_pop_size_results)
+  derived_pop_size_groups = results_list[[analysis]][[top_model_name]]$group.labels
+  length_derived_pop_size_groups = length(derived_pop_size_groups)
+  number_of_mr_occasions = (occasions / length_derived_pop_size_groups)
+  suffixes = c('Release', paste('MR', 1:(number_of_mr_occasions-1)))
+  row_names = paste(
+    rep(derived_pop_size_groups, each = number_of_mr_occasions),
+    "_",
+    rep(suffixes, times = length(derived_pop_size_groups))
+  )  
+  row_names = str_remove(row_names, "Facility")
+
+  derived_df = as.data.frame(derived_pop_size_results) |> 
+    mutate(
+      Parameter = row_names
+    ) |> 
+    separate_wider_delim(Parameter, delim = ' _ ', names = c('Group', 'Occasion'), too_many = "merge") |> 
+    mutate(Parameter = "N_derived")
+
+return (bind_rows(real_df, derived_df) |> 
+    mutate(mark_analysis = analysis)
+)
+}

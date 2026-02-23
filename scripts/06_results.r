@@ -15,8 +15,8 @@ source_python("config/paths.py")
 util_file = path(ROOT , "src", "util.r")
 source(util_file)
 
+#retrieve r object with model outputs from RMARK analysis
 results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
-
 results_list = readRDS(results_file)
 
 #number of mussels released by species
@@ -28,7 +28,83 @@ release_summary = data.frame(
   ),
   releases = c(34, 565, 1, 258, 245, 487)
 )
+#analysis = 'assemblage'
+extract_top_model_results = function(results_list, analysis) {
 
+  model_table = results_list[[analysis]]$model.table
+
+  top_model = head(model_table, 1)
+  
+  #get top model name 
+  phi_model = top_model[["Phi"]][1] %>% 
+    substring(2, nchar(.)) |> 
+    str_to_lower()
+  p_model = top_model[["p"]][1] %>% 
+    substring(2, nchar(.)) |> 
+    str_to_lower()
+  
+  # assemblage model names include N (because we examined factors for N) so we need to account for when N is in model name
+  if ("N" %in% colnames(top_model)) {
+    n_model = top_model[["N"]][1] %>% 
+      substring(2, nchar(.)) |> 
+      str_to_lower()
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0.N.", n_model)
+  } else {
+    top_model_name = paste0("Phi.", phi_model, ".p.", p_model, ".pent.0")  
+  }
+
+  #Set top model name to pull results from marklist object
+  top_model_name = gsub("1", "dot", top_model_name)
+  #deal with inconsistent naming of interaction models between row names and model names
+  top_model_name = str_replace_all(top_model_name, fixed(' + '), 'plus')
+  top_model_name = str_replace_all(top_model_name, fixed(' * '), '.')
+  
+  # TODO Add here if statement for assemblage lefle analysis
+  #extract real results from top model
+  real_results = results_list[[analysis]][[top_model_name]]$results$real
+
+  real_df = as.data.frame(real_results) |>
+    tibble::rownames_to_column("Parameter") |>
+    separate_wider_regex(Parameter, patterns = c(
+      Parameter = "^[^ ]+",
+      " ",
+      Group = ".*",
+      " ",
+      Occasion = "a[0-9]+ t[0-9]+$"
+    ))
+  
+  #extract derived results from top model
+  derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+  occasions = nrow(derived_pop_size_results)
+  derived_pop_size_groups = results_list[[analysis]][[top_model_name]]$group.labels
+  length_derived_pop_size_groups = length(derived_pop_size_groups)
+  number_of_mr_occasions = (occasions / length_derived_pop_size_groups)
+  suffixes = c('Release', paste('MR', 1:(number_of_mr_occasions-1)))
+  row_names = paste(
+    rep(derived_pop_size_groups, each = number_of_mr_occasions),
+    "_",
+    rep(suffixes, times = length(derived_pop_size_groups))
+  )  
+  row_names = str_remove(row_names, "Facility")
+
+  derived_df = as.data.frame(derived_pop_size_results) |> 
+    mutate(
+      Parameter = row_names
+    ) |> 
+    separate_wider_delim(Parameter, delim = ' _ ', names = c('Group', 'Occasion'), too_many = "merge") |> 
+    mutate(Parameter = "N_derived")
+
+return (bind_rows(real_df, derived_df) |> 
+    mutate(mark_analysis = analysis)
+)
+}
+
+analysis_names <- names(results_list)
+
+all_results <- purrr::map_dfr(
+  analysis_names,
+  ~ extract_top_model_results(results_list, .x)
+)
 
 analysis_name = names(results_list)
 #analysis_name = 'Alasmidonta varicosa'
@@ -69,6 +145,10 @@ for (analysis in analysis_name){
     ,real_results
   )
 
+  #TODO convert daily to annual apparent survial
+
+
+
   #None of derived results are labeled, which would be helpful
   #TODO add labels based on group_labels/number and number of estimates
   derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
@@ -87,7 +167,7 @@ for (analysis in analysis_name){
     Parameter = row_names
     ,derived_pop_size_results
   )
-#TODO convert daily to annual apparent survial
+
   #write model results
   write_xlsx(
     list(
