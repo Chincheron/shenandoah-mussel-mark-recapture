@@ -59,12 +59,86 @@ all_results = all_results |>
 
 #export results
 top_model_results_save_folder = path(ROOT, 'temp')
+dir.create(top_model_results_save_folder)
 top_model_results_save_name = 'top_model_results_all.xlsx'
 top_model_results_save_path = path(top_model_results_save_folder, top_model_results_save_name)
-dir.create(top_model_results_save_path)
 write_xlsx(all_results, top_model_results_save_path)
 
+# Plotting figures
+## configure global plot variables and settings
+all_plot_config <- list(
+  labels = list(
+    mark_analysis_level = "Analysis Level",
+    Occasion = "Sampling Occasion"
+   ),
+  palettes = list(
+    analysis_level = c(
+      assemblage = "steelblue",
+      species    = "darkorange"
+    )
+  ),
+  column_mapping = list(
+    analysis_level = "mark_analysis_level",
+    species = "species",
+    facility = "facility",
+    mark_parameter = "Parameter",
+    sampling_occasion = "Occasion",
+    parameter_estimate = "estimate",
+    standard_error = "se",
+    lower_ci = "lcI",
+    upper_ci = "ucI"
+  ),
+  theme = theme_bw(base_size = 12)
+)
+#pull column mapping for ease of reading functioni later
+cm = all_plot_config$column_mapping
 
+## Figures comparing assemblage level analysis to species level analysis
+### Abundance figures
+#### configure abundance level plot variables and settings
+abundance_plot_config <- list(
+  parameter = "N_derived",
+  y_label   = "Estimated Abundance",
+  x_factor = cm$sampling_occasion,
+  x_factor_label = all_plot_config$labels$Occasion,
+  grouping = cm$analysis_level,
+  grouping_label = all_plot_config$labels$mark_analysis_level,
+  grouping_palette = "analysis_level",
+  facet_var = cm$species
+)
+
+build_base_plot = function(data, family_config, global_config){
+
+  cm = global_config$column_mapping
+
+  #filter to parameter of interest
+  data |> 
+  filter(.data[[cm$mark_parameter]]  == 
+    family_config$parameter) |> 
+  #base plot
+  ggplot(
+    aes(
+      x = factor(.data[[family_config$x_factor]]), #pull to global or family config?
+      y = .data[[cm$parameter_estimate]],
+      fill = .data[[family_config$grouping]]
+    )
+  ) +
+  geom_col(position = position_dodge()) +
+  facet_wrap(vars(.data[[family_config$facet_var]])) +
+  labs(
+    x = family_config$x_factor_label,
+    y = family_config$y_label,
+    fill = family_config$grouping_label
+  ) +
+  scale_fill_manual(
+    values = global_config$palettes[[family_config$grouping_palette]]
+  ) +
+  global_config$theme
+}
+
+build_base_plot(all_results, abundance_plot_config, all_plot_config)
+
+#### Big picture - aggregated at only the species level for each occasion 
 
 ####
 # Results
