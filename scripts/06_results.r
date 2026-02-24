@@ -129,15 +129,24 @@ abundance_plot_config <- list(
   facet_vars = c(cm$species) 
 )
 
-# combined comparison of assemblage and species level analyses
+# assemblage vs. species level analyses abundance
 build_base_plot(all_results, all_plot_config, abundance_plot_config)
 
-#split by facility 
-figure_facility <- list(
+# assembalge vs. species analyses abundance split by facility 
+figure_config_facility <- list(
+  parameter = "Phi",
+  y_label = "Estimated apparent survival"
+)
+build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
+
+#asseblage vs. species analyses survival split by facility
+figure_config_facility <- list(
+  parameter = "Phi",
+  y_label = "Estimated apparent survival",
   facet_vars = c(cm$facility, cm$species)
 )
+build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
 
-build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_facility)
 
 
 
