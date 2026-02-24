@@ -104,39 +104,73 @@ abundance_plot_config <- list(
   grouping = cm$analysis_level,
   grouping_label = all_plot_config$labels$mark_analysis_level,
   grouping_palette = "analysis_level",
-  facet_var = cm$species
+  
+  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
+  facet_vars = c(cm$species) 
 )
 
-build_base_plot = function(data, family_config, global_config){
+build_base_plot = function(data, global_config, family_config, figure_config = list()){
 
+  #overide family_config with figure specific settings, if provided
+  config = modifyList(family_config, figure_config)
+
+  #for readability
   cm = global_config$column_mapping
 
   #filter to parameter of interest
-  data |> 
+  p = data |> 
   filter(.data[[cm$mark_parameter]]  == 
-    family_config$parameter) |> 
+    config$parameter) |> 
   #base plot
   ggplot(
     aes(
-      x = factor(.data[[family_config$x_factor]]), #pull to global or family config?
+      x = factor(.data[[config$x_factor]]), #pull to global or family config?
       y = .data[[cm$parameter_estimate]],
-      fill = .data[[family_config$grouping]]
+      fill = .data[[config$grouping]]
     )
   ) +
   geom_col(position = position_dodge()) +
-  facet_wrap(vars(.data[[family_config$facet_var]])) +
   labs(
-    x = family_config$x_factor_label,
-    y = family_config$y_label,
-    fill = family_config$grouping_label
+    x = config$x_factor_label,
+    y = config$y_label,
+    fill = config$grouping_label
   ) +
   scale_fill_manual(
-    values = global_config$palettes[[family_config$grouping_palette]]
+    values = global_config$palettes[[config$grouping_palette]]
   ) +
   global_config$theme
+  
+  # faceting logic
+  if (length(config$facet_vars) == 0) {
+    #do nothing to alter plot
+  } else if
+    (length(config$facet_vars) == 1) {
+    p = p +
+      facet_wrap(vars(.data[[config$facet_vars]]))
+  } else if (length(config$facet_vars) == 2){
+    p = p +
+      facet_grid(
+        rows = vars(.data[[config$facet_vars[1]]]),
+        cols = vars(.data[[config$facet_vars[2]]])
+      )
+  } else {
+    stop(("facet_vars in family config file must have either 1, 2, or 0 variables"))
+  }
+  
+  return(p)
 }
 
-build_base_plot(all_results, abundance_plot_config, all_plot_config)
+build_base_plot(all_results, all_plot_config, abundance_plot_config)
+
+
+figure_facility <- list(
+  grouping = cm$facility,
+  grouping_label = "Facility",
+  #grouping_palette = "facility",
+  facet_vars = c(cm$species)
+)
+
+build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_facility)
 
 #### Big picture - aggregated at only the species level for each occasion 
 
