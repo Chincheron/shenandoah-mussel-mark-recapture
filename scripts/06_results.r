@@ -59,6 +59,21 @@ all_results = all_results |>
   rename(mark_analysis_level = mark_analysis ) |> 
   select(mark_analysis_level, species, facility, Parameter, Occasion, estimate, se, lcl, ucl, fixed)
 
+# sum values to create a 'combined' facility
+combined_df = all_results |>
+  filter(Parameter == 'N_derived') |> 
+  group_by(mark_analysis_level, species, Parameter, Occasion) |> 
+  summarise(
+    estimate = sum(estimate),
+    se = sum(se),
+    lcl = sum(lcl),
+    ucl = sum(ucl),
+    .groups = "drop"
+  ) |> 
+  mutate(facility = 'combined')
+
+all_results = bind_rows(all_results, combined_df)
+
 #export results
 top_model_results_save_folder = path(ROOT, 'temp')
 dir.create(top_model_results_save_folder)
@@ -114,14 +129,12 @@ abundance_plot_config <- list(
   facet_vars = c(cm$species) 
 )
 
+# combined comparison of assemblage and species level analyses
 build_base_plot(all_results, all_plot_config, abundance_plot_config)
 
-
+#split by facility 
 figure_facility <- list(
-  grouping = cm$facility,
-  grouping_label = "Facility",
-  grouping_palette = "facility_level",
-  facet_vars = c(cm$species)
+  facet_vars = c(cm$facility, cm$species)
 )
 
 build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_facility)
