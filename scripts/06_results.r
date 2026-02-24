@@ -13,7 +13,9 @@ library(scales)
 source_python("config/paths.py")
 #pull utility functions
 util_file = path(ROOT , "src", "util.r")
+graph_util_file = path(ROOT , "src", "graph_util.r")
 source(util_file)
+source(graph_util_file)
 
 #retrieve r object with model outputs from RMARK analysis
 results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
@@ -75,6 +77,10 @@ all_plot_config <- list(
     analysis_level = c(
       assemblage = "steelblue",
       species    = "darkorange"
+    ),
+    facility_level = c(
+      FMCC = "deepskyblue",
+      "Harrison Lake" = "darkred"
     )
   ),
   column_mapping = list(
@@ -104,61 +110,9 @@ abundance_plot_config <- list(
   grouping = cm$analysis_level,
   grouping_label = all_plot_config$labels$mark_analysis_level,
   grouping_palette = "analysis_level",
-  
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
   facet_vars = c(cm$species) 
 )
-
-build_base_plot = function(data, global_config, family_config, figure_config = list()){
-
-  #overide family_config with figure specific settings, if provided
-  config = modifyList(family_config, figure_config)
-
-  #for readability
-  cm = global_config$column_mapping
-
-  #filter to parameter of interest
-  p = data |> 
-  filter(.data[[cm$mark_parameter]]  == 
-    config$parameter) |> 
-  #base plot
-  ggplot(
-    aes(
-      x = factor(.data[[config$x_factor]]), #pull to global or family config?
-      y = .data[[cm$parameter_estimate]],
-      fill = .data[[config$grouping]]
-    )
-  ) +
-  geom_col(position = position_dodge()) +
-  labs(
-    x = config$x_factor_label,
-    y = config$y_label,
-    fill = config$grouping_label
-  ) +
-  scale_fill_manual(
-    values = global_config$palettes[[config$grouping_palette]]
-  ) +
-  global_config$theme
-  
-  # faceting logic
-  if (length(config$facet_vars) == 0) {
-    #do nothing to alter plot
-  } else if
-    (length(config$facet_vars) == 1) {
-    p = p +
-      facet_wrap(vars(.data[[config$facet_vars]]))
-  } else if (length(config$facet_vars) == 2){
-    p = p +
-      facet_grid(
-        rows = vars(.data[[config$facet_vars[1]]]),
-        cols = vars(.data[[config$facet_vars[2]]])
-      )
-  } else {
-    stop(("facet_vars in family config file must have either 1, 2, or 0 variables"))
-  }
-  
-  return(p)
-}
 
 build_base_plot(all_results, all_plot_config, abundance_plot_config)
 
@@ -166,11 +120,13 @@ build_base_plot(all_results, all_plot_config, abundance_plot_config)
 figure_facility <- list(
   grouping = cm$facility,
   grouping_label = "Facility",
-  #grouping_palette = "facility",
+  grouping_palette = "facility_level",
   facet_vars = c(cm$species)
 )
 
 build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_facility)
+
+
 
 #### Big picture - aggregated at only the species level for each occasion 
 
