@@ -31,7 +31,10 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   labs(
     x = config$x_factor_label,
     y = config$y_label,
-    fill = config$grouping_label
+    fill = config$grouping_label,
+    title = config$title,
+    subtitle = config$subtitle,
+    caption = config$caption
   ) +
   scale_fill_manual(
     values = global_config$palettes[[config$grouping_palette]]

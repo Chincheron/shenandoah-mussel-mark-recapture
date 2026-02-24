@@ -78,7 +78,7 @@ all_results = bind_rows(all_results, combined_df)
 all_results = all_results |> 
   mutate(
     estimate = case_when(
-      Parameter == 'Phi' ~ estimate^365,
+      Parameter == 'Phi' ~ estimate^365.25,
       .default = estimate
     )
   )
@@ -135,22 +135,31 @@ abundance_plot_config <- list(
   grouping_label = all_plot_config$labels$mark_analysis_level,
   grouping_palette = "analysis_level",
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$species) 
+  facet_vars = c(cm$species),
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL 
 )
 
 # assemblage vs. species level analyses abundance
-build_base_plot(all_results, all_plot_config, abundance_plot_config)
+build_base_plot(all_results, all_plot_config, abundance_plot_config, 
+  list(title = 'Abundance estimates by species', 
+  subtitle = 'Assemblage vs. species level analyses'))
 
 #asseblage vs. species analyses abundance  split by facility
 figure_config_facility <- list(
-  facet_vars = c(cm$facility, cm$species)
+  facet_vars = c(cm$facility, cm$species),
+  title = 'Abundance estimates by species and Facility', 
+  subtitle = 'Assemblage vs. species level analyses'
 )
 build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
 
 # assembalge vs. species analyses survival 
 figure_config_facility <- list(
   parameter = "Phi",
-  y_label = "Estimated apparent survival"
+  y_label = "Estimated apparent survival",
+  title = 'Apparent survival estimates by species', 
+  subtitle = 'Assemblage vs. species level analyses'
 )
 build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
 
@@ -158,7 +167,9 @@ build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_conf
 figure_config_facility <- list(
   parameter = "Phi",
   y_label = "Estimated apparent survival",
-  facet_vars = c(cm$facility, cm$species)
+  facet_vars = c(cm$facility, cm$species),
+  title = 'Apparent survival estimates by species and facility', 
+  subtitle = 'Assemblage vs. species level analyses'
 )
 build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
 
