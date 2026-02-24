@@ -74,6 +74,15 @@ combined_df = all_results |>
 
 all_results = bind_rows(all_results, combined_df)
 
+# convert daily survival to annual survival
+all_results = all_results |> 
+  mutate(
+    estimate = case_when(
+      Parameter == 'Phi' ~ estimate^365,
+      .default = estimate
+    )
+  )
+
 #export results
 top_model_results_save_folder = path(ROOT, 'temp')
 dir.create(top_model_results_save_folder)
@@ -132,7 +141,13 @@ abundance_plot_config <- list(
 # assemblage vs. species level analyses abundance
 build_base_plot(all_results, all_plot_config, abundance_plot_config)
 
-# assembalge vs. species analyses abundance split by facility 
+#asseblage vs. species analyses abundance  split by facility
+figure_config_facility <- list(
+  facet_vars = c(cm$facility, cm$species)
+)
+build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
+
+# assembalge vs. species analyses survival 
 figure_config_facility <- list(
   parameter = "Phi",
   y_label = "Estimated apparent survival"
