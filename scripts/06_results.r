@@ -21,16 +21,6 @@ source(graph_util_file)
 results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
 results_list = readRDS(results_file)
 
-#number of mussels released by species
-release_summary = data.frame(
-  Facility = c('FMCC', 'FMCC', 'FMCC', 'FMCC', 'Harrison Lake', 'Harrison Lake'),
-  Species = c(
-    'Alasmidonta varicosa', 'Elliptio complanata', 'Elliptio fisheriana', 'Lampsilis cardium', 
-    'Alasmidonta varicosa', 'Elliptio complanata'
-  ),
-  releases = c(34, 565, 1, 258, 245, 487)
-)
-
 analysis_names <- names(results_list)
 
 all_results <- purrr::map_dfr(
@@ -71,6 +61,34 @@ all_results = all_results |>
       )
     )
 
+# add initial release numbers of uniquely tagged individuals
+#number of mussels released by species
+release_summary = data.frame(
+  facility = c('FMCC', 'FMCC', 'FMCC', 'FMCC', 'Harrison Lake', 'Harrison Lake'),
+  species = c(
+    'Alasmidonta varicosa', 'Elliptio complanata', 'Elliptio fisheriana', 'Lampsilis cardium', 
+    'Alasmidonta varicosa', 'Elliptio complanata'
+  ),
+  releases = c(34, 565, 1, 258, 245, 487)
+)
+all_results = all_results |>
+  left_join(
+    release_summary |> 
+      rename(initial_release = releases),
+    by = c('facility', 'species')
+  ) |> 
+  mutate(
+    perc_of_initial = case_when(
+      Parameter == "N_derived" ~ estimate / initial_release
+    ),
+    perc_of_initial_lcl = case_when(
+      Parameter == "N_derived" ~ lcl / initial_release
+    ),
+    perc_of_initial_ucl = case_when(
+      Parameter == "N_derived" ~ ucl / initial_release
+    )
+  )
+
 # sum values to create a 'combined' facility
 combined_df = all_results |>
   filter(Parameter == 'N_derived') |> 
@@ -109,7 +127,8 @@ all_plot_config <- list(
     mark_analysis_level = "Analysis Level",
     Occasion = "Sampling Occasion",
     facility = "Facility",
-    species = "Species"
+    species = "Species",
+    perc_of_initial = "Percentage of Initial Release"
    ),
   palettes = list(
     analysis_level = c(
@@ -131,7 +150,10 @@ all_plot_config <- list(
     parameter_estimate = "estimate",
     standard_error = "se",
     lower_ci = "lcl",
-    upper_ci = "ucl"
+    upper_ci = "ucl",
+    perc_of_initial = "perc_of_initial",
+    perc_of_initial_lcl = "perc_of_initial_lcl",
+    perc_of_initial_ucl = "perc_of_initial_ucl"
   ),
   category_order = list(
     sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
@@ -185,3 +207,8 @@ config_override = list(
   variance_flag = FALSE #TODO how to annualize variance? see mark book?
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
+
+#convert estimates to % of initial release
+
+
+release_summary
