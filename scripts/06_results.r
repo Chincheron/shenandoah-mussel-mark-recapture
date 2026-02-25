@@ -95,15 +95,17 @@ combined_df = all_results |>
   group_by(mark_analysis_level, species, Parameter, Occasion) |> 
   summarise(
     estimate = sum(estimate),
-    se = sum(se),
-    lcl = sum(lcl),
+    se = sum(se), # for se, lcl, and ucl, doublecheck calc and also consider only summing this way for n_derived
+    lcl = sum(lcl), 
     ucl = sum(ucl),
-    perc_of_initial = sum(perc_of_initial),
-    perc_of_initial_lcl = sum(perc_of_initial_lcl),
-    perc_of_initial_ucl = sum(perc_of_initial_ucl),
+    initial_release = sum(initial_release),
     .groups = "drop"
   ) |> 
-  mutate(facility = 'Combined')
+  mutate(
+    perc_of_initial = estimate/initial_release ,
+    perc_of_initial_lcl = lcl / initial_release, # doublecheck calc of  this
+    perc_of_initial_ucl = ucl / initial_release , # doublecheck calc of this 
+    facility = 'Combined')
 
 all_results = bind_rows(all_results, combined_df)
 
