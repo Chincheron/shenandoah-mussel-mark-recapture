@@ -12,6 +12,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   #overide family_config with figure specific settings, if provided
   config = modifyList(family_config, figure_config)
 
+  #TODO modify so that names are unique, right now some are being overridden
   #set default save name if one is not provided
   if (is.null(config$save_file_name)) {
     facet_name = if (!is.null(config$facet_vars)) {
@@ -64,6 +65,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   scale_fill_manual(
     values = global_config$palettes[[config$grouping_palette]]
   ) +
+  #TODO split into own function or make optional
   annotate(
   "text",
   x = -Inf,
