@@ -191,7 +191,7 @@ facility_plot_config <- list(
   aggregate_flag = FALSE,
   variance_flag = TRUE
 )
-facility_plot_config$y_factor
+
 #filter out assemblage analysis
 species_results = all_results |> 
   filter(mark_analysis_level == 'species')
@@ -199,15 +199,16 @@ species_results = all_results |>
 source(graph_util_file)
 # Abundance split by facility
 config_override = list(
-  title = 'Abundance estimates by species',
-  subtitle = 'Comparison of facilities'
+  save_file_name = 'Figure_1_abundance_top_model.jpg' 
 )
-build_base_plot(species_results, all_plot_config, facility_plot_config)
+build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
 #abundance as percentage of initial release
 config_override = list(
   y_factor = cm$perc_of_initial,
-  variance_flag = FALSE # TODO update function so that variancec are not hardcoded but reference config
+  y_label = 'Percent of Initial Release',
+  variance_flag = FALSE, # TODO update function so that variancec are not hardcoded but reference config
+  save_file_name = 'Figure_2_abundance_percent_of_initial.jpg'
 )
 config_override$y_factor
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
@@ -218,11 +219,9 @@ config_override = list(
   parameter = 'Phi',
   y_label = 'Estimated apparent survival',
   x_order = all_plot_config$category_order$sampling_occasion_phi,
-  variance_flag = FALSE #TODO how to annualize variance? see mark book?
+  variance_flag = FALSE, #TODO how to annualize variance? see mark book?
+  save_file_name = 'Figure_3_survival_top_model.jpg'
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
 #convert estimates to % of initial release
-
-
-release_summary
