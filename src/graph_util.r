@@ -64,15 +64,6 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   ) +
   scale_fill_manual(
     values = global_config$palettes[[config$grouping_palette]]
-  ) +
-  #TODO split into own function or make optional
-  annotate(
-  "text",
-  x = -Inf,
-  y = Inf,
-  label = 'label_released',
-  hjust = -0.1,
-  vjust = 1.1
   ) + 
   global_config$theme
   
@@ -115,4 +106,19 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   )  
 
   return(p)
+}
+
+add_release_label_to_graph = function(p) {
+  
+  p = p +
+    annotate(
+    "text",
+    x = -Inf,
+    y = Inf,
+    label = 'label_released',
+    hjust = -0.1,
+    vjust = 1.1
+    ) 
+  
+  print(p)
 }
