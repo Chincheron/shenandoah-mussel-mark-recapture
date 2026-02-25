@@ -34,6 +34,9 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   #for readability
   cm = global_config$column_mapping
 
+  #set dodge to make sure groups and error bars are on same alignment
+  dodge = position_dodge(width=0.9)
+
   #filter to parameter of interest
   p = data |> 
   filter(.data[[cm$mark_parameter]]  == 
@@ -46,7 +49,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
       fill = .data[[config$grouping]]
     )
   ) +
-  geom_col(position = position_dodge()) +
+  geom_col(position = dodge) +
   labs(
     x = config$x_factor_label,
     y = config$y_label,
@@ -90,7 +93,8 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
     p = p +  
       geom_errorbar(
       aes(ymin = .data[[cm$lower_ci]], ymax = .data[[cm$upper_ci]]),
-      width = 0.2
+      width = 0.2,
+      position = dodge
       ) 
     } else {
   }
