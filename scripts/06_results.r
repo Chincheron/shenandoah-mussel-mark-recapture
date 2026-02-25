@@ -59,6 +59,18 @@ all_results = all_results |>
   rename(mark_analysis_level = mark_analysis ) |> 
   select(mark_analysis_level, species, facility, Parameter, Occasion, estimate, se, lcl, ucl, fixed)
 
+# standardize occasion labels
+all_results = all_results |> 
+   mutate(
+      Occasion = case_when(
+      Parameter == "Phi" & str_detect(Occasion, "a0")   ~ "Interval 1",
+      Parameter == "Phi" & str_detect(Occasion, "a246") ~ "Interval 2",
+      Parameter == "Phi" & str_detect(Occasion, "a281") ~ "Interval 3",
+      Parameter == "Phi" & str_detect(Occasion, "a310") ~ "Interval 4",
+      TRUE ~ Occasion
+      )
+    )
+
 # sum values to create a 'combined' facility
 combined_df = all_results |>
   filter(Parameter == 'N_derived') |> 
@@ -122,8 +134,8 @@ all_plot_config <- list(
     upper_ci = "ucl"
   ),
   category_order = list(
-    sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4')
-
+    sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
+    sampling_occasion_phi = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4')
   ),
   theme = theme_bw(base_size = 12),
   save_folder = path(RESULTS_FIGURES, 'mark_results')
@@ -175,6 +187,7 @@ build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_conf
 figure_config_facility <- list(
   parameter = "Phi",
   y_label = "Estimated apparent survival",
+  x_order = all_plot_config$category_order$sampling_occasion_phi,
   title = 'Apparent survival estimates by species', 
   subtitle = 'Assemblage vs. species level analyses'
 )
@@ -184,6 +197,7 @@ build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_conf
 figure_config_facility <- list(
   parameter = "Phi",
   y_label = "Estimated apparent survival",
+  x_order = all_plot_config$category_order$sampling_occasion_phi,
   facet_vars = c(cm$facility, cm$species),
   title = 'Apparent survival estimates by species and facility', 
   subtitle = 'Assemblage vs. species level analyses'
@@ -221,14 +235,16 @@ config_override = list(
   title = 'Abundance estimates by species',
   subtitle = 'Comparison of facilities'
 )
-build_base_plot(species_results, all_plot_config, facility_plot_config)
+build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
 # Survival split by facility
 #config overrides
 config_override = list(
   parameter = 'Phi',
   y_label = 'Estimated apparent survival',
+  x_order = all_plot_config$category_order$sampling_occasion_phi,
   title = 'Apparent survival estimates by species',
-  subtitle = 'Comparison of facilities'
+  subtitle = 'Comparison of facilities',
+  variance_flag = FALSE
 )
-build_base_plot()
+build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
