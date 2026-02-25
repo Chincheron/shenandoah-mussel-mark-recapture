@@ -44,7 +44,10 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   #base plot
   ggplot(
     aes(
-      x = factor(.data[[config$x_factor]]), #pull to global or family config?
+      x = factor(
+        .data[[config$x_factor]],
+        levels = config$x_order
+      ), #pull to global or family config?
       y = .data[[cm$parameter_estimate]],
       fill = .data[[config$grouping]]
     )

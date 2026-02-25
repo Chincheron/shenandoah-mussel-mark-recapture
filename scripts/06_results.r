@@ -121,11 +121,17 @@ all_plot_config <- list(
     lower_ci = "lcl",
     upper_ci = "ucl"
   ),
+  category_order = list(
+    sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4')
+
+  ),
   theme = theme_bw(base_size = 12),
   save_folder = path(RESULTS_FIGURES, 'mark_results')
 )
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
+
+#set order of 
 
 ## Figures comparing assemblage level analysis to species level analysis
 ### Abundance figures
@@ -135,6 +141,7 @@ abundance_plot_config <- list(
   y_label   = "Estimated Abundance",
   x_factor = cm$sampling_occasion,
   x_factor_label = all_plot_config$labels$Occasion,
+  x_order = all_plot_config$category_order$sampling_occasion,
   grouping = cm$analysis_level,
   grouping_label = all_plot_config$labels$mark_analysis_level,
   grouping_palette = "analysis_level",
