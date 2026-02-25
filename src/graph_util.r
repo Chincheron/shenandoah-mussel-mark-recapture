@@ -47,10 +47,6 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
     )
   ) +
   geom_col(position = position_dodge()) +
-  geom_errorbar(
-    aes(ymin = .data[[cm$lower_ci]], ymax = .data[[cm$upper_ci]]),
-    width = 0.2
-  ) +
   labs(
     x = config$x_factor_label,
     y = config$y_label,
@@ -88,14 +84,25 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   } else {
     stop(("facet_vars in family config file must have either 1, 2, or 0 variables"))
   }
-  
-    ggsave(
-    filename =  config$save_file_name,
-    plot = p,
-    path = global_config$save_folder,  
-    width = 8,
-    height = 5,
-    dpi = 300
+
+  # add error bars if config flag is TRUE
+  if (config$variance_flag == TRUE) {
+    p = p +  
+      geom_errorbar(
+      aes(ymin = .data[[cm$lower_ci]], ymax = .data[[cm$upper_ci]]),
+      width = 0.2
+      ) 
+    } else {
+  }
+
+
+  ggsave(
+  filename =  config$save_file_name,
+  plot = p,
+  path = global_config$save_folder,  
+  width = 8,
+  height = 5,
+  dpi = 300
   )  
 
   return(p)
