@@ -98,6 +98,9 @@ combined_df = all_results |>
     se = sum(se),
     lcl = sum(lcl),
     ucl = sum(ucl),
+    perc_of_initial = sum(perc_of_initial),
+    perc_of_initial_lcl = sum(perc_of_initial_lcl),
+    perc_of_initial_ucl = sum(perc_of_initial_ucl),
     .groups = "drop"
   ) |> 
   mutate(facility = 'Combined')
@@ -169,6 +172,7 @@ cm = all_plot_config$column_mapping
 ### config file for this group of figures
 facility_plot_config <- list(
   parameter = "N_derived",
+  y_factor = cm$parameter_estimate,
   y_label   = "Estimated Abundance",
   x_factor = cm$sampling_occasion,
   x_factor_label = all_plot_config$labels$Occasion,
@@ -185,7 +189,7 @@ facility_plot_config <- list(
   aggregate_flag = FALSE,
   variance_flag = TRUE
 )
-
+facility_plot_config$y_factor
 #filter out assemblage analysis
 species_results = all_results |> 
   filter(mark_analysis_level == 'species')
@@ -197,6 +201,14 @@ config_override = list(
   subtitle = 'Comparison of facilities'
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config)
+
+#abundance as percentage of initial release
+config_override = list(
+  y_factor = cm$perc_of_initial,
+  variance_flag = FALSE # TODO update function so that variancec are not hardcoded but reference config
+)
+config_override$y_factor
+build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
 # Survival split by facility
 #config overrides

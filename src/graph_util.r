@@ -49,7 +49,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
         .data[[config$x_factor]],
         levels = config$x_order
       ), #pull to global or family config?
-      y = .data[[cm$parameter_estimate]],
+      y = .data[[config$y_factor]],
       fill = .data[[config$grouping]]
     )
   ) +
