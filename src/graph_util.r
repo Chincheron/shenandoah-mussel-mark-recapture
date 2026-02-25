@@ -12,6 +12,25 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   #overide family_config with figure specific settings, if provided
   config = modifyList(family_config, figure_config)
 
+  #set default save name if one is not provided
+  if (is.null(config$save_file_name)) {
+    facet_name = if (!is.null(config$facet_vars)) {
+      paste(config$facet_vars, collapse = "_")
+    } else {
+      'no_facet'
+    }
+    
+    config$save_file_name = sprintf(
+      '%s_%s_%s.png',
+      config$parameter,
+      config$y_label,
+      facet_name
+    )
+  }
+
+  #create save directory if needed
+  dir.create(global_config$save_folder)
+
   #for readability
   cm = global_config$column_mapping
 
@@ -28,6 +47,10 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
     )
   ) +
   geom_col(position = position_dodge()) +
+  geom_errorbar(
+    aes(ymin = .data[[cm$lower_ci]], ymax = .data[[cm$upper_ci]]),
+    width = 0.2
+  ) +
   labs(
     x = config$x_factor_label,
     y = config$y_label,
@@ -39,6 +62,14 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   scale_fill_manual(
     values = global_config$palettes[[config$grouping_palette]]
   ) +
+  annotate(
+  "text",
+  x = -Inf,
+  y = Inf,
+  label = 'label_released',
+  hjust = -0.1,
+  vjust = 1.1
+  ) + 
   global_config$theme
   
   # faceting logic
@@ -58,5 +89,14 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
     stop(("facet_vars in family config file must have either 1, 2, or 0 variables"))
   }
   
+    ggsave(
+    filename =  config$save_file_name,
+    plot = p,
+    path = global_config$save_folder,  
+    width = 8,
+    height = 5,
+    dpi = 300
+  )  
+
   return(p)
 }

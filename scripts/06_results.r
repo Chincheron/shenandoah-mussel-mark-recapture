@@ -115,10 +115,11 @@ all_plot_config <- list(
     sampling_occasion = "Occasion",
     parameter_estimate = "estimate",
     standard_error = "se",
-    lower_ci = "lcI",
-    upper_ci = "ucI"
+    lower_ci = "lcl",
+    upper_ci = "ucl"
   ),
-  theme = theme_bw(base_size = 12)
+  theme = theme_bw(base_size = 12),
+  save_folder = path(RESULTS_FIGURES, 'mark_results')
 )
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
@@ -138,9 +139,13 @@ abundance_plot_config <- list(
   facet_vars = c(cm$species),
   title = NULL,
   subtitle = NULL,
-  caption = NULL 
+  caption = NULL,
+  save_file_name = NULL
 )
 
+source(graph_util_file)
+#TODO add lcl/ucl for each group before plotting
+#TODO automate labels for total released
 # assemblage vs. species level analyses abundance
 build_base_plot(all_results, all_plot_config, abundance_plot_config, 
   list(title = 'Abundance estimates by species', 
