@@ -95,7 +95,9 @@ write_xlsx(all_results, top_model_results_save_path)
 all_plot_config <- list(
   labels = list(
     mark_analysis_level = "Analysis Level",
-    Occasion = "Sampling Occasion"
+    Occasion = "Sampling Occasion",
+    facility = "Facility",
+    species = "Species"
    ),
   palettes = list(
     analysis_level = c(
@@ -104,7 +106,8 @@ all_plot_config <- list(
     ),
     facility_level = c(
       FMCC = "deepskyblue",
-      "Harrison Lake" = "darkred"
+      "Harrison Lake" = "darkred",
+      "Combined" = "darkorange"
     )
   ),
   column_mapping = list(
