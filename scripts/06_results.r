@@ -119,7 +119,7 @@ all_plot_config <- list(
     facility_level = c(
       FMCC = "deepskyblue",
       "Harrison Lake" = "darkred",
-      "Combined" = "darkorange"
+      "Combined" = "springgreen4"
     )
   ),
   column_mapping = list(
@@ -142,67 +142,6 @@ all_plot_config <- list(
 )
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
-
-#set order of 
-
-## Figures comparing assemblage level analysis to species level analysis
-### Abundance figures
-#### configure abundance level plot variables and settings
-abundance_plot_config <- list(
-  parameter = "N_derived",
-  y_label   = "Estimated Abundance",
-  x_factor = cm$sampling_occasion,
-  x_factor_label = all_plot_config$labels$Occasion,
-  x_order = all_plot_config$category_order$sampling_occasion,
-  grouping = cm$analysis_level,
-  grouping_label = all_plot_config$labels$mark_analysis_level,
-  grouping_palette = "analysis_level",
-  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$species),
-  title = NULL,
-  subtitle = NULL,
-  caption = NULL,
-  save_file_name = NULL,
-  aggregate_flag = FALSE,
-  variance_flag = FALSE
-)
-
-source(graph_util_file)
-#TODO add lcl/ucl for each group before plotting
-#TODO automate labels for total released
-# assemblage vs. species level analyses abundance
-build_base_plot(all_results, all_plot_config, abundance_plot_config, 
-  list(title = 'Abundance estimates by species', 
-  subtitle = 'Assemblage vs. species level analyses'))
-
-#asseblage vs. species analyses abundance  split by facility
-figure_config_facility <- list(
-  facet_vars = c(cm$facility, cm$species),
-  title = 'Abundance estimates by species and Facility', 
-  subtitle = 'Assemblage vs. species level analyses'
-)
-build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
-
-# assembalge vs. species analyses survival 
-figure_config_facility <- list(
-  parameter = "Phi",
-  y_label = "Estimated apparent survival",
-  x_order = all_plot_config$category_order$sampling_occasion_phi,
-  title = 'Apparent survival estimates by species', 
-  subtitle = 'Assemblage vs. species level analyses'
-)
-build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
-
-#asseblage vs. species analyses survival split by facility
-figure_config_facility <- list(
-  parameter = "Phi",
-  y_label = "Estimated apparent survival",
-  x_order = all_plot_config$category_order$sampling_occasion_phi,
-  facet_vars = c(cm$facility, cm$species),
-  title = 'Apparent survival estimates by species and facility', 
-  subtitle = 'Assemblage vs. species level analyses'
-)
-build_base_plot(all_results, all_plot_config, abundance_plot_config, figure_config_facility)
 
 ## Figures comparing facility of just the species level analyses
 ### config file for this group of figures
@@ -235,7 +174,7 @@ config_override = list(
   title = 'Abundance estimates by species',
   subtitle = 'Comparison of facilities'
 )
-build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
+build_base_plot(species_results, all_plot_config, facility_plot_config)
 
 # Survival split by facility
 #config overrides
@@ -243,8 +182,6 @@ config_override = list(
   parameter = 'Phi',
   y_label = 'Estimated apparent survival',
   x_order = all_plot_config$category_order$sampling_occasion_phi,
-  title = 'Apparent survival estimates by species',
-  subtitle = 'Comparison of facilities',
   variance_flag = FALSE #TODO how to annualize variance? see mark book?
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
