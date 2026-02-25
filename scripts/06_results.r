@@ -70,7 +70,7 @@ combined_df = all_results |>
     ucl = sum(ucl),
     .groups = "drop"
   ) |> 
-  mutate(facility = 'combined')
+  mutate(facility = 'Combined')
 
 all_results = bind_rows(all_results, combined_df)
 
