@@ -245,6 +245,6 @@ config_override = list(
   x_order = all_plot_config$category_order$sampling_occasion_phi,
   title = 'Apparent survival estimates by species',
   subtitle = 'Comparison of facilities',
-  variance_flag = FALSE
+  variance_flag = FALSE #TODO how to annualize variance? see mark book?
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
