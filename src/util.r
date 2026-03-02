@@ -207,3 +207,97 @@ extract_rmark_model_results = function(data, analysis, model_name) {
     mutate(mark_analysis = analysis)
   )
 }
+
+process_model_results = function(data) {
+  data = data |> 
+  mutate(facility = case_when(
+      str_detect(data$Group, "FMCC") ~ "FMCC",
+      str_detect(data$Group, "Harrison") ~ "Harrison Lake",
+      .default = "None"
+    )
+    ,species = case_when(
+      str_detect(data$Group, "compl") ~ "Elliptio complanata",
+      str_detect(data$Group, "vari") ~ "Alasmidonta varicosa",
+      .default = mark_analysis
+    )      
+  ) |> 
+  mutate(mark_analysis = case_when(
+    mark_analysis == 'assemblage' ~ "assemblage",
+    .default = 'species'
+    )
+  ) |> 
+  rename(mark_analysis_level = mark_analysis ) |> 
+  select(mark_analysis_level, species, facility, Parameter, Occasion, estimate, se, lcl, ucl, fixed)
+
+# standardize occasion labels
+data = data |> 
+   mutate(
+      Occasion = case_when(
+      Parameter == "Phi" & str_detect(Occasion, "a0")   ~ "Interval 1",
+      Parameter == "Phi" & str_detect(Occasion, "a246") ~ "Interval 2",
+      Parameter == "Phi" & str_detect(Occasion, "a281") ~ "Interval 3",
+      Parameter == "Phi" & str_detect(Occasion, "a310") ~ "Interval 4",
+      TRUE ~ Occasion
+      )
+    )
+
+# add initial release numbers of uniquely tagged individuals
+#number of mussels released by species
+release_summary = data.frame(
+  facility = c('FMCC', 'FMCC', 'FMCC', 'FMCC', 'Harrison Lake', 'Harrison Lake'),
+  species = c(
+    'Alasmidonta varicosa', 'Elliptio complanata', 'Elliptio fisheriana', 'Lampsilis cardium', 
+    'Alasmidonta varicosa', 'Elliptio complanata'
+  ),
+  releases = c(34, 565, 1, 258, 245, 487)
+)
+data = data |>
+  left_join(
+    release_summary |> 
+      rename(initial_release = releases),
+    by = c('facility', 'species')
+  ) |> 
+  mutate(
+    perc_of_initial = case_when(
+      Parameter == "N_derived" ~ estimate / initial_release
+    ),
+    perc_of_initial_lcl = case_when(
+      Parameter == "N_derived" ~ lcl / initial_release
+    ),
+    perc_of_initial_ucl = case_when(
+      Parameter == "N_derived" ~ ucl / initial_release
+    )
+  )
+
+# sum values to create a 'combined' facility
+combined_df = data |>
+  filter(Parameter == 'N_derived') |> 
+  group_by(mark_analysis_level, species, Parameter, Occasion) |> 
+  summarise(
+    estimate = sum(estimate),
+    se = sum(se), # for se, lcl, and ucl, doublecheck calc and also consider only summing this way for n_derived
+    lcl = sum(lcl), 
+    ucl = sum(ucl),
+    initial_release = sum(initial_release),
+    .groups = "drop"
+  ) |> 
+  mutate(
+    perc_of_initial = estimate/initial_release ,
+    perc_of_initial_lcl = lcl / initial_release, # doublecheck calc of  this
+    perc_of_initial_ucl = ucl / initial_release , # doublecheck calc of this 
+    facility = 'Combined')
+
+data = bind_rows(data, combined_df)
+
+# convert daily survival to annual survival
+data = data |> 
+  mutate(
+    estimate = case_when(
+      Parameter == 'Phi' ~ estimate^365.25,
+      .default = estimate
+    )
+  )
+
+return(data)
+
+}
