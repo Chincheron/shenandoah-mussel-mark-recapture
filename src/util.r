@@ -162,8 +162,15 @@ extract_top_model_results = function(results_list, analysis) {
   top_model_name = str_replace_all(top_model_name, fixed(' * '), '.')
   
   # TODO Add here if statement for assemblage lefle analysis
-  #extract real results from top model
-  real_results = results_list[[analysis]][[top_model_name]]$results$real
+  #extract real and derived results from top model
+  final_results = extract_rmark_model_results(real_results, analysis, top_model_name) 
+  
+  return(final_results)
+}
+
+extract_rmark_model_results = function(data, analysis, model_name) {
+  
+  real_results = results_list[[analysis]][[model_name]]$results$real
 
   real_df = as.data.frame(real_results) |>
     tibble::rownames_to_column("Parameter") |>
@@ -176,9 +183,9 @@ extract_top_model_results = function(results_list, analysis) {
     ))
   
   #extract derived results from top model
-  derived_pop_size_results = results_list[[analysis]][[top_model_name]]$results$derived$`N Population Size`
+  derived_pop_size_results = results_list[[analysis]][[model_name]]$results$derived$`N Population Size`
   occasions = nrow(derived_pop_size_results)
-  derived_pop_size_groups = results_list[[analysis]][[top_model_name]]$group.labels
+  derived_pop_size_groups = results_list[[analysis]][[model_name]]$group.labels
   length_derived_pop_size_groups = length(derived_pop_size_groups)
   number_of_mr_occasions = (occasions / length_derived_pop_size_groups)
   suffixes = c('Release', paste('MR', 1:(number_of_mr_occasions-1)))
@@ -196,7 +203,7 @@ extract_top_model_results = function(results_list, analysis) {
     separate_wider_delim(Parameter, delim = ' _ ', names = c('Group', 'Occasion'), too_many = "merge") |> 
     mutate(Parameter = "N_derived")
 
-return (bind_rows(real_df, derived_df) |> 
+  return (bind_rows(real_df, derived_df) |> 
     mutate(mark_analysis = analysis)
-)
+  )
 }
