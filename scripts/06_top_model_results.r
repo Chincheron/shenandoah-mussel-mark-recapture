@@ -14,6 +14,7 @@ source_python("config/paths.py")
 #pull utility functions
 util_file = path(ROOT , "src", "util.r")
 graph_util_file = path(ROOT , "src", "graph_util.r")
+config_folder = path(ROOT, 'config')
 source(util_file)
 source(graph_util_file)
 
@@ -45,47 +46,10 @@ file_name = path(saved_objects_folder, '06_top_model_processed_results.rds')
 saveRDS(results_list, file_name, ascii = TRUE)
 
 # Plotting figures
-## configure global plot variables and settings
-all_plot_config <- list(
-  labels = list(
-    mark_analysis_level = "Analysis Level",
-    Occasion = "Sampling Occasion",
-    facility = "Facility",
-    species = "Species",
-    perc_of_initial = "Percentage of Initial Release"
-   ),
-  palettes = list(
-    analysis_level = c(
-      assemblage = "steelblue",
-      species    = "darkorange"
-    ),
-    facility_level = c(
-      FMCC = "deepskyblue",
-      "Harrison Lake" = "darkred",
-      "Combined" = "springgreen4"
-    )
-  ),
-  column_mapping = list(
-    analysis_level = "mark_analysis_level",
-    species = "species",
-    facility = "facility",
-    mark_parameter = "Parameter",
-    sampling_occasion = "Occasion",
-    parameter_estimate = "estimate",
-    standard_error = "se",
-    lower_ci = "lcl",
-    upper_ci = "ucl",
-    perc_of_initial = "perc_of_initial",
-    perc_of_initial_lcl = "perc_of_initial_lcl",
-    perc_of_initial_ucl = "perc_of_initial_ucl"
-  ),
-  category_order = list(
-    sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
-    sampling_occasion_phi = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4')
-  ),
-  theme = theme_bw(base_size = 12),
-  save_folder = path(RESULTS_FIGURES, 'mark_results')
-)
+## get global plot variables and settings
+source(path(config_folder, 'global_figure_config.r'))
+all_plot_config <- get_global_fig_config()
+
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
 
