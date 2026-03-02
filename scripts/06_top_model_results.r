@@ -18,25 +18,31 @@ source(util_file)
 source(graph_util_file)
 
 #retrieve r object with model outputs from RMARK analysis
-results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
+saved_objects_folder = path(DATA_INTERIM, 'saved_objects')
+dir.create(saved_objects_folder)
+results_file = path(path(saved_objects_folder, '05_mark_results.rds'))
 results_list = readRDS(results_file)
 
 analysis_names <- names(results_list)
 
-all_results <- purrr::map_dfr(
+top_model_results <- purrr::map_dfr(
   analysis_names,
   ~ extract_top_model_results(results_list, .x)
 )
 
-#final processing of model results
-all_results = process_model_results(all_results)
+#final processing of top model results
+top_model_results = process_model_results(top_model_results)
 
-#export results
+#export results to file
 top_model_results_save_folder = path(ROOT, 'temp')
 dir.create(top_model_results_save_folder)
 top_model_results_save_name = 'top_model_results_all.xlsx'
 top_model_results_save_path = path(top_model_results_save_folder, top_model_results_save_name)
-write_xlsx(all_results, top_model_results_save_path)
+write_xlsx(top_model_results, top_model_results_save_path)
+
+#export top_model_results object for later comparison to other models
+file_name = path(saved_objects_folder, '06_top_model_processed_results.rds')
+saveRDS(results_list, file_name, ascii = TRUE)
 
 # Plotting figures
 ## configure global plot variables and settings
@@ -106,7 +112,7 @@ facility_plot_config <- list(
 )
 
 #filter out assemblage analysis
-species_results = all_results |> 
+species_results = top_model_results |> 
   filter(mark_analysis_level == 'species')
 
 source(graph_util_file)
@@ -137,4 +143,3 @@ config_override = list(
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
-#convert estimates to % of initial release
