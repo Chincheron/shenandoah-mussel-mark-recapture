@@ -5,7 +5,8 @@ get_global_fig_config = function() {
     Occasion = "Sampling Occasion",
     facility = "Facility",
     species = "Species",
-    perc_of_initial = "Percentage of Initial Release"
+    perc_of_initial = "Percentage of Initial Release",
+    model = 'Model Type'
    ),
   palettes = list(
     analysis_level = c(
@@ -16,6 +17,10 @@ get_global_fig_config = function() {
       FMCC = "deepskyblue",
       "Harrison Lake" = "darkred",
       "Combined" = "springgreen4"
+    ),
+    model_level = c(
+      reduced_from_top = 'darkorange',
+      top = 'steelblue'
     )
   ),
   column_mapping = list(
