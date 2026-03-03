@@ -37,27 +37,50 @@ top_model_results <- purrr::map_dfr(
 top_model_results = process_model_results(top_model_results) |> 
   mutate(model = 'top')
 
-#alt E. complanata results (top model without the time element for survival)
-complanata_alt_model = "Phi.facility.p.time.pent.0.N.dot"
-complanata_alt_analysis = "Elliptio complanata"
-complanata_alt_results = extract_rmark_model_results(results_list, complanata_alt_analysis, complanata_alt_model)
+#reduced E. complanata results (top model without the time element for survival)
+complanata_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
+complanata_reduced_analysis = "Elliptio complanata"
+complanata_reduced_results = extract_rmark_model_results(results_list, complanata_reduced_analysis, complanata_reduced_model)
 # processing
-complanata_alt_results = process_model_results(complanata_alt_results)
+complanata_reduced_results = process_model_results(complanata_reduced_results)
+rm(complanata_reduced_model, complanata_reduced_analysis)
 
-#alt A. varicosa results (top model without the time element for survival)
-varicosa_alt_model = "Phi.facility.p.time.pent.0.N.dot"
-varicosa_alt_analysis = "Alasmidonta varicosa"
-varicosa_alt_results = extract_rmark_model_results(results_list, varicosa_alt_analysis, varicosa_alt_model)
+#reduced A. varicosa results (top model without the time element for survival)
+varicosa_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
+varicosa_reduced_analysis = "Alasmidonta varicosa"
+varicosa_reduced_results = extract_rmark_model_results(results_list, varicosa_reduced_analysis, varicosa_reduced_model)
 # processing
-varicosa_alt_results = process_model_results(varicosa_alt_results)
+varicosa_reduced_results = process_model_results(varicosa_reduced_results)
+rm(varicosa_reduced_model, varicosa_reduced_analysis)
 
 #bind species together and designate as reduced from top model
-alt_models = bind_rows(complanata_alt_results, varicosa_alt_results) |> 
+reduced_models = bind_rows(complanata_reduced_results, varicosa_reduced_results) |> 
   mutate(model = 'reduced_from_top')
+rm(complanata_reduced_results, varicosa_reduced_results) 
+
+## expand values Phi for reduced_models to match the number of occasions for the top model
+#get list of top model occasions for Phi
+top_occasions_phi = top_model_results |> 
+  filter(Parameter == 'Phi') |> 
+  select(species, facility, Parameter, Occasion)
+#get only reduced model rows for Phi
+reduced_rows_phi = reduced_models |> 
+    filter(Parameter == 'Phi') |> 
+    select(-Occasion)
+#join so that same value for Phi from reduced model is used for all occasions
+reduced_expanded_phi = top_occasions_phi |> 
+  left_join(
+    reduced_rows_phi,
+    by = c('species', 'facility', 'Parameter')
+  )
+#remove Phi values from original reduced models
+reduced_models_no_phi = reduced_models |> 
+  filter(Parameter != 'Phi')
+rm(top_occasions_phi, reduced_rows_phi, reduced_models)
 
 #bind all data together for plotting
-all_models = bind_rows(alt_models, top_model_results)
-
+all_models = bind_rows(top_model_results, reduced_expanded_phi, reduced_models_no_phi)
+rm(top_model_results, reduced_expanded_phi, reduced_models_no_phi)
 
 #export results to file
 model_results_save_folder = path(ROOT, 'temp')
@@ -71,7 +94,8 @@ global_config = get_global_fig_config()
 #pull column mapping for ease of reading functioni later
 cm = global_config$column_mapping
 
-### figure config file for this group of figures
+## Next set of figures compares the top model estimates to the submodel without time as factor for Phi
+### figure config file for this abundance comparison of figures
 facility_plot_config <- list(
   parameter = "N_derived",
   y_factor = cm$parameter_estimate,
@@ -79,11 +103,11 @@ facility_plot_config <- list(
   x_factor = cm$sampling_occasion,
   x_factor_label = global_config$labels$Occasion,
   x_order = global_config$category_order$sampling_occasion,
-  grouping = cm$facility,
-  grouping_label = global_config$labels$facility,
-  grouping_palette = "facility_level",
+  grouping = cm$model,
+  grouping_label = global_config$labels$model,
+  grouping_palette = "model_level",
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$species, cm$model),
+  facet_vars = c(cm$species, cm$facility),
   title = NULL,
   subtitle = NULL,
   caption = NULL,
@@ -93,3 +117,36 @@ facility_plot_config <- list(
 )
 
 build_base_plot(all_models, global_config, facility_plot_config)
+
+survival_fig_override = list(
+  parameter = 'Phi',
+  variance_flag = FALSE,
+  x_order = global_config$category_order$sampling_occasion_phi
+)
+build_base_plot(all_models, global_config, facility_plot_config, survival_fig_override)
+
+#table comparing values from figures above
+summary_comparison = all_models |> 
+  filter(Parameter == "N_derived" | Parameter == 'Phi') |> 
+  group_by(Parameter, Occasion, species, facility, model) |> 
+  summarize(
+    count = n(),
+    estimate = sum(estimate)
+  )
+
+summary_comparison = summary_comparison |> 
+  pivot_wider(
+    names_from = model,
+    values_from = estimate
+  ) |> 
+  mutate(
+    top_minus_reduced = top - reduced_from_top,
+    percent_difference =  (reduced_from_top / top)*100 
+  ) 
+
+#export summary table
+summary_save_folder = path(ROOT, 'temp')
+dir.create(summary_save_folder)
+summary_save_name = 'model_comparison_summary.xlsx'
+summary_save_path = path(summary_save_folder, summary_save_name)
+write_xlsx(summary_comparison, summary_save_path)
