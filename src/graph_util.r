@@ -50,7 +50,10 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
         levels = config$x_order
       ), #pull to global or family config?
       y = .data[[config$y_factor]],
-      fill = .data[[config$grouping]]
+      fill = factor(
+        .data[[config$grouping]],
+        levels = config$grouping_order
+      )
     )
   ) +
   geom_col(position = dodge) +

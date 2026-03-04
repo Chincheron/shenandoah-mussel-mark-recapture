@@ -116,6 +116,7 @@ facility_plot_config <- list(
   x_order = global_config$category_order$sampling_occasion,
   grouping = cm$model,
   grouping_label = global_config$labels$model,
+  grouping_order = global_config$category_order$reduced_model_order,
   grouping_palette = "model_level",
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
   facet_vars = c(cm$species, cm$facility),

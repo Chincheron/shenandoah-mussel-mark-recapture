@@ -43,7 +43,8 @@ get_global_fig_config = function() {
   ),
   category_order = list(
     sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
-    sampling_occasion_phi = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4')
+    sampling_occasion_phi = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4'),
+    reduced_model_order = c('top', 'reduced_from_top')
   ),
   theme = theme_bw(base_size = 12)
 )
