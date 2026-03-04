@@ -46,3 +46,60 @@ reduced_models = expand_phi_intervals(reduced_models)
 model_results_save_name = 'reduced_model_data.xlsx'
 model_results_save_path = path(data_export_folder, model_results_save_name)
 write_xlsx(reduced_models, model_results_save_path)
+
+####
+# Plotting figures
+####
+
+## get global plot variables and settings
+source(path(config_folder, 'global_figure_config.r'))
+all_plot_config <- get_global_fig_config()
+
+#pull column mapping for ease of reading functioni later
+cm = all_plot_config$column_mapping
+
+## Figures comparing facility of just the species level analyses
+### config file for this group of figures
+facility_plot_config <- list(
+  parameter = "N_derived",
+  y_factor = cm$parameter_estimate,
+  y_label   = "Estimated Abundance",
+  y_variance_upper = cm$upper_ci,
+  y_variance_lower = cm$lower_ci,
+  x_factor = cm$sampling_occasion,
+  x_factor_label = all_plot_config$labels$Occasion,
+  x_order = all_plot_config$category_order$sampling_occasion,
+  grouping = cm$facility,
+  grouping_label = all_plot_config$labels$facility,
+  grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
+  grouping_palette = "facility_level",
+  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
+  facet_vars = c(cm$species),
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  save_folder = figure_export_folder,
+  save_file_name = NULL,
+  aggregate_flag = FALSE,
+  variance_flag = TRUE
+)
+
+#filter out combined facilities
+reduced_no_combined = reduced_models |> 
+  filter(facility != 'Combined')
+
+# All comparison
+config_override = list(
+  save_file_name = 'Figure_1_abundance_two_graph.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, facility_plot_config, config_override)
+
+# All comparison facet by speciesxfacility
+config_override = list(
+  save_file_name = 'Figure_1_abundance_four_graph.jpg',
+  facet_vars = c(cm$facility, cm$species)
+)
+build_base_plot(reduced_no_combined, all_plot_config, facility_plot_config, config_override)
+
+
+
