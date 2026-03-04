@@ -96,10 +96,16 @@ cm = global_config$column_mapping
 
 ## Next set of figures compares the top model estimates to the submodel without time as factor for Phi
 ### figure config file for this abundance comparison of figures
+#NOTE - CIs are only accurate as presented below if all groups are completely broken up
+# such that each bar represents a single line in the data. 
+# Any other grouping will require variance/CIs to be properly recalculated before plotting
+#TODO ? - function to recalculate variance/CIs when summing abundance across groups?
 facility_plot_config <- list(
   parameter = "N_derived",
   y_factor = cm$parameter_estimate,
   y_label   = "Estimated Abundance",
+  y_variance_lower = cm$lower_ci,
+  y_variance_upper = cm$upper_ci,
   x_factor = cm$sampling_occasion,
   x_factor_label = global_config$labels$Occasion,
   x_order = global_config$category_order$sampling_occasion,
@@ -120,7 +126,8 @@ build_base_plot(all_models, global_config, facility_plot_config)
 
 survival_fig_override = list(
   parameter = 'Phi',
-  variance_flag = TRUE,
+  y_variance_lower = cm$phi_lower_ci,
+  y_variance_upper = cm$phi_upper_ci,
   x_order = global_config$category_order$sampling_occasion_phi
 )
 build_base_plot(all_models, global_config, facility_plot_config, survival_fig_override)

@@ -88,7 +88,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   if (config$variance_flag == TRUE) {
     p = p +  
       geom_errorbar(
-      aes(ymin = .data[[cm$lower_ci]], ymax = .data[[cm$upper_ci]]),
+      aes(ymin = .data[[config$y_variance_lower]], ymax = .data[[config$y_variance_upper]]),
       width = 0.2,
       position = dodge
       ) 

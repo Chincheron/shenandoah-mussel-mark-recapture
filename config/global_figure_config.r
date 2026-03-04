@@ -33,10 +33,13 @@ get_global_fig_config = function() {
     standard_error = "se",
     lower_ci = "lcl",
     upper_ci = "ucl",
+    initial_release = 'initial_release',
     perc_of_initial = "perc_of_initial",
     perc_of_initial_lcl = "perc_of_initial_lcl",
     perc_of_initial_ucl = "perc_of_initial_ucl",
-    model = 'model'
+    model = 'model',
+    phi_lower_ci = 'phi_lcl',
+    phi_upper_ci = 'phi_ucl'
   ),
   category_order = list(
     sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
