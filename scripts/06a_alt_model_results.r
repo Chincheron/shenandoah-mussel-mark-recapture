@@ -120,7 +120,7 @@ build_base_plot(all_models, global_config, facility_plot_config)
 
 survival_fig_override = list(
   parameter = 'Phi',
-  variance_flag = FALSE,
+  variance_flag = TRUE,
   x_order = global_config$category_order$sampling_occasion_phi
 )
 build_base_plot(all_models, global_config, facility_plot_config, survival_fig_override)

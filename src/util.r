@@ -295,6 +295,14 @@ data = data |>
     estimate = case_when(
       Parameter == 'Phi' ~ estimate^365.25,
       .default = estimate
+    ),
+    phi_lcl = case_when(
+      Parameter == 'Phi' ~ lcl^365.25,
+      .default = lcl
+    ),
+    phi_ucl = case_when(
+      Parameter == 'Phi' ~ ucl^365.25,
+      .default = ucl
     )
   )
 
