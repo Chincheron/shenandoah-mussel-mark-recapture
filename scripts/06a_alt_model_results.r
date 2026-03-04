@@ -21,6 +21,13 @@ source(util_file)
 source(graph_util_file)
 source(path(config_folder, 'global_figure_config.r'))
 
+#set export directories
+SCRIPT_NAME = '06a_reduced_model_comparison'
+data_export_folder = path(DATA_PROCESSED, SCRIPT_NAME)
+dir_create(data_export_folder)
+figure_export_folder = path(RESULTS_FIGURES, SCRIPT_NAME)
+dir_create(figure_export_folder)
+
 #retrieve r object with model outputs from RMARK analysis
 results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
 results_list = readRDS(results_file)
@@ -83,10 +90,8 @@ all_models = bind_rows(top_model_results, reduced_expanded_phi, reduced_models_n
 rm(top_model_results, reduced_expanded_phi, reduced_models_no_phi)
 
 #export results to file
-model_results_save_folder = path(ROOT, 'temp')
-dir.create(model_results_save_folder)
 model_results_save_name = 'model_results_comparison.xlsx'
-model_results_save_path = path(model_results_save_folder, model_results_save_name)
+model_results_save_path = path(data_export_folder, model_results_save_name)
 write_xlsx(all_models, model_results_save_path)
 
 #get global plot config for plotting
@@ -117,6 +122,7 @@ facility_plot_config <- list(
   title = NULL,
   subtitle = NULL,
   caption = NULL,
+  save_folder = figure_export_folder,
   save_file_name = NULL,
   aggregate_flag = FALSE,
   variance_flag = TRUE
@@ -152,8 +158,6 @@ summary_comparison = summary_comparison |>
   ) 
 
 #export summary table
-summary_save_folder = path(ROOT, 'temp')
-dir.create(summary_save_folder)
 summary_save_name = 'model_comparison_summary.xlsx'
-summary_save_path = path(summary_save_folder, summary_save_name)
+summary_save_path = path(data_export_folder, summary_save_name)
 write_xlsx(summary_comparison, summary_save_path)

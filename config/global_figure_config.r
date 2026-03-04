@@ -45,8 +45,7 @@ get_global_fig_config = function() {
     sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
     sampling_occasion_phi = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4')
   ),
-  theme = theme_bw(base_size = 12),
-  save_folder = path(RESULTS_FIGURES, 'mark_results')
+  theme = theme_bw(base_size = 12)
 )
   return(all_plot_config)
 }

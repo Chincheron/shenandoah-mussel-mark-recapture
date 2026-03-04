@@ -30,7 +30,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   }
 
   #create save directory if needed
-  dir.create(global_config$save_folder)
+  dir_create(config$save_folder)
 
   #for readability
   cm = global_config$column_mapping
@@ -99,7 +99,7 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   ggsave(
   filename =  config$save_file_name,
   plot = p,
-  path = global_config$save_folder,  
+  path = config$save_folder,  
   width = 8,
   height = 5,
   dpi = 300
