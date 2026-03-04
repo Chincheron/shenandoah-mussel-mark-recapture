@@ -309,3 +309,26 @@ data = data |>
 return(data)
 
 }
+
+load_reduced_models = function(results_list) {
+  #reduced E. complanata results (top model without the time element for survival)
+  complanata_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
+  complanata_reduced_analysis = "Elliptio complanata"
+  complanata_reduced_results = extract_rmark_model_results(results_list, complanata_reduced_analysis, complanata_reduced_model)
+  # processing
+  complanata_reduced_results = process_model_results(complanata_reduced_results)
+
+  #reduced A. varicosa results (top model without the time element for survival)
+  varicosa_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
+  varicosa_reduced_analysis = "Alasmidonta varicosa"
+  varicosa_reduced_results = extract_rmark_model_results(results_list, varicosa_reduced_analysis, varicosa_reduced_model)
+  # processing
+  varicosa_reduced_results = process_model_results(varicosa_reduced_results)
+
+  #bind species together and designate as reduced from top model
+  reduced_models = bind_rows(complanata_reduced_results, varicosa_reduced_results) |> 
+    mutate(model = 'reduced_from_top')
+  
+  return(reduced_models)
+
+}

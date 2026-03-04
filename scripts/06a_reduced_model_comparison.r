@@ -44,26 +44,7 @@ top_model_results <- purrr::map_dfr(
 top_model_results = process_model_results(top_model_results) |> 
   mutate(model = 'top')
 
-#reduced E. complanata results (top model without the time element for survival)
-complanata_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
-complanata_reduced_analysis = "Elliptio complanata"
-complanata_reduced_results = extract_rmark_model_results(results_list, complanata_reduced_analysis, complanata_reduced_model)
-# processing
-complanata_reduced_results = process_model_results(complanata_reduced_results)
-rm(complanata_reduced_model, complanata_reduced_analysis)
-
-#reduced A. varicosa results (top model without the time element for survival)
-varicosa_reduced_model = "Phi.facility.p.time.pent.0.N.dot"
-varicosa_reduced_analysis = "Alasmidonta varicosa"
-varicosa_reduced_results = extract_rmark_model_results(results_list, varicosa_reduced_analysis, varicosa_reduced_model)
-# processing
-varicosa_reduced_results = process_model_results(varicosa_reduced_results)
-rm(varicosa_reduced_model, varicosa_reduced_analysis)
-
-#bind species together and designate as reduced from top model
-reduced_models = bind_rows(complanata_reduced_results, varicosa_reduced_results) |> 
-  mutate(model = 'reduced_from_top')
-rm(complanata_reduced_results, varicosa_reduced_results) 
+reduced_models = load_reduced_models(results_list) 
 
 ## expand values Phi for reduced_models to match the number of occasions for the top model
 #get list of top model occasions for Phi
