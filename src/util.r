@@ -330,5 +330,26 @@ load_reduced_models = function(results_list) {
     mutate(model = 'reduced_from_top')
   
   return(reduced_models)
+}
+
+expand_phi_intervals = function(reduced_models) {
+  ## expand values Phi for reduced_models to match the number of occasions for time dependent model
+  
+  # get list of intervals to replicate
+  intervals_to_replicate = c('Interval 1', 'Interval 2', 'Interval 3', 'Interval 4')
+  # get only reduced model rows for Phi
+  reduced_rows_phi = reduced_models |> 
+      filter(Parameter == 'Phi') |> 
+      select(-Occasion)
+  # expand to all intervals
+  reduced_expanded_phi = reduced_rows_phi |> 
+    expand_grid(Occasion = intervals_to_replicate)
+  #remove Phi values from original reduced models
+  reduced_models_no_phi = reduced_models |> 
+    filter(Parameter != 'Phi')
+  # bind phi and no phi together again
+  df = bind_rows(reduced_models_no_phi, reduced_expanded_phi)
+
+  return (df)
 
 }

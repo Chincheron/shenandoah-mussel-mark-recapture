@@ -47,28 +47,10 @@ top_model_results = process_model_results(top_model_results) |>
 reduced_models = load_reduced_models(results_list) 
 
 ## expand values Phi for reduced_models to match the number of occasions for the top model
-#get list of top model occasions for Phi
-top_occasions_phi = top_model_results |> 
-  filter(Parameter == 'Phi') |> 
-  select(species, facility, Parameter, Occasion)
-#get only reduced model rows for Phi
-reduced_rows_phi = reduced_models |> 
-    filter(Parameter == 'Phi') |> 
-    select(-Occasion)
-#join so that same value for Phi from reduced model is used for all occasions
-reduced_expanded_phi = top_occasions_phi |> 
-  left_join(
-    reduced_rows_phi,
-    by = c('species', 'facility', 'Parameter')
-  )
-#remove Phi values from original reduced models
-reduced_models_no_phi = reduced_models |> 
-  filter(Parameter != 'Phi')
-rm(top_occasions_phi, reduced_rows_phi, reduced_models)
+reduced_models = expand_phi_intervals(reduced_models)
 
 #bind all data together for plotting
-all_models = bind_rows(top_model_results, reduced_expanded_phi, reduced_models_no_phi)
-rm(top_model_results, reduced_expanded_phi, reduced_models_no_phi)
+all_models = bind_rows(top_model_results, reduced_models)
 
 #export results to file
 model_results_save_name = 'model_results_comparison.xlsx'
