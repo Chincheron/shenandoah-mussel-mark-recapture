@@ -66,6 +66,7 @@ facility_plot_config <- list(
   y_label   = "Estimated Abundance",
   y_variance_upper = cm$upper_ci,
   y_variance_lower = cm$lower_ci,
+  y_axis_scale = 'fixed',
   x_factor = cm$sampling_occasion,
   x_factor_label = all_plot_config$labels$Occasion,
   x_order = all_plot_config$category_order$sampling_occasion,

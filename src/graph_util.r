@@ -6,6 +6,7 @@ library(tidyverse)
 library(ggplot2)
 library(writexl)
 library(scales)
+library(ggh4x)
 
 build_base_plot = function(data, global_config, family_config, figure_config = list()){
 
@@ -76,12 +77,15 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
   } else if
     (length(config$facet_vars) == 1) {
     p = p +
-      facet_wrap(vars(.data[[config$facet_vars]]))
+      facet_wrap(vars(.data[[config$facet_vars]]), scales = config$y_axis_scale)
   } else if (length(config$facet_vars) == 2){
+    independent_axis = if (config$y_axis_scale %in% c('free', 'free_y')) 'y' else 'none' 
     p = p +
-      facet_grid(
+      facet_grid2(
         rows = vars(.data[[config$facet_vars[1]]]),
-        cols = vars(.data[[config$facet_vars[2]]])
+        cols = vars(.data[[config$facet_vars[2]]]),
+        scales = config$y_axis_scale,
+        independent = independent_axis
       )
   } else {
     stop(("facet_vars in family config file must have either 1, 2, or 0 variables"))
