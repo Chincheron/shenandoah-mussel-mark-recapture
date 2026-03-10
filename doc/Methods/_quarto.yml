@@ -1,0 +1,12 @@
+project:
+  type: default
+
+format:
+  docx:
+    toc: false
+    number-sections: true
+
+execute:
+  echo: false
+  warning: false
+  message: false

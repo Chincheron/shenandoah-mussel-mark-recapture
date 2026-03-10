@@ -1,0 +1,10 @@
+---
+title: "Shenandoah River Mark-Recapture Methods"
+bibliography: sections/references.bib 
+format: docx
+editor: visual
+---
+
+{{< include sections/methods.qmd >}}
+
+{{< include sections/results.qmd >}}

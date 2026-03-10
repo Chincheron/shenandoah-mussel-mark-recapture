@@ -19,3 +19,6 @@ wheels/
 #output files
 .png
 .jpg
+
+#ignore generated report documents
+doc/Methods/*.docx

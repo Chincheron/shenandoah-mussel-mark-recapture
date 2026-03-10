@@ -1,0 +1,6 @@
+See @fig-abundance
+
+# Figures
+![](../../results/figures/07_reduced_model_results/Figure_1_abundance_four_graph.jpg){#fig-abundance}
+
+# Tables
