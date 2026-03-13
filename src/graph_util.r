@@ -79,12 +79,14 @@ build_base_plot = function(data, global_config, family_config, figure_config = l
     p = p +
       facet_wrap(vars(.data[[config$facet_vars]]), scales = config$y_axis_scale)
   } else if (length(config$facet_vars) == 2){
-    independent_axis = if (config$y_axis_scale %in% c('free', 'free_y')) 'y' else 'none' 
+    scales_setting = if (config$y_axis_scale == "free_full_y") "free_y" else config$y_axis_scale
+
+    independent_axis = if (config$y_axis_scale == "free_full_y") "y" else "none" 
     p = p +
       facet_grid2(
         rows = vars(.data[[config$facet_vars[1]]]),
         cols = vars(.data[[config$facet_vars[2]]]),
-        scales = config$y_axis_scale,
+        scales = scales_setting,
         independent = independent_axis
       )
   } else {
