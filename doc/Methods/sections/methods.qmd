@@ -60,7 +60,11 @@ where 𝐿(θ̂) is the likelihood of the parameter estimates, given the data, K
 Normally, the best model is the one with the lowest AICc score and other models are considered competing if ΔAIC <2.0. 
 However, top models for both species had issues estimating survival, especially on the last occasion. 
 This is not uncommon in parameters that are modeled as fully time-dependent, especially when capture rates are relativley low. *reference?*
-For purposes of estiamting survial/abundance, we decided to use the subset of the top model where time was remvoed as a factor for apparent survival (i.e, survival does not vary with time).  
+For purposes of estiamting survial/abundance, we decided to use the subset of the top model where time was remvoed as a factor for apparent survival (i.e, survival does not vary with time).
+All estimates of survival and abundance were based on this model.
+Finally, many of the mussels released by FMCC in 2023 were either untagged or tagged in a manner that did not allow for the specific mussel to be identified in the future (e.g., green squares with no unique identifier).
+Thus, we applied the survival estimates for FMCC releases to the entire release cohort of FMCC mussels for each species.  
+
 
 1) Talk about field sampling
 2) POPAN description and why
