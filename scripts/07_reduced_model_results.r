@@ -158,8 +158,8 @@ build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config)
 # default config file for group of figures that show abundance
 abundance_plot_config <- list(
   parameter = "N_derived",
-  y_factor = cm$parameter_estimate,
-  y_label   = "Estimated Abundance",
+  y_factor = cm$abundance_release,
+  y_label   = "Estimated Abundance of Full Release Cohort",
   y_variance_upper = cm$upper_ci,
   y_variance_lower = cm$lower_ci,
   y_axis_scale = 'fixed',
@@ -178,11 +178,13 @@ abundance_plot_config <- list(
   save_folder = figure_export_folder,
   save_file_name = NULL,
   aggregate_flag = FALSE,
-  variance_flag = TRUE
+  variance_flag = FALSE
 )
 
 # Abundance of entire release cohort faceted by speciesxfacility
 config_override = list(
-  save_file_name = 'Figure_3_abundance_four_graph.jpg'
+  save_file_name = 'Figure_3_abundance_four_graph.jpg',
+  y_axis_scale = 'free_y'
 )
 build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
+
