@@ -58,115 +58,9 @@ all_plot_config <- get_global_fig_config()
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
 
-# default config file for group of figures that show abundance
-abundance_plot_config <- list(
-  parameter = "N_derived",
-  y_factor = cm$parameter_estimate,
-  y_label   = "Estimated Abundance",
-  y_variance_upper = cm$upper_ci,
-  y_variance_lower = cm$lower_ci,
-  y_axis_scale = 'fixed',
-  x_factor = cm$sampling_occasion,
-  x_factor_label = all_plot_config$labels$Occasion,
-  x_order = all_plot_config$category_order$sampling_occasion,
-  grouping = cm$facility,
-  grouping_label = all_plot_config$labels$facility,
-  grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
-  grouping_palette = "facility_level",
-  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$species),
-  title = NULL,
-  subtitle = NULL,
-  caption = NULL,
-  save_folder = figure_export_folder,
-  save_file_name = NULL,
-  aggregate_flag = FALSE,
-  variance_flag = TRUE
-)
-
 #filter out combined facilities
 reduced_no_combined = reduced_models |> 
   filter(facility != 'Combined')
-
-# Abundance with facilities grouped on single graph for each species
-config_override = list(
-  save_file_name = 'Figure_1_abundance_two_graph_y_fixed.jpg'
-)
-source(graph_util_file)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-# Abundance with facilities grouped on single graph for each species independent y-axis
-config_override = list(
-  y_axis_scale = 'free',
-  save_file_name = 'Figure_1_abundance_two_graph_y_free.jpg'
-)
-source(graph_util_file)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-# Abundance facet by speciesxfacility and same y-axis
-config_override = list(
-  save_file_name = 'Figure_1_abundance_four_graph.jpg',
-  facet_vars = c(cm$facility, cm$species)
-)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-config_override = list(
-  facet_vars = c(cm$species, cm$facility),
-  save_file_name = 'Figure_1_abundance_four_graph_switch.jpg'
-)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-# Abundance facet by speciesxfacility and independent y-axis
-config_override = list(
-  y_axis_scale = 'free',
-  save_file_name = 'Figure_1_abundance_four_graph_y_free.jpg',
-  facet_vars = c(cm$facility, cm$species)
-)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-config_override = list(
-  y_axis_scale = 'free',
-  facet_vars = c(cm$species, cm$facility),
-  save_file_name = 'Figure_1_abundance_four_graph_y_free_switch.jpg'
-)
-build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
-
-
-# default config file for group of figures that show percentage of release
-perc_release_plot_config <- list(
-  parameter = "N_derived",
-  y_factor = cm$perc_of_initial,
-  y_label   = "Percent of Initial Release",
-  y_variance_upper = cm$perc_of_initial_ucl,
-  y_variance_lower = cm$perc_of_initial_lcl,
-  y_axis_scale = 'fixed',
-  x_factor = cm$sampling_occasion,
-  x_factor_label = all_plot_config$labels$Occasion,
-  x_order = all_plot_config$category_order$sampling_occasion,
-  grouping = cm$facility,
-  grouping_label = all_plot_config$labels$facility,
-  grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
-  grouping_palette = "facility_level",
-  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$facility, cm$species),
-  title = NULL,
-  subtitle = NULL,
-  caption = NULL,
-  save_folder = figure_export_folder,
-  save_file_name = 'Figure_2_abundance_percent_release.jpg',
-  aggregate_flag = FALSE,
-  variance_flag = TRUE
-)
-# Abundance as percent of release facet by speciesxfacility and independent y-axis
-# NOTE this graph and the one before are visually identical after setting y-axis independent for previous graph
-build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config)
-
-config_override = list(
-  facet_vars = c(cm$species, cm$facility),
-  save_file_name = 'Figure_2_abundance_percent_release_switch.jpg'
-)
-build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config, config_override)
-
 
 # default config file for group of figures that show Apparent survival
 survival_plot_config <- list(
@@ -184,20 +78,74 @@ survival_plot_config <- list(
   grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
   grouping_palette = "facility_level",
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
-  facet_vars = c(cm$facility, cm$species),
+  facet_vars = c(cm$species, cm$facility),
   title = NULL,
   subtitle = NULL,
   caption = NULL,
   save_folder = figure_export_folder,
-  save_file_name = 'Figure_3_survival.jpg',
+  save_file_name = 'Figure_1_survival.jpg',
   aggregate_flag = FALSE,
   variance_flag = TRUE
 )
+# Apparent survival faceted by speciesxfacility
 build_base_plot(reduced_no_combined, all_plot_config, survival_plot_config)
 
-#switch the factors around 
-config_override = list(
+# default config file for group of figures that show percentage of release
+perc_release_plot_config <- list(
+  parameter = "N_derived",
+  y_factor = cm$perc_of_initial,
+  y_label   = "Abundance Estimate as a Percent of Initial Release",
+  y_variance_upper = cm$perc_of_initial_ucl,
+  y_variance_lower = cm$perc_of_initial_lcl,
+  y_axis_scale = 'fixed',
+  x_factor = cm$sampling_occasion,
+  x_factor_label = all_plot_config$labels$Occasion,
+  x_order = all_plot_config$category_order$sampling_occasion,
+  grouping = cm$facility,
+  grouping_label = all_plot_config$labels$facility,
+  grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
+  grouping_palette = "facility_level",
+  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
   facet_vars = c(cm$species, cm$facility),
-  save_file_name = 'Figure_3_survival_switch.jpg'
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  save_folder = figure_export_folder,
+  save_file_name = 'Figure_2_abundance_percent_release.jpg',
+  aggregate_flag = FALSE,
+  variance_flag = TRUE
 )
-build_base_plot(reduced_no_combined, all_plot_config, survival_plot_config, config_override)
+# Abundance as percent of release faceted by speciesxfacility
+build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config)
+
+# default config file for group of figures that show abundance
+abundance_plot_config <- list(
+  parameter = "N_derived",
+  y_factor = cm$parameter_estimate,
+  y_label   = "Estimated Abundance",
+  y_variance_upper = cm$upper_ci,
+  y_variance_lower = cm$lower_ci,
+  y_axis_scale = 'fixed',
+  x_factor = cm$sampling_occasion,
+  x_factor_label = all_plot_config$labels$Occasion,
+  x_order = all_plot_config$category_order$sampling_occasion,
+  grouping = cm$facility,
+  grouping_label = all_plot_config$labels$facility,
+  grouping_order = c('Combined', 'FMCC', 'Harrison Lake'),
+  grouping_palette = "facility_level",
+  #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
+  facet_vars = c(cm$species, cm$facility),
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  save_folder = figure_export_folder,
+  save_file_name = NULL,
+  aggregate_flag = FALSE,
+  variance_flag = TRUE
+)
+
+# Abundance of entire release cohort faceted by speciesxfacility
+config_override = list(
+  save_file_name = 'Figure_3_abundance_four_graph.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
