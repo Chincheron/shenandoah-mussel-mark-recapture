@@ -42,6 +42,43 @@ reduced_models = load_reduced_models(results_list)
 # expand values Phi for reduced_models to match the number of occasions for the top model
 reduced_models = expand_phi_intervals(reduced_models)
 
+#calculate abundance estimates using total release and estimated survival values
+#extract Phi values 
+phi_lookup = reduced_models |> 
+  filter(Parameter == 'Phi') |> 
+  mutate(Occasion = str_replace(Occasion, 'Interval', 'MR')) |> 
+  select(species, facility, Occasion, phi_est = estimate)  
+time_interval = c('MR 1' = 246, 'MR 2' = 35, 'MR 3' = 29, 'MR 4' = 69)
+  phi_lookup = phi_lookup |> 
+    mutate(
+    interval_days = time_interval[Occasion]
+  ) |> 
+    mutate(interval_survival = phi_est^(interval_days/365))
+#get just abundance from main data
+abundance = reduced_models |> 
+  filter(Parameter == 'N_derived')
+abundance = abundance |> 
+  left_join(phi_lookup,
+            by = c("species","facility","Occasion")) |>
+  arrange(species, facility, Occasion) |>
+  group_by(species, facility) |>
+  mutate(
+    abundance_total_release = total_release * cumprod(interval_survival)
+  ) |>
+  ungroup() |> 
+  select(facility, species, Occasion, Parameter, interval_survival, abundance_total_release) #TODO join back to main table
+reduced_models = reduced_models |> 
+  left_join(
+    abundance,
+    by = c('species', 'facility', 'Occasion', 'Parameter')
+  ) |> 
+  mutate(abundance_total_release = case_when(
+      Occasion == 'Release' ~ total_release,
+      .default = abundance_total_release
+    )
+  )
+
+
 #export results to file
 model_results_save_name = 'reduced_model_data.xlsx'
 model_results_save_path = path(data_export_folder, model_results_save_name)

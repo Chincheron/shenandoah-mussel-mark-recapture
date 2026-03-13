@@ -39,7 +39,8 @@ get_global_fig_config = function() {
     perc_of_initial_ucl = "perc_of_initial_ucl",
     model = 'model',
     phi_lower_ci = 'phi_lcl',
-    phi_upper_ci = 'phi_ucl'
+    phi_upper_ci = 'phi_ucl',
+    abundance_release = 'abundance_total_release'
   ),
   category_order = list(
     sampling_occasion = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4'),
