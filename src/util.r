@@ -5,6 +5,7 @@ library(fs)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(readxl)
 
 run_popan = function(input_file, analy_groups, model_def, analysis_name, save_directory = path(ROOT, 'temp'))
 {
@@ -243,29 +244,24 @@ data = data |>
 
 # add initial release numbers of uniquely tagged individuals
 #number of mussels released by species
-release_summary = data.frame(
-  facility = c('FMCC', 'FMCC', 'FMCC', 'FMCC', 'Harrison Lake', 'Harrison Lake'),
-  species = c(
-    'Alasmidonta varicosa', 'Elliptio complanata', 'Elliptio fisheriana', 'Lampsilis cardium', 
-    'Alasmidonta varicosa', 'Elliptio complanata'
-  ),
-  releases = c(34, 565, 1, 258, 245, 487)
-)
+release_summary_path = path(DATA_RAW, 'release_summary.xlsx')
+release_summary = read_excel(release_summary_path) |> 
+  select(species, facility, total_release, total_unique_tag)
 data = data |>
   left_join(
     release_summary |> 
-      rename(initial_release = releases),
+      rename(total_unique_tag_release = total_unique_tag),
     by = c('facility', 'species')
   ) |> 
   mutate(
     perc_of_initial = case_when(
-      Parameter == "N_derived" ~ estimate / initial_release
+      Parameter == "N_derived" ~ estimate / total_unique_tag_release
     ),
     perc_of_initial_lcl = case_when(
-      Parameter == "N_derived" ~ lcl / initial_release
+      Parameter == "N_derived" ~ lcl / total_unique_tag_release
     ),
     perc_of_initial_ucl = case_when(
-      Parameter == "N_derived" ~ ucl / initial_release
+      Parameter == "N_derived" ~ ucl / total_unique_tag_release
     )
   )
 
@@ -278,13 +274,13 @@ combined_df = data |>
     se = sum(se), # for se, lcl, and ucl, doublecheck calc and also consider only summing this way for n_derived
     lcl = sum(lcl), 
     ucl = sum(ucl),
-    initial_release = sum(initial_release),
+    total_unique_tag_release = sum(total_unique_tag_release),
     .groups = "drop"
   ) |> 
   mutate(
-    perc_of_initial = estimate/initial_release ,
-    perc_of_initial_lcl = lcl / initial_release, # doublecheck calc of  this
-    perc_of_initial_ucl = ucl / initial_release , # doublecheck calc of this 
+    perc_of_initial = estimate/total_unique_tag_release ,
+    perc_of_initial_lcl = lcl / total_unique_tag_release, # doublecheck calc of  this
+    perc_of_initial_ucl = ucl / total_unique_tag_release , # doublecheck calc of this 
     facility = 'Combined')
 
 data = bind_rows(data, combined_df)
