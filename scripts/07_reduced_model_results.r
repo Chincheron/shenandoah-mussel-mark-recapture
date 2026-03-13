@@ -110,6 +110,12 @@ config_override = list(
 )
 build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
 
+config_override = list(
+  facet_vars = c(cm$species, cm$facility),
+  save_file_name = 'Figure_1_abundance_four_graph_switch.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
+
 # Abundance facet by speciesxfacility and independent y-axis
 config_override = list(
   y_axis_scale = 'free',
@@ -117,6 +123,14 @@ config_override = list(
   facet_vars = c(cm$facility, cm$species)
 )
 build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
+
+config_override = list(
+  y_axis_scale = 'free',
+  facet_vars = c(cm$species, cm$facility),
+  save_file_name = 'Figure_1_abundance_four_graph_y_free_switch.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
+
 
 # default config file for group of figures that show percentage of release
 perc_release_plot_config <- list(
@@ -147,6 +161,13 @@ perc_release_plot_config <- list(
 # NOTE this graph and the one before are visually identical after setting y-axis independent for previous graph
 build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config)
 
+config_override = list(
+  facet_vars = c(cm$species, cm$facility),
+  save_file_name = 'Figure_2_abundance_percent_release_switch.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, perc_release_plot_config, config_override)
+
+
 # default config file for group of figures that show Apparent survival
 survival_plot_config <- list(
   parameter = "Phi",
@@ -173,3 +194,10 @@ survival_plot_config <- list(
   variance_flag = TRUE
 )
 build_base_plot(reduced_no_combined, all_plot_config, survival_plot_config)
+
+#switch the factors around 
+config_override = list(
+  facet_vars = c(cm$species, cm$facility),
+  save_file_name = 'Figure_3_survival_switch.jpg'
+)
+build_base_plot(reduced_no_combined, all_plot_config, survival_plot_config, config_override)
