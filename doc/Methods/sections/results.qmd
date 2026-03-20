@@ -3,21 +3,22 @@
 We were able to succesfully estimate apparent survival and abundance for both *Elliptio complanata* and *Alasmidonta varicosa*. 
 We were unable to estiamte these parameters for either *Elliptio fisheriana* or *Lampsilis cardium*. 
 No models for these species successfully converged, most likely due to low initial releases and recapture rates.
+For estiatmion of *E. complanata*, and *A. varicsoa*, we used the model where super population was X, apparent survival varied by Y, and capture probability was Z.
 Apparent survival estimates ranged from xxx to xxx (add table here). 
 Survival was higher for Harrison Lake releases for both species, although the difference was much greater for *A. varicosa* (see @fig-survival). 
 
-Abundance estimates of the initial release cohorts ranged from x to y for *A. varicosa* and X to Y for *E. complanata* (Table x and @fig-abundance). 
-These estimates were directly derived from initial release and survival estimates.
-Thus, we observed the same trend for estimated percent of the initial release remaining on each sampling occasion as we did with apparent survival (@fig-abundance-percent).
-Abundance estimates of the tagged releases of FMCC were substantially lower than Harrison Lake.
-This effect is lessened greatly when accounting for the entire release cohort of FMCC (i.e., including untagged and non-unique tags).
-Abundance estimates in this instance range from X...  
-
+Abundance estimates of the initial release cohorts ranged from x to y for *A. varicosa* and X to Y for *E. complanata* (Table x). 
+These estimates were directly derived from the initial release of uniquely tagged mussels and survival estimates.
+Similar to apparent survival, abundance estimates were higher for Harrison Lake releases for both species, 
+This difference was less pronounced when reporting abundance estimates as a percentage of the initial release (@fig-abundance-percent).
+Abundance estimates of the uniquely tagged releases of FMCC were substantially lower than Harrison Lake.
+However, FMCC released a substantial number of non-uniquely tagged and untagged mussels. 
+Applying the estiamted surival to the entire release cohort of FMCC mussels results in abundance estimtates ranging from ... 
 
 # Figures
 
 ![](../../results/figures/07_reduced_model_results/Figure_1_survival.jpg){#fig-survival}
-![](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance}
-![](../../results/figures/07_reduced_model_results/Figure_3_abundance_four_graph.jpg){#fig-abundance-percent}
+![](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance-percent}
+![](../../results/figures/07_reduced_model_results/Figure_3_abundance_four_graph.jpg){#fig-abundance-all}
 
 # Tables
