@@ -9,6 +9,7 @@ DATA_PIPELINE = DATA / "pipeline"
 RESULTS = ROOT / "results"
 RESULTS_FIGURES = RESULTS / "figures"
 RESULTS_TABLES = RESULTS / "tables"
+RESULTS_OBJECTS = RESULTS / 'objects'
 RESULTS_PUBLICATIONS = RESULTS / "publications"
 RESULTS_TEMP = RESULTS / "temp"
 SCRIPTS = ROOT / "scripts/"

@@ -28,7 +28,6 @@ Applying the estiamted surival to the entire release cohort of FMCC mussels resu
 ```{r}
 #| label: tbl-abundance
 #| tbl-cap: 'Table Caption'
-library(gt)
-test_load |> 
-    gt()
+make_abundance_table(test_load)
+
 ```

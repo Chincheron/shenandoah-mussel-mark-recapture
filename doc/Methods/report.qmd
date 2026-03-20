@@ -1,7 +1,9 @@
 ---
 title: "Shenandoah River Mark-Recapture Methods"
 bibliography: sections/references.bib 
-format: docx
+format: 
+    docx:
+        reference-doc: template.docx
 ---
 
 ```{r}

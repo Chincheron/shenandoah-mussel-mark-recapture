@@ -113,8 +113,13 @@ tbl_abundance_summary = reduced_no_combined |>
 tbl_abundance_wide = tbl_abundance_summary |> 
   pivot_wider(
     names_from = 'Occasion',
-    values_from = 'estimate',
-    names_prefix = 'Occasion '
+    values_from = 'estimate'
+  ) |> 
+  select('species', 'facility', 'Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4') 
+occasions = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4')
+  pivot_wider(
+    names_from = 'facility',
+    values_from = all_of(occasions)
   )
 save_object = tbl_abundance_wide
 object_path = path(object_export_folder, 'abundance_summary.rds')
