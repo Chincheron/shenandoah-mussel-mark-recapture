@@ -183,7 +183,7 @@ abundance_plot_config <- list(
 
 # Abundance of entire release cohort faceted by speciesxfacility
 config_override = list(
-  save_file_name = 'Figure_3_abundance_four_graph.jpg',
+  save_file_name = 'Figure_3_abundance_full_cohort.jpg',
   y_axis_scale = 'free_y'
 )
 build_base_plot(reduced_no_combined, all_plot_config, abundance_plot_config, config_override)
