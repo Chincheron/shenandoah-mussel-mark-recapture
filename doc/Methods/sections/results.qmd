@@ -16,8 +16,8 @@ Abundance estimates in this instance range from X...
 
 # Figures
 
-![](../../results/figures/07_reduced_model_results/Figure_3_survival.jpg){#fig-survival}
-![](../../results/figures/07_reduced_model_results/Figure_1_abundance_two_graph_y_fixed.jpg){#fig-abundance}
-![](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance-percent}
+![](../../results/figures/07_reduced_model_results/Figure_1_survival.jpg){#fig-survival}
+![](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance}
+![](../../results/figures/07_reduced_model_results/Figure_3_abundance_four_graph.jpg){#fig-abundance-percent}
 
 # Tables
