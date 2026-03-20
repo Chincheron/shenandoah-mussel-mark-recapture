@@ -30,6 +30,8 @@ figure_export_folder = path(RESULTS_FIGURES, SCRIPT_NAME)
 dir_create(figure_export_folder)
 table_export_folder = path(RESULTS_TABLES, SCRIPT_NAME)
 dir_create(table_export_folder)
+object_export_folder = path(RESULTS_OBJECTS, SCRIPT_NAME)
+dir_create(object_export_folder)
 
 #retrieve r object with model outputs from RMARK analysis
 results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
@@ -84,6 +86,61 @@ model_results_save_name = 'reduced_model_data.xlsx'
 model_results_save_path = path(data_export_folder, model_results_save_name)
 write_xlsx(reduced_models, model_results_save_path)
 
+
+####
+# Tables 
+####
+
+#filter out combined facilities
+reduced_no_combined = reduced_models |> 
+  filter(facility != 'Combined')
+
+#summary table of apparent survival estimates
+tbl_survival_summary = reduced_no_combined |> 
+  filter(Parameter == 'Phi') |> 
+  group_by(species, facility) |> 
+  summarize(estimate = mean(estimate))
+object_path = path(object_export_folder, 'survival_summary.rds')
+saveRDS(tbl_survival_summary, object_path)
+object_path = path(table_export_folder, 'survival_summary.csv')
+write_csv(tbl_survival_summary, object_path)
+
+#summary table of abundance estimates unique cohort
+tbl_abundance_summary = reduced_no_combined |> 
+  filter(Parameter == 'N_derived') |> 
+  group_by(species, facility, Occasion) |> 
+  summarize(estimate = mean(estimate), .groups = 'drop')
+tbl_abundance_wide = tbl_abundance_summary |> 
+  pivot_wider(
+    names_from = 'Occasion',
+    values_from = 'estimate',
+    names_prefix = 'Occasion '
+  )
+save_object = tbl_abundance_wide
+object_path = path(object_export_folder, 'abundance_summary.rds')
+saveRDS(save_object, object_path)
+object_path = path(table_export_folder, 'abundance_summary.csv')
+write_csv(save_object, object_path)
+
+#summary table of abundance estimates all cohort
+tbl_abundance_all_summary = reduced_no_combined |> 
+  filter(Parameter == 'N_derived') |> 
+  group_by(species, facility, Occasion) |> 
+  summarize(estimate = mean(abundance_total_release), .groups = 'drop')
+tbl_abundance_all_wide = tbl_abundance_all_summary |> 
+  pivot_wider(
+    names_from = 'Occasion',
+    values_from = 'estimate',
+    names_prefix = 'Occasion '
+  )
+save_object = tbl_abundance_all_wide
+object_path = path(object_export_folder, 'abundance_all_summary.rds')
+saveRDS(save_object, object_path)
+object_path = path(table_export_folder, 'abundance_all_summary.csv')
+write_csv(save_object, object_path)
+
+
+
 ####
 # Plotting figures
 ####
@@ -94,10 +151,6 @@ all_plot_config <- get_global_fig_config()
 
 #pull column mapping for ease of reading functioni later
 cm = all_plot_config$column_mapping
-
-#filter out combined facilities
-reduced_no_combined = reduced_models |> 
-  filter(facility != 'Combined')
 
 # default config file for group of figures that show Apparent survival
 survival_plot_config <- list(
