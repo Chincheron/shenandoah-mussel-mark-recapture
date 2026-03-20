@@ -2,8 +2,18 @@
 title: "Shenandoah River Mark-Recapture Methods"
 bibliography: sections/references.bib 
 format: docx
-editor: visual
 ---
+
+```{r}
+library(reticulate)
+library(fs)
+source_python("../../config/paths.py")
+source_path = path(SCRIPTS / 'load_report_results.r')
+source(source_path)
+#source(source_path)
+```
+
+'r SCRIPTS'
 
 {{< include sections/methods.qmd >}}
 

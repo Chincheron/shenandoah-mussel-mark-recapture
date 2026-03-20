@@ -24,3 +24,11 @@ Applying the estiamted surival to the entire release cohort of FMCC mussels resu
 ![Caption 3](../../results/figures/07_reduced_model_results/Figure_3_abundance_full_cohort.jpg){#fig-abundance-all}
 
 # Tables
+
+```{r}
+#| label: tbl-abundance
+#| tbl-cap: 'Table Caption'
+library(gt)
+test_load |> 
+    gt()
+```
