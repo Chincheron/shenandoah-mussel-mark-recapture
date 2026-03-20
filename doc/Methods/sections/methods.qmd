@@ -12,20 +12,21 @@ Were returned to stream, etc.
 
 ## POPAN description
 We were interested primarily in estimating survival of the release cohort over time and the corresponding abundance on each sampling occasion.
-Consequently, we used the POPAN mark-recapture framework, which allows for the estimation of both apparent surival and population size, to analyze our mark-recapture data.
-The POPAN model is a parameterization of the Jolly-Seber model *reference*. 
-It models Jolly-Seber in terms of a super population (N) and probability of entry (see link below for Gary White overview and Schwarz and Arnason (1996) for original paper).
-It has four model parameters:
+Consequently, we used the POPAN mark-recapture framework (@schwarz.arnason_1996_GeneralMethodologyAnalysis), a parameterization of the Jolly-Seber model, to analyze our mark-recapture data.
+The POPAN model is an open population model that allows for the estimation of both apparent surival and population size. 
+It has four model parameters that are directly estimated:
 
-1) Super population 
-2) probability of entry into the super population 
-3) apparent survival
-4) capture probability
+1) *N*: Super population of all individuals that will ever be born into the population 
+2) $b_i$ probabiilty that a member of *N* will enter the population (i.e., become avaialbe for captrure) from occasion *i* to *i*+1 
+3) $\phi_i$: probability of an individual surivgin and remaining in population from occasion *i* to *i*+1 (i.e., apparent survival)
+4) $p_i$: probability of capture at occasion *i*
 
 During field sampling, we only recorded already tagged individuals without tagging new mussels (specify that this because there really weren't new mussels yet?)
-Consequently, we considered the super population to be the initial release cohort.
-We also assumed that pent was 0 because no new animals can enter the initial cohort. 
-Thus, neither of these two model parameters were estimated during the anlaysis. 
+Consequently, we assumed that $p_i$ was 0 for all occasions because no new animals can enter the initial cohort. 
+These four estimates can then be used to derive abundance estimates for each occasion 
+
+$$N_i=N_{i-1}\phi_{i-1} + $$
+
 
 ## Data Analysis
 Data for uniquely tagged individuals released in 2023 were combined with data from the four sampling occasions in 2024. 
@@ -40,20 +41,15 @@ We constructed candidate models where:
 This resulted in X total models in the canddiate model set for each species.
 To avoid introducing species as a factor in our models, we analyzed each of the four species released in 2023 separately rather than as a combined data set. 
 
-We analyzed our set of candidate models using Program MARK (White and Burnham 1999) to determine which model had the highest likelihood using an information criteria approach that balances the goodness-of-fit with model complexity to rank the models. *SEE BURNHAM BOOKS for language*.
-
-or
-
-We used an information criteria approach to determine the model with the highest likelihood (i.e., balance of goodness of fit and model complexity) (Villella, Smith, and Lemarié 2004; Meador, Peterson, and Wisniewski 2011) *confirm these references*
-
+We analyzed our set of candidate models using Program MARK (@white.burnham_1999_ProgramMARKSurvival) to determine which model had the highest likelihood using an information criteria approach that balances the goodness-of-fit with model complexity to rank the models (@burnham.anderson_2002_ModelSelectionMultimodel).
 We used RMARK (an R package runs MARK) to build and analyze models.
-The likelihood of each candidate model was calculated using Akaike’s Information Criterion (AIC) (Akaike 1973) modified for small sample sizes (AICc) (Sugiura 1978): 
+The likelihood of each candidate model was calculated using Akaike’s Information Criterion (AIC) (@akaike_1973_InformationTheoryExtension) modified for small sample sizes (AICc) (@sugiura_1978_FurtherAnalysisData): 
 $$𝐴𝐼𝐶𝑐=−2log(𝐿(θ̂))+2𝐾(𝐾+1)𝑛−𝐾−1$$
 
 where 𝐿(θ̂) is the likelihood of the parameter estimates, given the data, K is the number of parameters, and n is the sample size. 
-Normally, the best model is the one with the lowest AICc score and other models are considered competing if ΔAIC <2.0. **reference here** 
+Normally, the best model is the one with the lowest AICc score and other models are considered competing if ΔAIC <2.0 (@@burnham.anderson_2002_ModelSelectionMultimodel). 
 However, top models for both species had issues estimating survival, especially on the last occasion. 
-This is not uncommon in parameters that are modeled as fully time-dependent, especially when capture rates are relativley low. *reference?*
+This is not uncommon in parameters that are modeled as fully time-dependent, especially when capture rates are relativley low. **reference?**
 For purposes of estiamting survial/abundance, we decided to use the subset of the top model where time was remvoed as a factor for apparent survival (i.e, survival does not vary with time).
 We based all estimates of survival and abundance on this model for each species.
 

@@ -13,12 +13,14 @@ Similar to apparent survival, abundance estimates were higher for Harrison Lake 
 This difference was less pronounced when reporting abundance estimates as a percentage of the initial release (@fig-abundance-percent).
 Abundance estimates of the uniquely tagged releases of FMCC were substantially lower than Harrison Lake.
 However, FMCC released a substantial number of non-uniquely tagged and untagged mussels. 
-Applying the estiamted surival to the entire release cohort of FMCC mussels results in abundance estimtates ranging from ... 
+Applying the estiamted surival to the entire release cohort of FMCC mussels results in abundance estimtates ranging from X to Y for *A. varicosa* and X to Y for *E. complanata* (table X and @fig-abundance-all).  
 
 # Figures
 
-![](../../results/figures/07_reduced_model_results/Figure_1_survival.jpg){#fig-survival}
-![](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance-percent}
-![](../../results/figures/07_reduced_model_results/Figure_3_abundance_four_graph.jpg){#fig-abundance-all}
+![Caption 1](../../results/figures/07_reduced_model_results/Figure_1_survival.jpg){#fig-survival}
+
+![Caption 2](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance-percent}
+
+![Caption 3](../../results/figures/07_reduced_model_results/Figure_3_abundance_full_cohort.jpg){#fig-abundance-all}
 
 # Tables
