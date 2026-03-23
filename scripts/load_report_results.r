@@ -3,6 +3,8 @@ library(readxl)
 library(flextable)
 library(fs)
 
+set_flextable_defaults(fonts_ignore = TRUE)
+
 SCRIPT_NAME = '07_reduced_model_results'
 TABLE_PATH = path(RESULTS_TABLES, SCRIPT_NAME)
 
@@ -100,10 +102,17 @@ make_abundance_table = function(test_load) {
 
   ft = flextable(test_load) |> 
      set_header_labels(
-    values = setNames(
-      rep(c("FMCC", "Harrison Lake"), 5),
-      paste0(rep(occasions, each = 2), "_", c("FMCC", "Harrison Lake"))
-    ) |> c(species = "Species") |> as.list()
+      `species` = "Species",
+      `Release_FMCC` = "FMCC",
+      `Release_Harrison Lake` = "Harrison Lake",
+      `MR 1_FMCC` = "FMCC",
+      `MR 1_Harrison Lake` = "Harrison Lake",
+      `MR 2_FMCC` = "FMCC",
+      `MR 2_Harrison Lake` = "Harrison Lake",
+      `MR 3_FMCC` = "FMCC",
+      `MR 3_Harrison Lake` = "Harrison Lake",
+      `MR 4_FMCC` = "FMCC",
+      `MR 4_Harrison Lake` = "Harrison Lake"
   ) |>
   # Add spanning top header row for occasions
   add_header_row(
@@ -118,7 +127,7 @@ make_abundance_table = function(test_load) {
   fontsize(size = 8, part = "all") |> 
   padding(padding.top = 2, padding.bottom = 2, 
           padding.left = 3, padding.right = 3, part = "all") |> 
-  width(j = -1, width = (6.5 - .8) / 10) |>  # distribute remaining width evenly across data cols
+  width(j = 2:ncol(test_load), width = (6.5 - .8) / 10) |>  # distribute remaining width evenly across data cols
   width(j = 1, width = .8) 
     # autofit() |> 
   # fit_to_width(max_width = 6.5) |> 

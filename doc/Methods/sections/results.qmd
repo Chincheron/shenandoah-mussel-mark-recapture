@@ -29,12 +29,15 @@ Applying the estimated survival to the entire release cohort of FMCC mussels res
 ```{r}
 #| label: tbl-abundance
 #| tbl-cap: 'Abundance estimates from the selected POPAN model. Each row (i.e., species) represents results from a single analysis/model.'
+#| ft.keepnext: false
+
 make_abundance_table(tbl_abundance_summary)
 
 ```
 ```{r}
 #| label: tbl-abundance_all
 #| tbl-cap: 'Abundance estimates of all individuals from the initial release (uniquely tagged, non-uniquely tagged, and untagged). Based on apparent survival estimates from the selected POPAN model and initial number of mussels released. Each row (i.e., species) represents results from a single analysis/model.'
+#| ft.keepnext: false
 make_abundance_table(tbl_abundance_all_summary)
 
 ```
