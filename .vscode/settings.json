@@ -1,11 +1,30 @@
 {
     "cSpell.words": [
+        "Akaike’s",
+        "Alasmidonta",
+        "autofit",
+        "Bentonville",
+        "cardium",
+        "colwidths",
         "complanata",
         "Elliptio",
-        "Alasmidonta",
-        "varicosa",
         "fisheriana",
+        "flextable",
         "FMCC",
-        "POPAN"
+        "fontsize",
+        "Lampsilis",
+        "POPAN",
+        "readxl",
+        "RMARK",
+        "Seber",
+        "tidyverse",
+        "varicosa"
+    ],
+    "cSpell.ignoreRegExpList": [
+    "markdownCodeBlock",
+    "markdownInlineCode",
+    "@[\\w.:]+",
+    "/\\$\\$[\\s\\S]*?\\$\\$/g",
+    "/\\$[^$\\n]+\\$/g"
     ]
 }
