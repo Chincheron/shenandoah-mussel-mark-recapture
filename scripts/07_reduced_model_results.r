@@ -99,7 +99,8 @@ reduced_no_combined = reduced_models |>
 tbl_survival_summary = reduced_no_combined |> 
   filter(Parameter == 'Phi') |> 
   group_by(species, facility) |> 
-  summarize(estimate = mean(estimate))
+  summarize(estimate = mean(estimate)) |> 
+  mutate(estimate = round(estimate, 2))
 object_path = path(object_export_folder, 'survival_summary.rds')
 saveRDS(tbl_survival_summary, object_path)
 object_path = path(table_export_folder, 'survival_summary.csv')
@@ -109,18 +110,14 @@ write_csv(tbl_survival_summary, object_path)
 tbl_abundance_summary = reduced_no_combined |> 
   filter(Parameter == 'N_derived') |> 
   group_by(species, facility, Occasion) |> 
-  summarize(estimate = mean(estimate), .groups = 'drop')
+  summarize(estimate = mean(estimate), .groups = 'drop') |> 
+  mutate(estimate = round(estimate, 0))
 tbl_abundance_wide = tbl_abundance_summary |> 
   pivot_wider(
     names_from = 'Occasion',
     values_from = 'estimate'
   ) |> 
   select('species', 'facility', 'Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4') 
-occasions = c('Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4')
-  pivot_wider(
-    names_from = 'facility',
-    values_from = all_of(occasions)
-  )
 save_object = tbl_abundance_wide
 object_path = path(object_export_folder, 'abundance_summary.rds')
 saveRDS(save_object, object_path)
@@ -131,13 +128,14 @@ write_csv(save_object, object_path)
 tbl_abundance_all_summary = reduced_no_combined |> 
   filter(Parameter == 'N_derived') |> 
   group_by(species, facility, Occasion) |> 
-  summarize(estimate = mean(abundance_total_release), .groups = 'drop')
+  summarize(estimate = mean(abundance_total_release), .groups = 'drop') |> 
+  mutate(estimate = round(estimate, 0))
 tbl_abundance_all_wide = tbl_abundance_all_summary |> 
   pivot_wider(
     names_from = 'Occasion',
     values_from = 'estimate',
-    names_prefix = 'Occasion '
-  )
+  ) |> 
+  select('species', 'facility', 'Release', 'MR 1', 'MR 2', 'MR 3', 'MR 4')
 save_object = tbl_abundance_all_wide
 object_path = path(object_export_folder, 'abundance_all_summary.rds')
 saveRDS(save_object, object_path)
