@@ -19,3 +19,9 @@ source(source_path)
 {{< include sections/methods.qmd >}}
 
 {{< include sections/results.qmd >}}
+
+\newpage
+# References
+
+::: {refs}
+:::

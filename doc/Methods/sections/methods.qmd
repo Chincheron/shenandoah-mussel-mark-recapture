@@ -2,13 +2,17 @@
 # Methods
 ## Mark-recapture sampling
 
-Harrison Lake and FMCC jointly released a total of 3,494 mussels of four species of freshwater mussels on October 11, 2023 in the Shenandoah River at the Bentonville site (38.84376127456249, -78.3387504059278). 
-Of these releases, 265 were uniquely tagged such that the individual mussel could be later identified. 
-In 2024, the site was sampled four times from June to October. 
-*description of sampling here - see notes from Jess*. 
+Harrison Lake and FMCC jointly released a total of 3,494 mussels of four species of freshwater mussels on October 11, 2023 in the Shenandoah River at the Bentonville site (38.84376, -78.33875). 
+Of these releases, 1,590 were uniquely tagged with Hallprint glue-on shellfish tags such that the individual mussel could be later identified. 
+Of these, 1,590 mussels, 49 *Alasmidonta varicosa* released by Harrison Lake were also tagged with a PIT transponder. 
+In 2024, the site was sampled four times from June to October.
+We sampled the entire area of the site twice by:
+
+1) snorkeling 
+2) passing a PIT tag reader over the area  
+
 For each mussel encountered, we measured its overall length and recorded the unique tag number. 
 Untagged mussels were not tagged. 
-Were returned to stream, etc.
 
 ## POPAN description
 We were interested primarily in estimating survival of the release cohort over time and the corresponding abundance on each sampling occasion.
@@ -17,42 +21,49 @@ The POPAN model is an open population model that allows for the estimation of bo
 It has four model parameters that are directly estimated:
 
 1) $N$: Super population of all individuals that will ever be born into the population 
-2) $b_i$ probability that a member of $N$ will enter the population (i.e., become available for capture) from occasion $i$ to $i+1$ 
+2) $b_i$: probability that a member of $N$ will enter the population (i.e., become available for capture) from occasion $i$ to $i+1$ 
 3) $\phi_i$: probability of an individual surviving and remaining in population from occasion $i$ to $i+1$ (i.e., apparent survival)
-4) $p_i$: probability of capture at occasion $i$.
+4) $p_i$: probability of capture at occasion $i$ (i.e., detectability).
 
-During field sampling, we only recorded already tagged individuals without tagging new mussels (specify that this because there really weren't new mussels yet?)
-Consequently, we assumed that $p_i$ was 0 for all occasions because no new animals can enter the initial cohort. 
-These four estimates can then be used to derive abundance estimates for each occasion 
+During field sampling, we only recorded already tagged individuals without tagging new mussels.
+Consequently, we assumed that $b_i$ was 0 for the interval between all sampling occasions because no new animals can enter the initial cohort (i.e., $N$). 
+These four estimates can be used to derive abundance estimates for each occasion after the first occasion: 
 
-$$N_i=N_{i-1}\phi_{i-1}$$
+$$N_i=N_{i-1}\phi_{i-1} + Nb_{i-1}$$
 
+Abundance estimates for the first occasion are derived by:
+
+$$N_1 = Nb_0$$
+
+where $b_0$ is the probability that a member of $N$ will enter the population immediately prior to the first sampling occasion. 
+Because we assume $b_i$ is 0 for sampling intervals, $b_0$ is equal to one, and the abundance estimate for the first occasion is the same as $N$ (i.e., the initial release cohort).
 
 ## Data Analysis
 Data for uniquely tagged individuals released in 2023 were combined with data from the four sampling occasions in 2024. 
 A set of candidate models were developed under the POPAN framework for estimating abundance and apparent survival of the 2023 release cohort.
 Each candidate model represents a set of hypotheses regarding the four model parameters of the POPAN model (e.g., survival varies over time or is constant).
-For all models, the probability of entry into the super population was fixed to 0.
+For all models, the probability of entry into the super population between sampling occasions was fixed to 0.
 We constructed candidate models where:
 
 1) super population was either constant or varied between facilities,
 2) apparent survival was either constant, varied over time, varied by facility, or varied over time and by facility,
 3) capture probability was either constant, varied over time, or varied by facility.
+
 This resulted in X total models in the candidate model set for each species.
 To avoid introducing species as a factor in our models, we analyzed each of the four species released in 2023 separately rather than as a combined data set. 
 
 We analyzed our set of candidate models using Program MARK (@white.burnham_1999_ProgramMARKSurvival) to determine which model had the highest likelihood using an information criteria approach that balances the goodness-of-fit with model complexity to rank the models (@burnham.anderson_2002_ModelSelectionMultimodel).
-We used RMARK (an R package runs MARK) to build and analyze models.
+We used RMARK (an R package that runs MARK) to build and analyze models.
 The likelihood of each candidate model was calculated using Akaike’s Information Criterion (AIC) (@akaike_1973_InformationTheoryExtension) modified for small sample sizes (AICc) (@sugiura_1978_FurtherAnalysisData): 
-$$𝐴𝐼𝐶𝑐=−2log(𝐿(θ̂))+2𝐾(𝐾+1)𝑛−𝐾−1$$
+$$𝐴𝐼𝐶𝑐=−2log(𝐿(\hat{θ̂}))+ \frac{2𝐾(𝐾+1)}{𝑛−𝐾−1}$$
 
-where $𝐿(θ̂)$ is the likelihood of the parameter estimates, given the data, $K$ is the number of parameters, and $n$ is the sample size. 
+where $𝐿(\hat{θ̂})$ is the likelihood of the parameter estimates, given the data, $K$ is the number of parameters, and $n$ is the sample size. 
 Normally, the best model is the one with the lowest $AICc$ score and other models are considered competing if $ΔAIC$ <2.0 (@burnham.anderson_2002_ModelSelectionMultimodel). 
 However, top models for both species had issues estimating survival, especially on the last occasion. 
-This is not uncommon in parameters that are modeled as fully time-dependent, especially when capture rates are relatively low. **reference?**
-For purposes of estimating survival/abundance, we decided to use the subset of the top model where time was removed as a factor for apparent survival (i.e, survival does not vary with time).
+This is not uncommon in parameters that are modeled as fully time-dependent, especially when capture rates are relatively low. 
+For purposes of estimating survival and abundance, we decided to use the subset of the top model where time was removed as a factor for apparent survival (i.e, survival does not vary with time).
 We based all estimates of survival and abundance on this model for each species.
 
 Finally, many of the mussels released by FMCC in 2023 were either untagged or tagged in a manner that did not allow for the specific mussel to be identified in the future (e.g., green squares with no unique identifier).
-We assumed that the survival estimates for uniquely tagged mussels was the same for non-unique and untagged mussels released by FMCC.
+We assumed that the survival estimates for uniquely tagged mussels was the same for non-uniquely tagged and untagged mussels released by FMCC.
 Thus, we applied the estimated survival rates to the entire release cohort for FMCC (unique, non-unique, and untagged) to estimate abundance for all mussels for each species.  

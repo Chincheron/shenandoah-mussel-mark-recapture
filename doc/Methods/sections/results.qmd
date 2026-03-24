@@ -1,20 +1,33 @@
 # Results
 
-We were able to successfully estimate apparent survival and abundance for both *Elliptio 
+We were able to successfully estimate apparent survival and abundance for both *Elliptio complanata
 * and *Alasmidonta varicosa*. 
 We were unable to estimate these parameters for either *Elliptio fisheriana* or *Lampsilis cardium*. 
 No models for these species successfully converged, most likely due to low initial releases and recapture rates.
-For estimation of *E. complanata*, and *A. varicosa*, we used the model where apparent survival varied by by facility but the same between sampling occasions, and capture probability varied by time but the same for both facilities.
+For estimation of *E. complanata*, and *A. varicosa*, we used the model where apparent survival varied by facility but was the same between sampling occasions, and capture probability varied by time but was the same for both facilities.
 Apparent survival estimates ranged from `{r} min_survival_varicosa` to `{r} max_survival_varicosa` for *A. varicosa* and from `{r} min_survival_complanata` to `{r} max_survival_complanata` for *E. complanata* (@fig-survival). 
-Survival was higher for Harrison Lake releases for both species, although the difference was much greater for *A. varicosa*. 
+Survival was higher for the Harrison Lake cohorts for both species, although the difference was much greater for *A. varicosa*. 
 
-Abundance estimates of the uniquely tagged initial release cohorts ranged from `{r} min_abundance_varicosa` to `{r} max_abundance_varicosa` for *A. varicosa* and `{r} min_abundance_complanata` to `{r} max_abundance_complanata` for *E. complanata* (@tbl-abundance). 
-These estimates were directly derived from the initial release of uniquely tagged mussels and survival estimates.
-Similar to apparent survival, abundance estimates were higher for Harrison Lake releases for both species, 
-This difference was less pronounced when reporting abundance estimates as a percentage of the initial release (@fig-abundance-percent).
-Abundance estimates of the uniquely tagged releases of FMCC were substantially lower than Harrison Lake.
+Abundance estimates of the uniquely tagged release cohorts ranged from `{r} min_abundance_varicosa` to `{r} max_abundance_varicosa` for *A. varicosa* and `{r} min_abundance_complanata` to `{r} max_abundance_complanata` for *E. complanata* (@tbl-abundance). 
+These estimates were directly derived from the release cohort of uniquely tagged mussels and survival estimates.
+Similar to apparent survival, abundance estimates were higher for the Harrison Lake cohorts for both species. 
+This difference was less pronounced when reporting abundance estimates as a percentage of the size of the release cohort (@fig-abundance-percent).
+In either case, abundance estimates of the uniquely tagged FMCC cohorts were substantially lower than Harrison Lake cohorts.
 However, FMCC released a substantial number of non-uniquely tagged and untagged mussels. 
-Applying the estimated survival to the entire release cohort of FMCC mussels results in abundance estimates ranging from `{r} min_abundance_all_varicosa` to `{r} max_abundance_all_varicosa` for *A. varicosa* and `{r} min_abundance_all_complanata` to `{r} max_abundance_all_complanata` for *E. complanata* (@tbl-abundance_all and @fig-abundance-all).  
+Applying the estimated survival to the entire release cohort of FMCC mussels resulted in abundance estimates ranging from `{r} min_abundance_all_varicosa` to `{r} max_abundance_all_varicosa` for *A. varicosa* and `{r} min_abundance_all_complanata` to `{r} max_abundance_all_complanata` for *E. complanata* (@tbl-abundance_all and @fig-abundance-all).  
+
+# Discussion
+
+Survival was generally higher for Harrison Lake cohorts compared to FMCC for each species.
+One possible reason for this is because FMCC released smaller individuals than Harrison Lake. 
+We would expect these smaller mussels to have a lower survival rate than older, larger mussels.
+This effect was more pronounced for *A. varicosa*. 
+While smaller sizes likely contributed to this, it is also possible that the small size and low recapture rate of the  FMCC release cohort of *A. varicosa* affected estimates of survival.
+The model used for estimation did not allow detectability to vary between facilities.
+However, of the 34 uniquely tagged mussels released by FMCC, we observed only 4 at least once over all sampling occasions, whereas 211 of the 245 Harrison Lake releases were observed.
+It is more likely that the data for uniquely tagged, FMCC *A. varicosa* were too sparse for our selected model to estimate their detectability separately from Harrison Lake releases.
+Given that the selected model assumes detectability is high and that survival estimates are linked to detectability, we expect that the true survival for FMCC *A. varicosa* is likely somewhat higher than estimated here. 
+Essentially, if detectability is high and the data indicates very few mussels were observed, then survival must by necessity be low.
 
 # Figures
 
@@ -22,7 +35,7 @@ Applying the estimated survival to the entire release cohort of FMCC mussels res
 
 ![Abundance estimates from the selected POPAN model, reported as a percentage of the initial release of uniquely tagged individuals. Error bars indicate 95% CIs. Each row (i.e., species) represents results from a single analysis/model.](../../results/figures/07_reduced_model_results/Figure_2_abundance_percent_release.jpg){#fig-abundance-percent}
 
-![Abundance estimates of all individuals from the initial release (uniquely tagged, non-uniquely tagged, and untagged). Based on apparent survival estimates from the selected POPAN model and initial number of mussels released. Error bars indicate 95% CIs. Each row (i.e., species) represents results from a single analysis/model.](../../results/figures/07_reduced_model_results/Figure_3_abundance_full_cohort.jpg){#fig-abundance-all}
+![Abundance estimates of all individuals from the initial release (uniquely tagged, non-uniquely tagged, and untagged). Based on apparent survival estimates from the selected POPAN model and number of mussels in release cohorts. Each row (i.e., species) represents results from a single analysis/model.](../../results/figures/07_reduced_model_results/Figure_3_abundance_full_cohort.jpg){#fig-abundance-all}
 
 # Tables
 
@@ -34,10 +47,12 @@ Applying the estimated survival to the entire release cohort of FMCC mussels res
 make_abundance_table(tbl_abundance_summary)
 
 ```
+
+\newpage
 ```{r}
 #| label: tbl-abundance_all
 #| tbl-cap: 'Abundance estimates of all individuals from the initial release (uniquely tagged, non-uniquely tagged, and untagged). Based on apparent survival estimates from the selected POPAN model and initial number of mussels released. Each row (i.e., species) represents results from a single analysis/model.'
 #| ft.keepnext: false
 make_abundance_table(tbl_abundance_all_summary)
-
 ```
+
