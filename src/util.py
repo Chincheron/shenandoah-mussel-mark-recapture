@@ -290,7 +290,7 @@ def handle_tag_duplicates(df):
         how='anti'
     )
 
-    ## deal with remaing duplicates where lengths were identical or very close
+    ## deal with remaining duplicates where lengths were identical or very close
     tag_list = [
     'E754',
     'E848',
@@ -370,7 +370,7 @@ def handle_exact_duplicates(df):
     ]
     #dictionary of paired values to remove
     delete_df = pl.DataFrame({'Tag Number': tag_list, 'Length': length_list})
-    #filter out unique rows wher paired values match
+    #filter out unique rows where paired values match
     df_dup = df.join(
         delete_df,
         on=['Tag Number', 'Length'],
@@ -424,7 +424,7 @@ def qc_unique_values(df, write_path, file_name):
     file_name = write_path / file_name
     util.write_unique_values(unique_df, file_name)
 
-def remove_summary_rows(df):
+def remove_non_unique_mussel_rows(df):
     #Remove mussels that are not individually identifiable
     df = df.remove(pl.col('Tag 1 #') == 'No #') # 91 records
     df = df.remove(pl.col('Tag 1 #') == 'Untagged') # 30 records
