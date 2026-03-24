@@ -10,8 +10,12 @@ Inputs:
 
 Outputs:
 - Pipeline:
-   - Cleaned summary dataset
-   - Standardized MR occasion datasets
+   - 01_Summary.csv (Cleaned summary dataset)
+   - Standardized MR occasion datasets:
+        - Occasion_1.csv
+        - Occasion_2.csv
+        - Occasion_3.csv
+        - Occasion_4.csv
 - Various QC files
 
 '''

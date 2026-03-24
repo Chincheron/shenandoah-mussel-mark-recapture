@@ -1,20 +1,54 @@
+'''
+Script: 03_join_release_occasion.py
+
+Purpose: Join occasion data and release data together for final conversion into 
+    MARK format; includes additional QC
+ 
+Inputs:
+- 02_combined_occasions.csv 
+- 01_Summary.csv
+
+Outputs:
+- Pipeline:
+    - 03_cleaned_data.csv (Joined summary and occasion data)
+- Various QC files
+'''
+# =============================================================================
+# 1. Setup 
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Imports and Constants
+# -----------------------------------------------------------------------------
+
 import chincheron_util.file_util as file_util
 from config.paths import DATA_INTERIM, DATA_PIPELINE
 import polars as pl
 import src.util as util
 
-### Purpose: join occasion data and release data together for final conversion into MARK format; includes additional QC
+# -----------------------------------------------------------------------------
+# Paths and import/export directories
+# -----------------------------------------------------------------------------
 
+# Set directories
+SCRIPT_NAME = '03_join_release_occasion'
+occasion_source_folder = DATA_PIPELINE / '02_occasion_cleanup'
+release_source_folder = DATA_PIPELINE / '01_load_raw_data'
+qc_folder = DATA_INTERIM / SCRIPT_NAME / 'QC'
+qc_folder_final_data = qc_folder / 'final_qc'
+pipeline_folder = DATA_PIPELINE / SCRIPT_NAME
 
-#set folder locations
-occasion_source_file = DATA_PIPELINE / '02_combined_occasions.csv'
-summary_source_file = DATA_PIPELINE / '01_Summary.csv'
-qc_output_folder_name = DATA_INTERIM / 'QC_03'
-qc_output_path = DATA_INTERIM / qc_output_folder_name
-output_path = DATA_PIPELINE
-file_util.make_directory(qc_output_path)
+# Make directories
+file_util.make_directory(qc_folder)
+file_util.make_directory(pipeline_folder)
+file_util.make_directory(qc_folder_final_data)
 
-# Load occasion data
+# =============================================================================
+# 2. Load occasion data
+# =============================================================================
+
+occasion_file = occasion_source_folder / '02_combined_occasions.csv'
+release_source_folder = DATA_PIPELINE / '01_load_raw_data'
 columns_to_load = [
  'Species',
  'Tag Color',
@@ -26,37 +60,37 @@ columns_to_load = [
  'Other Tag Attribute',
  'sampling_occasion'   
 ]
-occasion_df = pl.read_csv(occasion_source_file, columns=columns_to_load)
+occasion_df = pl.read_csv(occasion_file, columns=columns_to_load)
 
-## exclude non-individually identifiable mussels 
-#include only Mussels with valid tag colors OR PIT tag no. 
+# -----------------------------------------------------------------------------
+# Filter and transform occasion data
+# -----------------------------------------------------------------------------
+
+# --- Exclude non-uniquely tagged mussels ---  
+
+# Include only valid tag colors OR PIT tag no. 
 tag_color_list = ['Yellow', 'Green', 'Red', 'Orange']
 occasion_df = occasion_df.filter(
     ((pl.col('Tag Color').is_in(tag_color_list)) |
     (pl.col('PIT_tag_no').is_not_null())
     )
 )
-
-# Two PIT tags were detected, but mussels were not found. Exlude these
+# Two PIT tags were detected, but mussels were not found. Exclude these.
 occasion_df = occasion_df.filter(
     ~(pl.col('Tag Color') == 'NO MUSSEL')
 )
-
-#Exclude invalid tag numbers (also excludes null values for tag 1 column)
+# Exclude invalid tag numbers (also excludes null values for tag 1 column)
 invalid_tag_number = ['SQUARE', 'NO TAG', 'GLUE DOT']
 occasion_df = occasion_df.filter(
     ~(pl.col('Hallprint_tag_no_1').is_in(invalid_tag_number))
 )
 
-## collapse into single line for each mussel
-#TODO multiple results per occasion must be handled before this step
-
-#convert single occasion column into dummy variable columns
+# --- Collapse into single line for each mussel ---
+# Convert single occasion column into dummy variable columns
 occasion_df = occasion_df.to_dummies(columns='sampling_occasion')
-
-#Change encounter history to A/D
+# Identify occasions where status is DEAD  
+# Flag corresponding occasion dummy column as 'D' rather than '1' for later filtering
 occasion_df = util.encounter_to_AD(occasion_df)
-
 #grouping columns
 group_col = [
     'Tag Color',
@@ -64,13 +98,7 @@ group_col = [
     'Hallprint_tag_no_2',
     'PIT_tag_no'
 ]
-#count of unique mussels
-#TODO this count (597) does not match count from raw summary (~533 with encounter history) confrim why
-unique_count = occasion_df.group_by(group_col).len().sort('len')
-
-#confirm only one species per group
-#TODO calculate separate 'Average' length column and decide which to use later
-# group by tags
+# Group by tags, resulting in a single line per mussel
 occasion_group_df = (
     occasion_df
     .group_by(group_col)
@@ -84,22 +112,29 @@ occasion_group_df = (
     )
 )
 
-#QC - check for multiple instances of same tag 
+# -----------------------------------------------------------------------------
+# QC of loaded occasion data before joining with release
+# -----------------------------------------------------------------------------
+
+# Check for multiple instances of same tag 
 df_mask = occasion_group_df.select(['Tag Color', 'Hallprint_tag_no_1']).is_duplicated()
 df_dup = occasion_group_df.filter(df_mask).sort('Hallprint_tag_no_1')
-file_name = qc_output_path / 'individual_duplicate_check.csv'
+file_name = qc_folder / 'individual_duplicate_check.csv'
 df_dup.write_csv(file_name)
 
-
-#QC - Manual review of grouped occasions
-file_name = qc_output_path / 'occasion_grouped.csv'
+# Export final occasion data for manual review before joining with release data
+file_name = qc_folder_final_data / 'occasion_grouped.csv'
 occasion_group_df.write_csv(file_name)
 
-#after updates, still need 906 rows in occasion_df
-#check - should have 586 records after combining (2/10/26)
+# =============================================================================
+# 3. Load release (summary) data
+# =============================================================================
 
+# -----------------------------------------------------------------------------
+# Load cleaned release data
+# -----------------------------------------------------------------------------
 
-#load cleaned summary data
+release_file = release_source_folder / '01_Summary.csv'
 columns_to_load = [
  'Species',
  'Facility',
@@ -116,63 +151,72 @@ columns_to_load = [
  'Sum value',
  'A or D' 
 ]
-summary_df = pl.read_csv(summary_source_file, columns=columns_to_load)
+release_df = pl.read_csv(release_file, columns=columns_to_load)
 
-#remove \r and \n values from headings to avoid issues later when writing to csv
-summary_df = summary_df.rename(
+# -----------------------------------------------------------------------------
+# Filter and transform release data
+# -----------------------------------------------------------------------------
+
+# Remove \r and \n values from headings to avoid potential issues later when writing to csv
+release_df = release_df.rename(
     lambda c: c.replace('\r\n', ' ').strip()
 )
 
-summary_df = summary_df.rename({'Measurement (mm) when released': 'release_length', 'Measurement (mm) when last found': 'sample_length'})
+# Rename columns to avoid issues with () later on
+release_df = release_df.rename({'Measurement (mm) when released': 'release_length', 'Measurement (mm) when last found': 'sample_length'})
 
-#join occasion to summary
-#second tag number not included becasue summary file using PIT tag for tag number 2 and some 2nd tags are missing compared to later encounters
+# =============================================================================
+# 04. Join occasion data to release data
+# =============================================================================
+
+# Second tag number not included because summary file uses PIT tag for tag number 2 
+# and some 2nd tags are missing compared to later encounters
 left_join_col = [
-    'Tag color', 'Tag 1 #'#, 'PIT Tag ID'
+    'Tag color', 'Tag 1 #'
 ]
 right_join_col =[
-    'Tag Color', 'Hallprint_tag_no_1'#, 'PIT_tag_no'
+    'Tag Color', 'Hallprint_tag_no_1'
 ]
-
-#somewhere here need to cross compare tag1/2 to tag 2/1 (for records where occasion data is missing a second tag and is in wrong column)
-#where to place in order and how to fit in with unmatched?
-
-
-
-#QC - find unmatched records from MR occasions (i.e., records that could not be joined to release data )
-
-unmatched_occasion_df = occasion_group_df.join(
-    summary_df,
-    left_on=right_join_col,
-    right_on=left_join_col,
-    how="anti"
-)
-#write to csv for review
-file_name = qc_output_path / 'unmatched_occasions_records.csv'
-#TODO - finish manually reviewing and updating correction script in util for each mussel
-unmatched_occasion_df.write_csv(file_name)
-
-#actual join of raw summary and processed occasion data
-join_df = summary_df.join(
+join_df = release_df.join(
     occasion_group_df, 
     left_on=left_join_col, 
     right_on=right_join_col,
     how='left'
 )
 
-
-
-#Various QC to be done here (compare tag number/color mismatch, different encounter histories, etc.)
-#make sure all from right table are joining 
-
-
-#occasion - Create unique ID column for each mussel
+# Create unique ID column for each mussel
 join_df = join_df.with_row_index(name='ID', offset=1)
 
-#no nulls for encounter hisotyr (eihter 1 or 0)
+# -----------------------------------------------------------------------------
+# QC of joined data
+# -----------------------------------------------------------------------------
 
-#clean up columns
-#TODO - handle sampled lengths smaller than release
+# Find unmatched records from MR occasions (i.e., records that could not be joined to release data )
+unmatched_occasion_df = occasion_group_df.join(
+    release_df,
+    left_on=right_join_col,
+    right_on=left_join_col,
+    how="anti"
+)
+#write to csv for review
+file_name = qc_folder / 'unmatched_occasions_records.csv'
+unmatched_occasion_df.write_csv(file_name)
+
+# =============================================================================
+# 05. Export joined release/occasion data
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Export for final QC check
+# -----------------------------------------------------------------------------
+
+file_name = qc_folder_final_data / 'qc_joined_data.csv'
+join_df.write_csv(file_name)
+
+# -----------------------------------------------------------------------------
+# Export for Pipeline
+# -----------------------------------------------------------------------------
 
 #export for mark-recapture analysis preparation
-join_df.write_csv(output_path / '03_cleaned_data.csv')
+file_name = pipeline_folder / '03_cleaned_data.csv'
+join_df.write_csv(file_name)

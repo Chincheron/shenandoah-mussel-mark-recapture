@@ -11,7 +11,7 @@ Inputs:
 
 Outputs:
 - Pipeline:
-    - Cleaned combined occasion data
+    - 02_combined_occasions.csv (Cleaned combined occasion data)
 - Various QC files 
 '''
 # =============================================================================
@@ -39,7 +39,6 @@ qc_folder_final_data = qc_folder / 'final_qc'
 pipeline_folder = DATA_PIPELINE / SCRIPT_NAME
 
 # Make directories
-file_util.make_directory(source_folder)
 file_util.make_directory(qc_folder)
 file_util.make_directory(pipeline_folder)
 file_util.make_directory(qc_folder_final_data)
