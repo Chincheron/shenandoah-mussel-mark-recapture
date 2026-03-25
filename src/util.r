@@ -23,11 +23,8 @@ run_popan = function(input_file, analy_groups, model_def, analysis_name, save_di
 
   mark_input = input_file
   #setup common analysis variables
-  if (mr_only == TRUE) {
-    time_interval = c(35, 29, 69)
-  } else {
-    time_interval = c(246,35, 29, 69) #TODO setup formula for calculating for each species automaically}
-  }
+  time_interval = c(246,35, 29, 69) #TODO setup formula for calculating for each species automaically}
+ 
   begin_time = 2024 # must be a number and not a string
 
 
