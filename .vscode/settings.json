@@ -30,5 +30,16 @@
     "@[\\w.:]+",
     "/\\$\\$[\\s\\S]*?\\$\\$/g",
     "/\\$[^$\\n]+\\$/g"
+    ],
+    "cSpell.languageSettings": [
+        {
+            "languageId": "R",
+            "includeRegExpList": ["/#.*/", "/('''|\"\"\")[^\\1]+?\\1/g"]
+        },
+        {
+            "languageId": "python",
+            "includeRegExpList": ["/#.*/", "/('''|\"\"\")[^\\1]+?\\1/g"]
+        }
     ]
+
 }
