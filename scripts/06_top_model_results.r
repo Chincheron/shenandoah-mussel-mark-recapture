@@ -1,3 +1,34 @@
+# =============================================================================
+# Script: 06_top_model_results.py
+#
+# Purpose: Explore top model results of MARK analysis (plotting, etc.). 
+#  Includes final data transformation of model results (daily to annual survival
+#   combine estimates for facilities, etc.)         
+#
+# Inputs:
+# - 05_mark_results.rds 
+#
+# Outputs:
+# - Pipeline
+#   - 06_top_model_processed_results.rds (Processed results of just the top model
+#       for each analysis)
+# - Data:
+#   - 06_top_model_results.xlsx
+#   - 06_top_model_processed_results.rds
+# - Results
+#   - Various figures
+#   - 
+# 
+# =============================================================================
+
+# =============================================================================
+# 1. Setup 
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Imports and Constants
+# -----------------------------------------------------------------------------
+
 library(RMark)
 library(reticulate)
 library(withr)
@@ -8,53 +39,123 @@ library(ggplot2)
 library(writexl)
 library(scales)
 
+# -----------------------------------------------------------------------------
+# Pulls path constants and config files
+# -----------------------------------------------------------------------------
 
-#pulls path constants
-source_python("config/paths.py")
-#pull utility functions
-util_file = path(ROOT , "src", "util.r")
-graph_util_file = path(ROOT , "src", "graph_util.r")
-config_folder = path(ROOT, 'config')
+global_paths = import("config.paths", convert = TRUE) 
+
+config_folder = path(global_paths$ROOT, 'config')
+source(path(config_folder, 'global_figure_config.r'))
+
+# -----------------------------------------------------------------------------
+# Load custom libraries
+# -----------------------------------------------------------------------------
+
+# Requires path constants to be loaded first
+
+util_file = path(global_paths$ROOT , "src", "util.r")
+graph_util_file = path(global_paths$ROOT , "src", "graph_util.r")
 source(util_file)
 source(graph_util_file)
 
-#retrieve r object with model outputs from RMARK analysis
-saved_objects_folder = path(DATA_INTERIM, 'saved_objects')
-dir.create(saved_objects_folder)
-results_file = path(path(saved_objects_folder, '05_mark_results.rds'))
+# -----------------------------------------------------------------------------
+# Paths and import/export directories
+# -----------------------------------------------------------------------------
+
+# Set directories
+SCRIPT_NAME = '06_top_model_results'
+source_folder = path(global_paths$DATA_PIPELINE, '05_mark_analysis')
+pipeline_folder = path(global_paths$DATA_PIPELINE, '06_top_model_results')
+data_save_folder = path(global_paths$DATA_PROCESSED, SCRIPT_NAME)
+data_objects_folder = path(global_paths$DATA, 'objects', SCRIPT_NAME)
+figure_folder = path(global_paths$RESULTS_FIGURES, SCRIPT_NAME)
+
+# Make directories
+dir_create(c(
+  pipeline_folder,
+  data_save_folder,
+  data_objects_folder,
+  figure_folder
+  )
+)
+
+# =============================================================================
+# 2. Load and transform MARK results
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Load ALL results from MARK analysis
+# ----------------------------------------------------------------------------- 
+
+results_file = path(source_folder, '05_mark_results.rds')
 results_list = readRDS(results_file)
 
-analysis_names <- names(results_list)
+# -----------------------------------------------------------------------------
+# Extract results from the top model
+# -----------------------------------------------------------------------------
 
+analysis_names <- names(results_list)
+# Create dataframe with parameter estimates of survival, capture probability, and abundance 
+#  from the top model of each analysis
 top_model_results <- purrr::map_dfr(
   analysis_names,
   ~ extract_top_model_results(results_list, .x)
 )
 
-#final processing of top model results
+# Final processing of top model results
+# e.g., standardize labels, add initial release numbers, convert daily to annual survival
+#   , create estimates for 'combined' facility
 top_model_results = process_model_results(top_model_results)
 
-#export results to file
-top_model_results_save_folder = path(ROOT, 'temp')
-dir.create(top_model_results_save_folder)
-top_model_results_save_name = 'top_model_results_all.xlsx'
-top_model_results_save_path = path(top_model_results_save_folder, top_model_results_save_name)
-write_xlsx(top_model_results, top_model_results_save_path)
+# =============================================================================
+# 3. Export top model results 
+# =============================================================================
 
-#export top_model_results object for later comparison to other models
-file_name = path(saved_objects_folder, '06_top_model_processed_results.rds')
+# -----------------------------------------------------------------------------
+# Export to data folder 
+# ----------------------------------------------------------------------------- 
+
+# Export top model results to file for manual review/use
+data_save_path = path(data_save_folder, '06_top_model_results.xlsx')
+write_xlsx(top_model_results, data_save_path)
+
+# Export R object for later use
+data_objects_path = path(data_objects_folder, '06_top_model_results.rds')
+write_xlsx(top_model_results, data_objects_path)
+
+# -----------------------------------------------------------------------------
+# Export to pipeline
+# -----------------------------------------------------------------------------
+
+# Export top results R object for use in later scripts
+file_name = path(pipeline_folder, '06_top_model_processed_results.rds')
 saveRDS(results_list, file_name, ascii = TRUE)
 
-# Plotting figures
-## get global plot variables and settings
-source(path(config_folder, 'global_figure_config.r'))
-all_plot_config <- get_global_fig_config()
+# =============================================================================
+# 4. Plot top model results
+# =============================================================================
 
-#pull column mapping for ease of reading functioni later
+# All figures are exported to the specified figure_folder
+
+# Only interested in species level analyses (analyzed separately)
+species_results = top_model_results |> 
+  filter(mark_analysis_level == 'species')
+
+# -----------------------------------------------------------------------------
+# Get global plot variables and settings
+# -----------------------------------------------------------------------------
+
+# Specifies settings for visual aspects of all figures
+all_plot_config <- get_global_fig_config()
+# Pull column mapping for ease of reading function later
 cm = all_plot_config$column_mapping
 
-## Figures comparing facility of just the species level analyses
-### config file for this group of figures
+# -----------------------------------------------------------------------------
+# Figures grouping results by facility and species
+# -----------------------------------------------------------------------------
+
+# Define initial settings for group of figures
 facility_plot_config <- list(
   parameter = "N_derived",
   y_factor = cm$parameter_estimate,
@@ -73,35 +174,29 @@ facility_plot_config <- list(
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  save_folder = figure_export_folder,
+  save_folder = figure_folder,
   save_file_name = NULL,
   aggregate_flag = FALSE,
   variance_flag = TRUE
 )
 
-#filter out assemblage analysis
-species_results = top_model_results |> 
-  filter(mark_analysis_level == 'species')
-
-source(graph_util_file)
-# Abundance split by facility
+# --- Abundance ---
 config_override = list(
   save_file_name = 'Figure_1_abundance_top_model.jpg' 
 )
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
-#abundance as percentage of initial release
+# --- Abundance as a percentage of initial release ---
 config_override = list(
   y_factor = cm$perc_of_initial,
   y_label = 'Percent of Initial Release',
-  variance_flag = FALSE, # TODO update function so that variancec are not hardcoded but reference config
+  variance_flag = FALSE, # TODO update function so that variance are not hardcoded but reference config
   save_file_name = 'Figure_2_abundance_percent_of_initial.jpg'
 )
 config_override$y_factor
 build_base_plot(species_results, all_plot_config, facility_plot_config, config_override)
 
-# Survival split by facility
-#config overrides
+# --- Survival ---
 config_override = list(
   parameter = 'Phi',
   y_label = 'Estimated apparent survival',

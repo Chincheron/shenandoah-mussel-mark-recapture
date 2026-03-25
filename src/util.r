@@ -241,7 +241,7 @@ data = data |>
 
 # add initial release numbers of uniquely tagged individuals
 #number of mussels released by species
-release_summary_path = path(DATA_RAW, 'release_summary.xlsx')
+release_summary_path = path(global_paths$DATA_RAW, 'release_summary.xlsx')
 release_summary = read_excel(release_summary_path) |> 
   select(species, facility, total_release, total_unique_tag)
 data = data |>
