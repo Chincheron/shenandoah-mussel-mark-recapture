@@ -1,9 +1,12 @@
-#ignore results and data for now
-data
-results
+#ignore results and generated data 
+data/*
+results/*
+
+#unignore raw data (should never change other than adding files as needed)
+!data/raw/
 
 #ignore testing files
-temp
+temp/*
 
 # Python-generated files
 __pycache__/
