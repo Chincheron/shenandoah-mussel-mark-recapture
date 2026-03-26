@@ -1,3 +1,31 @@
+# =============================================================================
+# Script: 06a_reduced_model_comparison.py
+#
+# Purpose: Compares the top model for E. complanata and A. varicosa to their 
+#     respective sub-models without a time factor for apparent survival         
+#
+# Inputs:
+# -  
+#
+# Outputs:
+# - Pipeline
+#   - 
+# - Data:
+#   - 
+# - Results
+#   - 
+#   - 
+# 
+# =============================================================================
+
+# =============================================================================
+# 1. Setup 
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Imports and Constants
+# -----------------------------------------------------------------------------
+
 library(RMark)
 library(reticulate)
 library(withr)
@@ -8,66 +36,136 @@ library(ggplot2)
 library(writexl)
 library(scales)
 
-#this script compares the top model for E. complanata and A. varicosa 
-# to their respective submodels without a time factor for apparent survival
 
-#pulls path constants
-source_python("config/paths.py")
-#pull utility functions
-util_file = path(ROOT , "src", "util.r")
-graph_util_file = path(ROOT , "src", "graph_util.r")
-config_folder = path(ROOT, 'config')
-source(util_file)
-source(graph_util_file)
+# -----------------------------------------------------------------------------
+# Pulls path constants and config files
+# -----------------------------------------------------------------------------
+
+global_paths = import("config.paths", convert = TRUE) 
+
+# Config for figures
+config_folder = path(global_paths$ROOT, 'config')
 source(path(config_folder, 'global_figure_config.r'))
 
-#set export directories
-SCRIPT_NAME = '06a_reduced_model_comparison'
-data_export_folder = path(DATA_PROCESSED, SCRIPT_NAME)
-dir_create(data_export_folder)
-figure_export_folder = path(RESULTS_FIGURES, SCRIPT_NAME)
-dir_create(figure_export_folder)
+# -----------------------------------------------------------------------------
+# Load custom libraries
+# -----------------------------------------------------------------------------
 
-#retrieve r object with model outputs from RMARK analysis
-results_file = path(path(DATA_INTERIM, 'saved_objects', '05_mark_results.rds'))
+# Requires path constants to be loaded first
+
+util_file = path(global_paths$ROOT , "src", "util.r")
+graph_util_file = path(global_paths$ROOT , "src", "graph_util.r")
+source(util_file)
+source(graph_util_file)
+
+# -----------------------------------------------------------------------------
+# Paths and import/export directories
+# -----------------------------------------------------------------------------
+
+# Set directories
+SCRIPT_NAME = '06a_reduced_model_comparison'
+source_folder = path(global_paths$DATA_PIPELINE, '05_mark_analysis')
+pipeline_folder = path(global_paths$DATA_PIPELINE, SCRIPT_NAME)
+data_save_folder = path(global_paths$DATA_PROCESSED, SCRIPT_NAME)
+data_objects_folder = path(global_paths$DATA, 'objects', SCRIPT_NAME)
+figure_folder = path(global_paths$RESULTS_FIGURES, SCRIPT_NAME)
+
+# Make directories
+dir_create(c(
+  pipeline_folder,
+  data_save_folder,
+  data_objects_folder,
+  figure_folder
+  )
+)
+
+# =============================================================================
+# 2. Load and transform MARK results
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Load ALL results from MARK analysis
+# ----------------------------------------------------------------------------- 
+
+results_file = path(source_folder, '05_mark_results.rds')
 results_list = readRDS(results_file)
-#remove assemblage level analyses
+
+# --- Remove assemblage level analyses ---
 results_list = results_list[names(results_list) != 'assemblage']
 
-#top model results
+# -----------------------------------------------------------------------------
+# Extract top model and sub-model results and combine for comparison
+# -----------------------------------------------------------------------------
+
+# --- Extract top model results and process --- 
 analysis_names <- names(results_list)
 top_model_results <- purrr::map_dfr(
   analysis_names,
   ~ extract_top_model_results(results_list, .x)
 )
-#process and add category for model
+# Final processing of top models 
+# Add field to designate which model results are from (top vs. sub)
 top_model_results = process_model_results(top_model_results) |> 
   mutate(model = 'top')
 
+# --- Extract reduced model results, process, and combine with top model results ---
+# Note that final processing of reduced models is done within this function 
+#  (i.e., process_model_results)
 reduced_models = load_reduced_models(results_list) 
-
-## expand values Phi for reduced_models to match the number of occasions for the top model
+# Reduced models have only one survival value. For comparison to the time-dependent
+#  top model, add identical values of Phi for reduced model to  match the number 
+#  of occasions for the top model
 reduced_models = expand_phi_intervals(reduced_models)
-
-#bind all data together for plotting
+# Combine top and reduced models for export/plotting
 all_models = bind_rows(top_model_results, reduced_models)
 
-#export results to file
-model_results_save_name = 'model_results_comparison.xlsx'
-model_results_save_path = path(data_export_folder, model_results_save_name)
-write_xlsx(all_models, model_results_save_path)
+# =============================================================================
+# 3. Export top model results 
+# =============================================================================
 
-#get global plot config for plotting
-global_config = get_global_fig_config()
-#pull column mapping for ease of reading functioni later
-cm = global_config$column_mapping
+# -----------------------------------------------------------------------------
+# Export to data folder 
+# ----------------------------------------------------------------------------- 
+data_save_path = path(data_save_folder, '06a_top_sub_model_results_comparison.xlsx')
+write_xlsx(all_models, data_save_path)
 
-## Next set of figures compares the top model estimates to the submodel without time as factor for Phi
-### figure config file for this abundance comparison of figures
-#NOTE - CIs are only accurate as presented below if all groups are completely broken up
-# such that each bar represents a single line in the data. 
-# Any other grouping will require variance/CIs to be properly recalculated before plotting
+# Export R object for later use
+data_objects_path = path(data_objects_folder, '06a_top_sub_model_results.rds')
+saveRDS(all_models, data_objects_path)
+
+# -----------------------------------------------------------------------------
+# Export to pipeline
+# -----------------------------------------------------------------------------
+
+# Export top results R object for use in later scripts
+data_objects_path = path(pipeline_folder, '06a_top_sub_model_results.rds')
+saveRDS(all_models, data_objects_path)
+
+# =============================================================================
+# 4. Plot top/sub model comparison results
+# =============================================================================
+
+# All figures are exported to the specified figure_folder
+
+# -----------------------------------------------------------------------------
+# Get global plot variables and settings
+# -----------------------------------------------------------------------------
+
+# Specifies settings for visual aspects of all figures
+all_plot_config <- get_global_fig_config()
+# Pull column mapping for ease of reading function later
+cm = all_plot_config$column_mapping
+
+# -----------------------------------------------------------------------------
+# Figures grouping results by facility and species
+# -----------------------------------------------------------------------------
+
+# NOTE - CIs are only accurate as presented below if all groups are completely broken up
+#   such that each bar represents a single line in the data. 
+#   Any other grouping will require variance/CIs to be properly recalculated before plotting
 #TODO ? - function to recalculate variance/CIs when summing abundance across groups?
+
+# Define initial settings for group of figures
 facility_plot_config <- list(
   parameter = "N_derived",
   y_factor = cm$parameter_estimate,
@@ -75,34 +173,37 @@ facility_plot_config <- list(
   y_variance_lower = cm$lower_ci,
   y_variance_upper = cm$upper_ci,
   x_factor = cm$sampling_occasion,
-  x_factor_label = global_config$labels$Occasion,
-  x_order = global_config$category_order$sampling_occasion,
+  x_factor_label = all_plot_config$labels$Occasion,
+  x_order = all_plot_config$category_order$sampling_occasion,
   grouping = cm$model,
-  grouping_label = global_config$labels$model,
-  grouping_order = global_config$category_order$reduced_model_order,
+  grouping_label = all_plot_config$labels$model,
+  grouping_order = all_plot_config$category_order$reduced_model_order,
   grouping_palette = "model_level",
   #NULL if 0 facets, 1 if single. If 2, then first will be rows and second columns
   facet_vars = c(cm$species, cm$facility),
   title = NULL,
   subtitle = NULL,
   caption = NULL,
-  save_folder = figure_export_folder,
+  save_folder = figure_folder,
   save_file_name = NULL,
   aggregate_flag = FALSE,
   variance_flag = TRUE
 )
 
-build_base_plot(all_models, global_config, facility_plot_config)
+build_base_plot(all_models, all_plot_config, facility_plot_config)
 
 survival_fig_override = list(
   parameter = 'Phi',
   y_variance_lower = cm$phi_lower_ci,
   y_variance_upper = cm$phi_upper_ci,
-  x_order = global_config$category_order$sampling_occasion_phi
+  x_order = all_plot_config$category_order$sampling_occasion_phi
 )
-build_base_plot(all_models, global_config, facility_plot_config, survival_fig_override)
+build_base_plot(all_models, all_plot_config, facility_plot_config, survival_fig_override)
 
-#table comparing values from figures above
+# =============================================================================
+# Create table comparing values from figures above
+# =============================================================================
+
 summary_comparison = all_models |> 
   filter(Parameter == "N_derived" | Parameter == 'Phi') |> 
   group_by(Parameter, Occasion, species, facility, model) |> 
@@ -123,5 +224,5 @@ summary_comparison = summary_comparison |>
 
 #export summary table
 summary_save_name = 'model_comparison_summary.xlsx'
-summary_save_path = path(data_export_folder, summary_save_name)
+summary_save_path = path(data_save_folder, summary_save_name)
 write_xlsx(summary_comparison, summary_save_path)

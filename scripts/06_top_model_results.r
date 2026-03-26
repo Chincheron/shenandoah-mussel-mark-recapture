@@ -66,7 +66,7 @@ source(graph_util_file)
 # Set directories
 SCRIPT_NAME = '06_top_model_results'
 source_folder = path(global_paths$DATA_PIPELINE, '05_mark_analysis')
-pipeline_folder = path(global_paths$DATA_PIPELINE, '06_top_model_results')
+pipeline_folder = path(global_paths$DATA_PIPELINE, SCRIPT_NAME)
 data_save_folder = path(global_paths$DATA_PROCESSED, SCRIPT_NAME)
 data_objects_folder = path(global_paths$DATA, 'objects', SCRIPT_NAME)
 figure_folder = path(global_paths$RESULTS_FIGURES, SCRIPT_NAME)
@@ -122,7 +122,7 @@ write_xlsx(top_model_results, data_save_path)
 
 # Export R object for later use
 data_objects_path = path(data_objects_folder, '06_top_model_results.rds')
-write_xlsx(top_model_results, data_objects_path)
+saveRDS(results_list, data_objects_path, ascii = TRUE)
 
 # -----------------------------------------------------------------------------
 # Export to pipeline
