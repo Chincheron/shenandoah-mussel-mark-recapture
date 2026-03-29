@@ -1,6 +1,6 @@
 #ignore results and generated data 
-data/*
-results/*
+#data/*
+#results/*
 
 #unignore raw data (should never change other than adding files as needed)
 !data/raw/
@@ -20,8 +20,20 @@ wheels/
 .venv
 
 #output files
-.png
-.jpg
+*.png
+*.jpg
+*.csv
+*.xls
+*.xlsx
+*.rds
+
+# Mark Output files
+*.inp
+*.Rinp
+*.out
+*.res
+*.vcv
+*.tmp
 
 #ignore generated report documents
 *.docx
