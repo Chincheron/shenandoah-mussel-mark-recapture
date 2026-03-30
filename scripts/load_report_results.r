@@ -1,3 +1,14 @@
+# =============================================================================
+# Script: load_report_results.r
+#
+# Purpose: Load created tables, figures, and other data to be included in the report
+# and creates tables for rendering to word document 
+#
+# Inputs:
+# -  Various
+# =============================================================================
+
+
 library(tidyverse)
 library(readxl)
 library(flextable)

@@ -5,16 +5,16 @@
 #     respective sub-models without a time factor for apparent survival         
 #
 # Inputs:
-# -  
+# - '05_mark_results.rds'
 #
 # Outputs:
 # - Pipeline
-#   - 
-# - Data:
-#   - 
+#   - 06a_top_sub_model_results_comparison.rds (R object of estimates, SE, etc. for both models)
 # - Results
-#   - 
-#   - 
+#   - Various figures comparing top and reduced models
+# - Data:
+#   - 06a_top_sub_model_results_comparison.xlsx (Estimates, SE, etc. for both models)
+#   - 06a_top_sub_model_results_comparison.rds (R object of estimates, SE, etc. for both models)
 # 
 # =============================================================================
 
@@ -130,7 +130,7 @@ data_save_path = path(data_save_folder, '06a_top_sub_model_results_comparison.xl
 write_xlsx(all_models, data_save_path)
 
 # Export R object for later use
-data_objects_path = path(data_objects_folder, '06a_top_sub_model_results.rds')
+data_objects_path = path(data_objects_folder, '06a_top_sub_model_results_comparison.rds')
 saveRDS(all_models, data_objects_path)
 
 # -----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ saveRDS(all_models, data_objects_path)
 # -----------------------------------------------------------------------------
 
 # Export top results R object for use in later scripts
-data_objects_path = path(pipeline_folder, '06a_top_sub_model_results.rds')
+data_objects_path = path(pipeline_folder, '06a_top_sub_model_results_comparison.rds')
 saveRDS(all_models, data_objects_path)
 
 # =============================================================================
