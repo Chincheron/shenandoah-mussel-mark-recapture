@@ -1,6 +1,6 @@
-library(reticulate)
+library(here)
 
-Sys.setenv(RETICULATE_PYTHON = "managed")
+setwd(here::here())
 
 python_scripts = c(
   'scripts/01_load_raw_data.py',
@@ -10,10 +10,12 @@ python_scripts = c(
 )
 
 for (script in python_scripts) {
+  script_path = here::here(script)
   message('Running Python script: ', script)
-  source_python(script)
+  system2('uv', c('run', 'python', script_path))
 }
 
+renv::restore(prompt = FALSE)
 
 r_scripts = c(
   #'scripts/05_mark_analysis.r',

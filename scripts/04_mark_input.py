@@ -19,9 +19,20 @@ Outputs:
 # Imports and Constants
 # -----------------------------------------------------------------------------
 
+# --- Import standard libraries ---
+import sys
+from pathlib import Path
+import polars as pl
+from pyprojroot import here
+
+# Find Root of project folder for custom imports
+ROOT = here()
+# Insert root on PATH search so custom module is imported correctly
+sys.path.insert(0, str(ROOT))
+
+# --- Import custom libraries ---
 import chincheron_util.file_util as file_util
 from config.paths import DATA_INTERIM, DATA_PIPELINE
-import polars as pl
 
 # -----------------------------------------------------------------------------
 # Paths and import/export directories
