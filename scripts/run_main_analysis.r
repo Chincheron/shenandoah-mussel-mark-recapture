@@ -18,7 +18,7 @@ for (script in python_scripts) {
 renv::restore(prompt = FALSE)
 
 r_scripts = c(
-  #'scripts/05_mark_analysis.r',
+  'scripts/05_mark_analysis.r',
   'scripts/06_top_model_results.r',
   'scripts/06a_reduced_model_comparison.r',
   'scripts/07_reduced_model_results.r'
